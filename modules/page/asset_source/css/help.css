@@ -1,0 +1,50 @@
+.modal.fade:not(.in).right .modal-dialog {
+    -webkit-transform: translate3d(125%, 0, 0);
+    transform: translate3d(125%, 0, 0);
+}
+.rotate {
+
+    /* Safari */
+    -webkit-transform: rotate(90deg);
+
+    /* Firefox */
+    -moz-transform: rotate(90deg);
+
+    /* IE */
+    -ms-transform: rotate(90deg);
+
+    /* Opera */
+    -o-transform: rotate(90deg);
+
+    /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+}
+
+
+.helpLink{
+    position: absolute;
+    top: 40%;
+    left: -54px;
+    font-size: 25px;
+    padding: 1px 10px;
+}
+
+.helpBlock{
+    position: fixed;
+    bottom: 10%;
+    right: -300px;
+    width: 300px;
+    z-index: 10;
+    background: white;
+    padding: 10px 20px 5px;
+    border: 1px solid #ccc;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+@media (max-width: 768px) {
+    .helpBlock {
+        display: none;
+    }
+}

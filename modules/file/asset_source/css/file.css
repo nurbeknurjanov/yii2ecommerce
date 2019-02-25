@@ -1,0 +1,18 @@
+.krajee-default .file-footer-caption{
+    max-width: 100px;
+    overflow: hidden;
+}
+
+#videoModal .modal-body {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 25px;
+    height: 0;
+}
+#videoModal .modal-body iframe {
+    position: absolute;
+    top: 3%;
+    left: 3%;
+    width: 94%;
+    height: 93%;
+}

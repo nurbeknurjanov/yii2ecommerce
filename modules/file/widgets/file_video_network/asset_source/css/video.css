@@ -1,0 +1,28 @@
+.video-image{
+    cursor: pointer;
+    width: auto;
+    display: inline-block;
+    position: relative;
+}
+.video-image img{
+    /*border-radius: 3px;*/
+}
+.video-image:before{
+    font-family: 'Glyphicons Halflings';
+    content: "\e072";
+    font-size: 30px;
+    left: 45%;
+    opacity: 0.8;
+    position: absolute;
+    top: 38%;
+    color: white;
+}
+.file-preview .video-image:before{
+    font-size: 18px;
+}
+.video-image-little > img{
+    width: 120px;
+}
+.video-image-little:before{
+    font-size: 15px;
+}

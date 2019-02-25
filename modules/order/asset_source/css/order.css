@@ -1,0 +1,66 @@
+.cardButtons .btn-group{
+    padding:0; border:none; box-shadow:none; background:inherit; display:block;
+}
+
+.cardButtons label.btn, .cardButtons label.btn-default{
+    padding:10px; margin-right:10px; border-radius:5px;
+}
+.cardButtons .btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle){
+    border-radius:5px;
+}
+.cardButtons .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle){
+    border-radius:5px;
+}
+.cardButtons .btn-group > .btn:last-child:not(:first-child), .btn-group > .dropdown-toggle:not(:first-child){
+    border-radius:5px;
+}
+.cardButtons .help-block{
+    clear: both;
+}
+
+
+
+.card{
+    width: 80%;
+    position: relative;
+    margin-bottom: 90px;
+}
+.card > img{
+    float: right;
+}
+.card > div{
+    clear: both;
+}
+.digits > div{
+    display: inline-block;
+    width: 23%;
+}
+.card .form-control{
+    padding: 6px 6px;
+}
+.cardWhite{
+    z-index: 1;
+    position: relative;
+    padding: 10px;
+    border: 1px solid #ccc;/*ee7838*/
+    background: #deefff;
+    border-radius: 10px;
+}
+.cardBlack{
+    z-index: 0;
+    position: absolute;
+    top: 34%;
+    left: 5%;
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+.ccv{
+    position: absolute;
+    bottom: -5px;
+    left: 40%;
+}
+.ccv > div > div{
+    padding-left: 0;
+}

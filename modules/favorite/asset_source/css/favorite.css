@@ -1,0 +1,31 @@
+
+
+
+.favorite, .compare{
+    margin-left: -20px;
+}
+.favorite:before, .compare:before{
+    position: relative;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    content: "\e005";
+    font-size: 15px;
+}
+.favorite:before{
+    top: 1px;
+    content: "\e005";
+    left: -3px;
+}
+
+
+.addToFavorite, .addToFavorite:hover{
+    color: #555;
+}
+
+.removeFromFavorite, .removeFromFavorite:hover{
+    color: black;
+}
+

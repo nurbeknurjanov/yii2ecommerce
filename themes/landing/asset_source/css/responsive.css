@@ -1,0 +1,103 @@
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section-header .section-title {
+    font-size: 22px; }
+  .navbar-light .navbar-nav .nav-link {
+    padding: 7px 10px;
+    font-size: 12px; }
+  #hero-area .contents h1 {
+    font-size: 26px; }
+  #hero-area .contents-two h2 {
+    font-size: 30px; }
+  #about .img-about-out {
+    right: -110px; }
+    #about .img-about-out img {
+      width: 378px; }
+  .services .service-box h3 {
+    font-size: 14px; }
+  .services .service-box .icon i {
+    font-size: 42px; }
+  .why .why-content h3 {
+    font-size: 14px; }
+  .single-team .team-content {
+    padding: 10px 0; }
+  .single-team h4 {
+    font-size: 14px; }
+  .subscribe-box input[type="text"] {
+    padding: 6px 10px; }
+  .carousel-slider .owl-controls .owl-buttons div.owl-prev {
+    margin-left: -60px; }
+  .carousel-slider .owl-controls .owl-buttons div.owl-next {
+    margin-right: -60px; }
+  .great-started .great-started-text h2 {
+    font-size: 22px;
+    line-height: 36px; } }
+
+@media (max-width: 640px) {
+  #hero-area .contents h1 {
+    font-size: 24px; }
+  .bg-faded {
+    background: #fff !important; }
+  .navbar-light .navbar-nav .nav-link {
+    color: #666; }
+  #about .img-about-out {
+    display: none; }
+  #hero-area .contents-two h2 {
+    font-size: 30px; } }
+
+@media (min-width: 320px) and (max-width: 480px) {
+  .bg-faded {
+    background: #fff !important;
+    padding: 5px 30px; }
+  .navbar-light .navbar-nav .nav-link {
+    color: #666; }
+  .section-header .section-title {
+    font-size: 20px; }
+  #hero-area .contents h1 {
+    font-size: 22px;
+    line-height: 30px; }
+  #hero-area .contents p {
+    font-size: 14px;
+    line-height: 22px; }
+  #hero-area .contents .btn {
+    margin: 10px; }
+  #hero-area .contents-two h2 {
+    font-size: 24px; }
+  #hero-area .contents-two {
+    padding: 130px 0 0px; }
+  #hero-area .intro-img {
+    margin: 50px 0px; }
+  #about .counters .facts-item .fact-count h3 {
+    font-size: 28px; }
+  #about .counters .facts-item .fact-count h4 {
+    font-size: 15px; }
+  #about .img-about-out {
+    display: none; }
+  .services .service-box h3 {
+    font-size: 18px;
+    margin-bottom: 7px; }
+  .services .service-box {
+    margin-bottom: 30px; }
+  .services .service-box .icon i {
+    font-size: 42px;
+    line-height: 42px; }
+  .controls .btn {
+    padding: 7px 5px;
+    font-size: 13px; }
+  .why .why-content h3 {
+    font-size: 15px;
+    line-height: 22px; }
+  .why-two .why-content h3 {
+    font-size: 15px; }
+  .single-team {
+    margin-bottom: 30px; }
+  .great-started .great-started-text h2 {
+    line-height: 30px;
+    font-size: 22px; }
+  .pricing-tables .pricing-table {
+    margin-bottom: 30px; }
+  #contact .section-title {
+    font-size: 22px; }
+  .widget {
+    margin: 15px 0; }
+  .pull-right {
+    float: left; } }

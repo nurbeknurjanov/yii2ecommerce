@@ -1,0 +1,20 @@
+.categoryBlock{
+    padding: 0;
+    /*background: #f8f8f8;*/
+    margin-bottom: 20px;
+}
+.categoryBlock ul{
+    padding-left: 5px;
+}
+.categoryBlock > li{
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 10px;
+}
+.categoryBlock a{
+    color: inherit;
+}
+.category-icon{
+    height: 50px;
+    display: block;
+}

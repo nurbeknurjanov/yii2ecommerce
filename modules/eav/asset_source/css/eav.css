@@ -1,0 +1,77 @@
+.eavFields .form-control{
+    height:auto;
+}
+.eavBlock .form-group, .eavFields .form-group{
+    margin-bottom: 0;
+}
+
+
+.eavBlock{
+    border: 1px solid #ededed;
+    /*border: 1px solid #e7e7e7;*/
+    border-radius: 5px;
+    padding:5px 10px;
+}
+.eavBlock .form-group > label{
+    margin-bottom: 0;
+    margin-top: 5px;
+    color: #525252;
+}
+.eavBlock .form-control label{
+    display: block;
+    margin-bottom: 0;
+    font-weight: normal;
+}
+.eavBlock .form-control input{
+    position: relative;
+    top: 2px;
+}
+
+
+.eavBlock .eavFields .form-group > label::after{
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-family: 'Glyphicons Halflings';
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    padding-left: 5px;
+    content: "\e250";
+    font-size: 11px;
+}
+.eavBlock .eavFields .opened > label::after{
+    content: "\e252";
+}
+.eavBlock .eavFields .checkBoxBlock{
+    display: none;
+}
+.eavBlock .eavFields .opened .checkBoxBlock{
+    display: block;
+}
+
+.eavBlock .eavFields .checkBoxBlock{
+    padding:0;
+    border:none;
+    box-shadow:none;
+    background:inherit;
+}
+
+
+
+#loading, #pjaxLoading{
+    display: none;
+    font-size: 0;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;
+}
+
+
+.inputRange,
+.eavBlock .eavFields .inputRange{
+    display:inline; width:70px;
+}
+
+

@@ -1,0 +1,11 @@
+actor: ApiTester
+modules:
+    enabled:
+        - \Helper\Api
+        - REST:
+                url: http://sakura/frontend/web/index-test.php/site
+                depends: PhpBrowser
+                #part: Json
+        - Yii2:
+                 cleanup: true,
+                 part: [orm, email, fixtures, init]

@@ -1,0 +1,19 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c> 
+  RewriteEngine on
+
+  #RewriteCond %{REQUEST_URI} !^public|themes
+  RewriteCond %{REQUEST_URI} !^public|requirements.php|phpinfo.php
+  RewriteRule ^(.*)$ frontend/web/$1 [L]
+
+</IfModule>
+
+# Deny accessing below extensions
+<Files ~ "(.json|.lock|.git)">
+Order allow,deny
+Deny from all
+</Files>
+
+# Deny accessing dot files
+RewriteRule (^\.|/\.) - [F]

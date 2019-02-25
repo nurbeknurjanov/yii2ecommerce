@@ -1,0 +1,20 @@
+
+.rating-xs{
+    font-size: 14px;
+}
+.rating-block{
+    margin-right: 5px;
+}
+.product-view-rating{
+    margin-bottom: 5px;
+}
+.product-view-rating .rating-xs{
+    font-size: 20px;
+}
+.list-block .rating-xs{
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+.list-block .rating-container .star{
+    margin: 0;
+}

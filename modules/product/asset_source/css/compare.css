@@ -1,0 +1,66 @@
+
+.compare{
+    color: #333;
+    text-decoration: underline;
+    display: block;
+}
+.compare:hover{
+    color: inherit;
+}
+
+.compareTable > tbody > tr > th,
+.compareTable > tfoot > tr > th,
+.compareTable > thead > tr > td,
+.compareTable > tbody > tr > td,
+.compareTable > tfoot > tr > td{
+    border-right: 1px solid #ddd;
+    border-top: none;
+}
+.compareTable > tbody > tr > th:last-child,
+.compareTable > tfoot > tr > th:last-child,
+.compareTable > thead > tr > td:last-child,
+.compareTable > tbody > tr > td:last-child,
+.compareTable > tfoot > tr > td:last-child{
+    border-right: none;
+}
+.compareTable > tbody > tr:nth-of-type(odd){
+    background-color: #F2F2F2;
+}
+.compareTable > thead > tr > th{
+    border-bottom: none;
+    text-align: center;
+    font-weight: normal;
+}
+.compareTable .list-block{
+    max-width: 150px;
+    display: block;
+    clear: both;
+    float: none;
+}
+.compare-remove{
+    display: block;
+    color:#333;
+    text-align: left;
+    padding: 0 5px;
+}
+.compare-remove:hover{
+    color: inherit;
+}
+.compare-remove i{
+    font-size: 8px;
+    top:0px;
+}
+
+.compare:before{
+    top: 0px;
+    content: "\e185";
+    left: -4px;
+}
+
+.addToCompare, .addToCompare:hover{
+    color: #555;
+}
+
+.removeFromCompare, .removeFromCompare:hover{
+    color: black;
+}

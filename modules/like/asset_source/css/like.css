@@ -1,0 +1,37 @@
+.ratingFactorResult{
+    font-size: 16px;
+    display: inline-block;
+    width: 21px;
+    text-align: center;
+    font-weight: bold;
+    top: 1px;
+    position: relative;
+}
+.like{
+    color: #777;
+    display: inline-block;
+    position: relative;
+    top: 1px;
+    margin: 0 5px;
+    font-size: 16px;
+}
+.hoverRed{
+    margin-right: 0;
+}
+.hoverRed:hover
+{
+    color: #ac2925;
+}
+.hoverGreen:hover
+{
+    color: #5cb85c;
+}
+.disabledLike{
+    color: #dddccc !important;
+}
+
+.commentRemove{
+    top: 5px;
+    position: relative;
+    left: -3px;
+}

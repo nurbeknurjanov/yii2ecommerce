@@ -1,0 +1,38 @@
+.article-list{
+    height: 120px;
+    display: table;
+    overflow: hidden;
+}
+.article-list p{
+    height: 40px;
+    display: block;
+    overflow: hidden;
+}
+.article-image{
+    padding: 5px;
+    width: 130px;
+}
+.article-image img{
+    border-radius: 2px;
+    width: 100%;
+}
+.article-image .video-image:before{
+    font-size: 18px;
+}
+.article-image, .article-list-block{
+    display: table-cell;
+    vertical-align: top;
+}
+
+
+
+
+.tags{
+    margin-top:20px;
+}
+.tags a{
+    color:#333;
+}
+.news-list p{
+    color: #595959;
+}

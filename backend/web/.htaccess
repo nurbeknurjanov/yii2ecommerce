@@ -1,0 +1,19 @@
+Options +FollowSymLinks
+IndexIgnore */*
+RewriteEngine on
+
+# if a directory or a file exists, use it directly
+
+
+RewriteCond %{HTTP_HOST} ^www\.(.*) [NC]
+RewriteRule ^/?(.*) http://%1/$1 [L,R=permanent]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# otherwise forward it to index.php
+RewriteRule . index.php
+
+php_flag display_startup_errors on
+php_flag display_errors on
+php_value error_reporting 30719

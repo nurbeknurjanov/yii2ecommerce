@@ -1,0 +1,23 @@
+actor: AcceptanceTester
+modules:
+    enabled:
+        #- PhpBrowser:
+            #url: http://egrade/frontend/web/index-test.php
+        - WebDriver:
+            url: http://sakura/frontend/web/
+            browser: chrome
+            depends: Yii2
+        - \Helper\Acceptance
+        - Yii2:
+            part: [orm, email, fixtures, init]
+            #transaction: false # don't wrap test in transaction
+            #cleanup: false # don't cleanup the fixtures
+            entryScript: index-test.php
+            entryUrl: http://sakura/frontend/web/
+            cleanup: true
+        - Asserts
+        - Db:
+              dsn: 'mysql:host=localhost;dbname=sakura_test'
+              user: 'root'
+              password: 'root'
+              cleanup: true
