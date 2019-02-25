@@ -17,7 +17,7 @@ modules:
             cleanup: true
         - Asserts
         - Db:
-              dsn: 'mysql:host=localhost;dbname=sakura_test'
-              user: 'root'
-              password: 'root'
+              dsn: 'mysql:host=localhost;dbname=sakura_test_db'
+              user: ''
+              password: ''
               cleanup: true

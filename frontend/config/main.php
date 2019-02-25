@@ -69,8 +69,8 @@ return [
                 //https://developers.facebook.com/apps/
                 'facebook' => [
                     'class' => 'yii\authclient\clients\Facebook',
-                    'clientId' => '1492252481090244',
-                    'clientSecret' => 'bc474b6f7c76b1de1bf3697659861eaa',
+                    'clientId' => '',
+                    'clientSecret' => '',
                     //'authUrl' => 'https://www.facebook.com/dialog/oauth?display=popup',
                     //'scope'=>'user_photos'
                     //'scope'=>'email'
@@ -81,18 +81,18 @@ return [
                 //https://console.developers.google.com/project/tidy-outlet-106516/apiui/credential/oauthclient/634077512000-g0jci99968hevgebbl2pgtqadkb3dg4f.apps.googleusercontent.com
                 'google'=>[
                     'class' => 'yii\authclient\clients\Google',
-                    'clientId' => '634077512000-g0jci99968hevgebbl2pgtqadkb3dg4f.apps.googleusercontent.com',//new
-                    'clientSecret' => 'sJYNs3CejnbZVcTiCDJHCQxv',
+                    'clientId' => '',//new
+                    'clientSecret' => '',
                     'scope'=>'profile email',
                     'returnUrl' => "http://demo.sakuracommerce.com/user/guest/auth?authclient=google",
-                    //'scope'=>'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login',
+                
                 ],
                 //https://vk.com/apps?act=manage
                 'vkontakte' => [
                     //'class' => 'yii\authclient\clients\VKontakte',
                     'class' => 'extended\authclient\VKontakte',
-                    'clientId' => '5066354',
-                    'clientSecret' => '9PRXniCaNLbLZGfpT1bN',
+                    'clientId' => '',
+                    'clientSecret' => '',
                 ],
             ],
         ],
@@ -109,8 +109,8 @@ return [
 
             // the global settings for the facebook widget
             'facebook' => [
-                'appId' => '1492252481090244',
-                'secret' => 'bc474b6f7c76b1de1bf3697659861eaa',
+                'appId' => '',
+                'secret' => '',
             ],
         ],
     ],*/

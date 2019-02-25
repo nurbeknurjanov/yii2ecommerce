@@ -18,7 +18,7 @@ return [
         'db' =>
             YII_ENV_TEST_PROD ?
                 [
-                    'dsn' => 'mysql:host=localhost;dbname=sakura_sakura_test',
+                    'dsn' => 'mysql:host=localhost;dbname=sakura_db_test',
                 ]:
                 [
                     'dsn' => 'mysql:host=localhost;dbname=sakura_test',
