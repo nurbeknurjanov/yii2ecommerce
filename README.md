@@ -3,9 +3,11 @@ Sakuracommerce.com
 
 Sakuracommerce.com - ecommerce made on Yii2 php framework.
 This code is just for review. Not for install.
-If you have any questions, please message me in sakuracommerce.com/site/contact
+If you have any questions, please message me in https://sakuracommerce.com/site/contact
 Thank you.
 
+
+https://sakuracommerce.com/
 
 DIRECTORY STRUCTURE
 -------------------
