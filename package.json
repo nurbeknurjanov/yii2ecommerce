@@ -21,7 +21,7 @@
     "axios": "^0.15.3",
     "css-loader": "^2.1.0",
     "file-loader": "^3.0.1",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "less": "^3.9.0",
     "less-loader": "^4.1.0",
     "sass-loader": "^7.1.0",
