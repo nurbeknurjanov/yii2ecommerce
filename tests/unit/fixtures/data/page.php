@@ -9,7 +9,7 @@
 
 return [
     [
-        'id' => '1','url' => 'about_us',
+        'id' => '1','title_url' => 'about_us',
         'title' => 'About us',
         'text' => 'E-commerce is the activity of buying or selling online. Electronic commerce draws on technologies such as mobile commerce, electronic funds transfer, supply chain management, Internet marketing, online transaction processing, electronic data interchange (EDI), inventory management systems, and automated data collection systems.
         Modern electronic commerce typically uses the World Wide Web for at least one part of the transaction\'s life cycle 
@@ -21,7 +21,7 @@ return [
         There are three areas of e-commerce: online retailing, electric markets, and online auctions. E-commerce is supported by electronic business.'
     ],
     array('id' => '2',
-        'url' => 'delivery',
+        'title_url' => 'delivery',
         'title' => 'Payment and delivery','text' => '<div class="about-us-wrap pay-delivery">
 						<div class="about-us-block">
 							<h4 class="about-us-title">Payment methods</h4>
@@ -33,7 +33,7 @@ return [
 						</div>
 					</div>'),
     array('id' => '3',
-        'url' => 'guarantee',
+        'title_url' => 'guarantee',
         'title' => 'Guarantee',
         'text' => '<p>
 Guarantees and returns are crucial to your ecommerce business because it helps build trust and loyalty among your customers. With an easy to accomplish Return Policy and a Money Back Guarantee in place, you’re eliminating last-second hesitation and sense of risk that may abort the sale, while letting customers know that you got their back.

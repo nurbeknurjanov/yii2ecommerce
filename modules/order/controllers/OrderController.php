@@ -8,7 +8,7 @@
 
 namespace order\controllers;
 
-use http\Url;
+use country\models\City;
 use order\models\Basket;
 use order\models\Card;
 use order\models\OrderLocal;
@@ -17,7 +17,10 @@ use order\models\OrderProduct;
 use Yii;
 use order\models\Order;
 use order\models\search\OrderSearch;
+use yii\db\ActiveRecord;
 use yii\grid\GridView;
+use yii\helpers\Inflector;
+use yii\helpers\StringHelper;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -43,7 +46,7 @@ class OrderController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['create', 'create1', 'create2', 'create3'],
+                        'actions' => ['create', 'create1', 'create2'],
                         'allow' => true,
                     ],
                     [
@@ -183,7 +186,14 @@ class OrderController extends Controller
     //do order
     public function actionCreate2()
     {
+        if(Basket::isEmpty())
+            Yii::$app->session->setFlash('warning', Yii::t('order', 'Your shopping cart is empty.'));
+
         $model = new Order;
+        /*$model->email='qwe@mail.ru';
+        $model->address = 'address';
+        $model->city_id = 48019;*/
+
         $card = new Card;
         if(Yii::$app->session->get('Order'))
             $model->attributes = Yii::$app->session->get('Order');
@@ -193,13 +203,9 @@ class OrderController extends Controller
         if(Yii::$app->user->isGuest)
             $model->scenario = Order::SCENARIO_GUEST;
 
-        if(Basket::isEmpty()){
-            Yii::$app->session->setFlash('warning', Yii::t('order', 'Your shopping cart is empty.'));
-            return $this->goAlert();
-        }
-
-
         $model->trigger($model::EVENT_INIT_BASKET_PRODUCTS);
+
+
 
         if($model->load(Yii::$app->request->post()) && $model->loadBasketProducts(Yii::$app->request->post())) {
             $card->load(Yii::$app->request->post());
@@ -208,21 +214,23 @@ class OrderController extends Controller
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 $errorArray = array_merge(ActiveForm::validate($model), ActiveForm::validateMultiple($model->basketProducts));
 
-                if($model->payment_type==$model::PAYMENT_TYPE_ONLINE && $model->online_payment_type==$model::ONLINE_PAYMENT_TYPE_CARD)
+                if($model->isPaymentOnline && $model->online_payment_type==$model::ONLINE_PAYMENT_TYPE_CARD)
                     $errorArray = array_merge($errorArray, ActiveForm::validate($card));
                 //$errorArray['product-price'][]='some error';
                 return $errorArray;
             }
             try{
-                if($model->payment_type==$model::PAYMENT_TYPE_ONLINE){
+                if($model->isPaymentOnline){
+
                     Yii::$app->session->remove('Order');
                     Yii::$app->session->set('Order', $model->attributes);
                     if($model->online_payment_type==$model::ONLINE_PAYMENT_TYPE_PAYPAL)
-                        return $this->redirect(['/order/paypal/paypal']);
+                        return $this->redirect(['/order/paypal/paypal']);//go to save, if error come back here(saving sessions), if not, goes to view
                     if($model->online_payment_type==$model::ONLINE_PAYMENT_TYPE_CARD){
                         Yii::$app->session->remove('Card');
+                        $card->trigger(ActiveRecord::EVENT_BEFORE_VALIDATE);
                         Yii::$app->session->set('Card', $card->attributes);
-                        return $this->redirect(['/order/paypal/card']);
+                        return $this->redirect(['/order/paypal/card']);//go to save, if error come back here(saving sessions), if not, goes to view
                     }
                 }else{
                     if($model->saveWithOrderProducts()){
@@ -270,14 +278,21 @@ class OrderController extends Controller
      */
     public function actionDelete($id)
     {
+        $transaction = Yii::$app->db->beginTransaction();
         try {
-            $this->findModel($id)->delete();
+            $model = $this->findModel($id);
+            $model->delete();
+            $transaction->commit();
+            Yii::$app->session->setFlash('success', 'You have successfully deleted the '
+                .Inflector::titleize(StringHelper::basename(Order::class), true).' '.$model->title);
+            if(strpos(Yii::$app->request->referrer,'view')!==false)
+                return $this->redirect($this->defaultAction);
         } catch (Exception $e) {
+            $transaction->rollBack();
             Yii::$app->session->setFlash('error', $e->getMessage());
         }
-        return $this->redirect(['index']);
+        return $this->redirect(Yii::$app->request->referrer);
     }
-
 
     /**
      * Finds the Order model based on its primary key value.

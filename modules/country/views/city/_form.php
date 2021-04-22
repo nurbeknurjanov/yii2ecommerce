@@ -5,6 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use country\models\Region;
 use country\models\Country;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model \country\models\City */
@@ -29,8 +30,18 @@ use country\models\Country;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
+    <?php
+    if(!Yii::$app->request->isPost && $model->region_id)
+        $model->country_id = $model->region->country_id;
+
+    ?>
+    <?=$form->field($model, 'country_id',['parts'=>['{input}'=>
+        (new Country)->getWidgetSelectPicker($model, 'country_id', null, ['class'=>'selectpicker country_id'])]]) ?>
     <?=$form->field($model, 'region_id',['parts'=>['{input}'=>
-        (new Region)->getWidgetSelectPicker($model, 'region_id')]]) ?>
+        (new Region)->getWidgetSelectPicker($model, 'region_id', Region::find()->countryQuery($model->country_id),
+            ['class'=>'selectpicker region_id',
+                'data-url'=>Url::to(['/country/region/select-picker', 'country_id'=>$model->country_id])
+            ])]]) ?>
 
     <div class="form-group">
         <div class="col-lg-offset-0 col-lg-0">

@@ -63,7 +63,7 @@ class FavoriteCest
         $I->waitForText($text);
 
         $I->amOnPage(Url::to(['/product/product/favorites']));
-        $I->waitForText(Yii::t('favorite', 'Favorites'), null, 'h1');
+        $I->waitForText(Yii::t('favorite', 'Favorites'), null, 'h1.title');
         $I->dontSee($product->title);
     }
     protected function testAddFavorite(AcceptanceTester $I)

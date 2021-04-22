@@ -31,7 +31,7 @@ GridViewAsset::register($this);
             <?=$form->field($model, 'email') ?>
         </div>
         <div class="col-lg-4">
-            <?=$form->field($model, 'status')->dropDownList($model->statusValues, ['prompt'=>'Select',]) ?>
+            <?=$form->field($model, 'status')->dropDownList($model->statusOptions, ['prompt'=>'Select',]) ?>
         </div>
         <div class="col-lg-4">
             <?php echo $form->field($model, 'rolesAttribute')->dropDownList($model->rolesValues, ['prompt'=>'Select',]) ?>

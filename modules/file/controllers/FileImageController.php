@@ -9,9 +9,14 @@
 namespace file\controllers;
 
 use file\models\FileImage;
+use Imagine\Image\Box;
+use Imagine\Image\ImageInterface;
+use product\models\FileImageProduct;
+use product\models\Product;
 use Yii;
 use file\models\File;
 use yii\helpers\Url;
+use yii\imagine\Image;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -31,6 +36,10 @@ class FileImageController extends \file\controllers\FileController
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
+                    [
+                        'actions' => ['resize',],
+                        'allow' => true,
+                    ],
                     [
                         'actions' => ['main', 'not-main',],
                         'allow' => true,
@@ -85,5 +94,66 @@ class FileImageController extends \file\controllers\FileController
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    public function actionResize()
+    {
+        $models = FileImage::findAll(['model_name'=>Product::class]);
+        foreach ($models as $model) {
+            $file = new UploadedFile();
+            $file->name = 'somename';
+
+            $fip = new FileImageProduct;
+
+            $file->tempName =  (new File())->copy($model->imageUrl) ;
+            $imagine = Image::getImagine();
+
+
+            $dest = Yii::getAlias('@tests')."/unit/fixtures/files/product/{$model->model->id}/thumb/md-".$model->file_name;
+            copy($file->tempName, $dest);
+            $image = $imagine->open($dest);
+            $size = new Box($fip->thumbMdWidth, $fip->thumbMdHeight);
+            if($fip->padding){
+                $image->thumbnail($size, ImageInterface::THUMBNAIL_INSET)->save($dest  );
+                \extended\imagine\Imagine::pad($dest, $size);
+            }else
+                $image->thumbnail($size, ImageInterface::THUMBNAIL_OUTBOUND)->save($dest );
+
+
+            $dest = Yii::getAlias('@tests')."/unit/fixtures/files/product/{$model->model->id}/thumb/sm-".$model->file_name;
+            copy($file->tempName, $dest);
+            $image = $imagine->open($dest);
+            $size = new Box($fip->thumbSmWidth, $fip->thumbSmHeight);
+            if($fip->padding){
+                $image->thumbnail($size, ImageInterface::THUMBNAIL_INSET)->save($dest  );
+                \extended\imagine\Imagine::pad($dest, $size);
+            }else
+                $image->thumbnail($size, ImageInterface::THUMBNAIL_OUTBOUND)->save($dest );
+
+            $dest = Yii::getAlias('@tests')."/unit/fixtures/files/product/{$model->model->id}/thumb/xs-".$model->file_name;
+            copy($file->tempName, $dest);
+            $image = $imagine->open($dest);
+            $size = new Box($fip->thumbXsWidth, $fip->thumbXsHeight);
+            if($fip->padding){
+                $image->thumbnail($size, ImageInterface::THUMBNAIL_INSET)->save($dest  );
+                \extended\imagine\Imagine::pad($dest, $size);
+            }else
+                $image->thumbnail($size, ImageInterface::THUMBNAIL_OUTBOUND)->save($dest );
+        }
+
+        /*$models = FileImage::findAll(['model_name'=>Room::class]);
+        foreach ($models as $model) {
+            $file = new UploadedFile();
+            $file->name = 'sm.jpg';
+
+            $file->tempName =  (new File())->copy($model->imageUrl) ;
+
+            $dest = Yii::getAlias('@tests')."/unit/fixtures/files/room/{$model->model->id}/thumb/sm-".$model->file_name;
+            copy($file->tempName, $dest);
+            $image = Image::getImagine();
+            $image = $image->open($dest);
+            $size = new Box(120, 120);
+            $image->thumbnail($size, ImageInterface::THUMBNAIL_OUTBOUND)->save($dest, ['quality' => 60] );
+        }*/
     }
 } 

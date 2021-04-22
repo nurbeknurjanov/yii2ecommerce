@@ -15,7 +15,11 @@ $(document).on('beforeSubmit', '#leftSearchForm', function ()
     //if(data.length>0)
     if(countProperties(data))
         action+='?'+dataUrl;
-    //window.location.href=action;
+
+    if (typeof window.router !=="undefined"){
+        window.router.push(action);
+        return false;
+    }
     $.pjax.reload('#productsPjax', { url:action});
     return false;
 });
@@ -32,7 +36,7 @@ $( "[name='priceFrom'], [name='priceTo']" ).keyup(function () {
 
 //reset
 $('.resetButton').click(function(){
-    var $form = $form;
+    var $form = $(this).parents('form');
     $form.find("input, select, textarea").not(':button, :submit, :reset, :checkbox, :radio').val("");
     $form.find(":checkbox, :radio").prop("checked", false);
     $form.submit();

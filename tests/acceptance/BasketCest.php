@@ -93,9 +93,9 @@ class BasketCest
 
         $I->selectOption($orderProduct->formName().'[product_id]', $fantaBig->id);
         $I->waitForText((string) $fantaBig->price);
-        $I->seeInField($orderProduct->formName().'[price]', $fantaBig->price);
+        $I->seeInField($orderProduct->formName().'[price]',(string) $fantaBig->price);
 
-        $I->seeInField($orderProduct->formName().'[count]', 1);
+        $I->seeInField($orderProduct->formName().'[count]', '1');
         //$I->cantSeeInField('user[name]', 'Miles');
         //$I->grabValueFrom('input[name=api]');
         $I->click(Yii::t('order', 'Continue shopping'));

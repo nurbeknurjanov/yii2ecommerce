@@ -11,15 +11,15 @@ use extended\helpers\StringHelper;
 $this->title = Yii::t('common', 'I18n Source Messages');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="i18n-source-message-index box">
+<div class="i18n-source-message-index card">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Html::a(Yii::t('common', 'Create I18n Source Message'), ['create'], ['class' => 'btn btn-success']) ?>
     </div>
 
-    <div class="box-body">
+    <div class="card-body">
         To translate messages, use in code this format
         <code>
             Yii::t('db_frontend', 'Some message');

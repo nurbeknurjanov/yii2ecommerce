@@ -33,6 +33,17 @@ use yii\data\ArrayDataProvider;
             'value'=>function($data) { return Html::a($data->product->title, ['/product/product/view', 'id'=>$data->product_id,]); },
         ],
         [
+            'attribute'=>'price',
+            'format'=>'currency',
+            'contentOptions' =>function ($model, $key, $index, $column){
+                return [
+                    'class' => 'priceTD',
+                    'data-price' => $model->price,
+                    'data-currency' => Yii::$app->formatter->currencySymbol,
+                ];
+            },
+        ],
+        [
             'attribute'=>'count',
             'format'=>'raw',
             'value'=>function($data) use ($form) {
@@ -51,17 +62,7 @@ use yii\data\ArrayDataProvider;
                 return ['class' => 'countTD'];
             },
         ],
-        [
-            'attribute'=>'price',
-            'format'=>'currency',
-            'contentOptions' =>function ($model, $key, $index, $column){
-                return [
-                    'class' => 'priceTD',
-                    'data-price' => $model->price,
-                    'data-currency' => Yii::$app->formatter->currencySymbol,
-                ];
-            },
-        ],
+
         [
             'label'=>Yii::t('order', 'Amount'),
             'format'=>'currency',
@@ -87,7 +88,7 @@ use yii\data\ArrayDataProvider;
                         'aria-label' => Yii::t('yii', 'Delete'),
                         'data' =>[
                             'form'=>'anotherForm',
-                            'confirm'=>Yii::t('common', 'Are you sure you want to delete this item from shopping cart ?')
+                            'confirm'=>Yii::t('order', 'Are you sure you want to remove this item from shopping cart ?')
                         ]
                     ];
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',

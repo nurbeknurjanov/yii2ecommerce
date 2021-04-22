@@ -251,7 +251,7 @@ class Generator extends \mii\Generator
         if ($column->dbType==='tinyint(1)')
             return "\$form->field(\$model, '$attribute')->checkbox([], false)";
         if ($column->dbType==='smallint(6)')
-            return "\$form->field(\$model, '$attribute')->dropDownList(\$model->{$attribute}Values, ['prompt'=>Yii::t('common', 'Select'),])";
+            return "\$form->field(\$model, '$attribute')->dropDownList(\$model->{$attribute}Options, ['prompt'=>Yii::t('common', 'Select'),])";
 
         if ($column->phpType === 'boolean') {
             return "\$form->field(\$model, '$attribute')->checkbox()";
@@ -307,9 +307,9 @@ class Generator extends \mii\Generator
             return "\$form->field(\$model, '$attribute')->dropDownList(ArrayHelper::map(\\{$column->comment}::find()->all(), 'id', 'title'), ['prompt'=>Yii::t('common', 'Select'),])";
         }
         if ($column->dbType==='tinyint(1)')
-            return "\$form->field(\$model, '$attribute')->radioList(\$model->{$attribute}Values, ['prompt'=>Yii::t('common', 'Select'),])";
+            return "\$form->field(\$model, '$attribute')->radioList(\$model->{$attribute}Options, ['prompt'=>Yii::t('common', 'Select'),])";
         if ($column->dbType==='smallint(6)')
-            return "\$form->field(\$model, '$attribute')->dropDownList(\$model->{$attribute}Values, ['prompt'=>Yii::t('common', 'Select'),])";
+            return "\$form->field(\$model, '$attribute')->dropDownList(\$model->{$attribute}Options, ['prompt'=>Yii::t('common', 'Select'),])";
         if ($column->phpType === 'boolean') {
             return "\$form->field(\$model, '$attribute')->checkbox()";
         } else {

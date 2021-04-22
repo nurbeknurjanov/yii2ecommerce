@@ -18,13 +18,7 @@ $basketProducts = \order\models\Basket::findAll();
 <div class="list-block list-block-list-style" >
     <div>
         <a href="<?=Url::to($model->url)?>"  class="<?=$model->typeClass?>"  data-discount="<?=$model->discount?>" >
-            <?php
-            if($mainImage = $model->mainImage)
-                //if($mainImage = $model->getImages()->queryMainImage()->one())
-                echo $mainImage->getImg('sm');
-            else
-                echo Html::noImg();
-            ?>
+            <?=$model->getThumbImg('sm')?>
         </a>
         <div class="block">
             <?=Html::a($model->title, $model->url, ['class'=>'title']);?>
@@ -36,7 +30,7 @@ $basketProducts = \order\models\Basket::findAll();
             <?=Html::a(Yii::t('product', 'Buy'), 'javascript:void(0);',
                 [
                     'id'=>'showBasket-'.$model->id,
-                    'class'=>'btn btn-warning btn-sm showBasket '.(isset($basketProducts[$model->id])?"showBasketActive":null),
+                    'class'=>'btn btn-warning btn-sm showBasket '.(isset($basketProducts[$model->id])?"alreadyInBasket":null),
                     'data'=>[
                         'count'=>isset($basketProducts[$model->id]) ? $basketProducts[$model->id]['count']:1,
                         'product_id'=>$model->id,

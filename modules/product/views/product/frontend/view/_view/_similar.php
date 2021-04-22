@@ -20,7 +20,7 @@ if($models){
     <br/>
     <br/>
     <h1><?=Yii::t('product', 'Similar products');?></h1>
-    <div class="index-product-list">
+    <div class="similars">
         <?php
         foreach ($models as $data) {
             ?>

@@ -31,7 +31,7 @@ class Permissions
         $auth->add($indexPage);
 
         $guestRole = $auth->getRole(User::ROLE_GUEST);
-        $managerRole = $auth->getRole(User::ROLE_MANAGER);
+        $managerRole = $auth->getRole(User::ROLE_ADMINISTRATOR);
 
 
         $auth->addChild($guestRole, $viewPage);

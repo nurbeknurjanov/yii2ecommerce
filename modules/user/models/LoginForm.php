@@ -31,6 +31,7 @@ class LoginForm extends Model
             // password is validated by validatePassword()
             //['validateAttribute', 'validateIP'],
             ['password', 'validatePassword'],
+            ['username', 'validateStatus'],
         ];
     }
 
@@ -47,7 +48,23 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect username or password.');
+                return $this->addError($attribute, 'Incorrect username or password.');
+            }
+            if(Yii::$app->id=='app-backend'){
+                if(!Yii::$app->authManager->checkAccess($user->id, User::ROLE_MANAGER)){
+                    $this->addError($attribute, 'Incorrect username or password.');
+                }
+            }
+        }
+    }
+    public function validateStatus($attribute, $params)
+    {
+        if (!$this->hasErrors()) {
+            $user = $this->getUser();
+            if($user){
+                if(!$user->isActive)
+                    $this->addError($attribute, 'Verify your email. '
+                        .Html::a('Resend Activation Link', ['/user/guest/resend-activate-link', 'username'=>$this->username]));
             }
         }
     }
@@ -88,7 +105,7 @@ class LoginForm extends Model
     public function attributeLabels()
     {
         return [
-            'username' => Yii::t('user', 'Username or Email'),
+            'username' => Yii::t('user', 'Email'),
             'password' => Yii::t('user', 'Password'),
             'rememberMe' => Yii::t('user', 'Remember me'),
         ];

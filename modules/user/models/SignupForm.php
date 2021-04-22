@@ -41,7 +41,7 @@ class SignupForm extends Model
             ['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
-            ['email', 'unique', 'targetClass' => '\user\models\User', 'message'=>Yii::t('yii', '{attribute} "{value}" has already been taken.').' '.Html::a(Yii::t('common', 'Login'), ['/user/guest/login'])],
+            ['email', 'unique', 'targetClass' => '\user\models\User', 'message'=>Yii::t('yii', '{attribute} "{value}" has already been taken.')],
 
             [['password', 'password_repeat'], 'required'],
             ['password', 'string', 'min' => 6],
@@ -50,11 +50,8 @@ class SignupForm extends Model
 
             [['reCaptcha'], ReCaptchaValidator::className(),
                 'when'=>function($model){
-                    return YII_ENV_PROD;
+                    return YII_ENV_PROD && !Yii::$app->request->isAjax;
                 },
-                'whenClient'=>new JsExpression("function (attribute, value) {
-                                        return ".(YII_ENV_PROD).";
-                                    }"),
                 'on'=>'step1',
             ],
 

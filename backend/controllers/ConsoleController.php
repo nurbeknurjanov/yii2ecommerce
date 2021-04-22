@@ -27,7 +27,7 @@ class ConsoleController extends Controller
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        'roles' => [User::ROLE_MANAGER],// if you set it some role
+                        'roles' => [User::ROLE_ADMINISTRATOR],// if you set it some role
                     ],
                 ],
             ],

@@ -10,7 +10,7 @@ use yii\helpers\Url;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="page-search advancedSearch"  style="<?=isset($_GET['searchForm']) ? '':'display: none;';?>" >
+<div class="card-body page-search advancedSearch"  style="<?=isset($_GET['searchForm']) ? '':'display: none;';?>" >
 
     <?php $form = ActiveForm::begin([
         'action' => '/'.Yii::$app->controller->route,
@@ -19,7 +19,7 @@ use yii\helpers\Url;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'url') ?>
+    <?= $form->field($model, 'title_url') ?>
 
     <?= $form->field($model, 'title') ?>
 
@@ -33,5 +33,5 @@ use yii\helpers\Url;
     <?php ActiveForm::end(); ?>
 
 </div>
+<div class="card-header"><?= Html::button(Yii::t('common', 'Advanced search'), ['class' => 'btn btn-success advancedSearchButton']) ?></div>
 
-<p><?= Html::button(Yii::t('common', 'Advanced search'), ['class' => 'btn btn-success advancedSearchButton']) ?></p>

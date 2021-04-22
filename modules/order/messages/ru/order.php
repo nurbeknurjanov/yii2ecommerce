@@ -28,6 +28,8 @@ return [
     'Description'=>'Комментарий',
     'Product'=>'Товар',
     'Count'=>'Количество',
+    'Quantity'=>'Количество',
+    'Qty'=>'Кол-во',
     'You added the item into shopping cart.'=>'Вы положили в корзину товар.',
     'You removed the item from shopping cart.'=>'Вы убрали из корзины товар.',
     'You removed all items from shopping cart.'=>'Вы убрали из корзины все товары.',
@@ -62,4 +64,7 @@ return [
 
     'Here is new order.'=>'Поступил новый заказ.',
     'Go to the shopping cart'=>'Идите в корзину',
+    'Card number'=>'Номер карты',
+    'Expire date'=>'Срок карты',
+    'Update Order'=>'Править заказ',
 ];

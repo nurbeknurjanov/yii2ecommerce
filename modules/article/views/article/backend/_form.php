@@ -10,7 +10,7 @@ use kartik\file\FileInput;
 use file\models\FileImage;
 use file\widgets\file_preview\FilePreview;
 use tag\models\Tag;
-use extended\vendor\BootstrapSelectAsset;
+use common\assets\BootstrapSelectAsset;
 
 BootstrapSelectAsset::register($this);
 
@@ -94,19 +94,16 @@ BootstrapSelectAsset::register($this);
 
 
 
-        <?php $this->beginBlock('imagesFields') ?>
-            <?php
-            $imagesAttributeField = $form->field($model, 'imagesAttribute[]');
-            $imagesAttributeField->parts['{input}'] = FilePreview::widget(['images'=>$model->images]);
-            $imagesAttributeField->parts['{input}'].=FileInput::widget([
-                'model' => $model,
-                'attribute' => 'imagesAttribute[]',
-                'options' => ['multiple' => true],
-            ]);
-            echo $imagesAttributeField;
-            ?>
-        <?php $this->endBlock() ?>
-        {{imagesFields}}
+        <?php
+        $imagesAttributeField = $form->field($model, 'imagesAttribute[]');
+        $imagesAttributeField->parts['{input}'] = FilePreview::widget(['images'=>$model->images]);
+        $imagesAttributeField->parts['{input}'].=FileInput::widget([
+            'model' => $model,
+            'attribute' => 'imagesAttribute[]',
+            'options' => ['multiple' => true],
+        ]);
+        echo $imagesAttributeField;
+        ?>
 
 
     <?php $this->endBlock() ?>

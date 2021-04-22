@@ -9,18 +9,18 @@ use common\widgets\Alert;
 /* @var $searchModel country\models\search\CountrySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('common', 'Country');
+$this->title = Yii::t('country', 'Countries');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="country-index box">
+<div class="country-index card">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Alert::widget() ?>
         <?php
 		if(Yii::$app->user->can('createCountry'))
-            echo Html::a(Yii::t('common', 'Create Country'), ['create'], ['class' => 'btn btn-success']);
+            echo Html::a(Yii::t('country', 'Create Country'), ['create'], ['class' => 'btn btn-success']);
         ?>
     </div>
 

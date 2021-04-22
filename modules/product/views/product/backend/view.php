@@ -13,31 +13,32 @@ use eav\models\DynamicValue;
 use file\widgets\file_preview\FilePreview;
 use product\models\Product;
 use yii\bootstrap\ButtonDropdown;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model \product\models\Product */
 
-$this->registerLinkTag(['rel' => 'canonical',  'href' => $model->url]);
+$this->registerLinkTag(['rel' => 'canonical',  'href' => Url::to($model->url)]);
 
 $this->params['breadcrumbs'][] = ['label' => Yii::t('product', 'Products'), 'url' => [Yii::$app->controller->defaultAction]];
 
 $this->title = $model->title;
 $this->params['breadcrumbs'][] = $this->title;
 
-$this->beginBlock('page');
 ?>
-<div class="product-view box">
+
+<div class="product-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <div style="float: left;">
             <?php
             if(Yii::$app->user->can('updateProduct', ['model' => $model]))
-                echo Html::a(Yii::t('product', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
+                echo Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
             ?>
             <?php
             if(Yii::$app->user->can('deleteProduct', ['model' => $model]))
-                echo Html::a(Yii::t('product', 'Delete'), ['delete', 'id' => $model->id], [
+                echo Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
                     'class' => 'btn btn-danger',
                     'data' => [
                         'confirm' => Yii::t('product', 'Are you sure you want to delete this item?'),
@@ -95,7 +96,7 @@ $this->beginBlock('page');
                 'dropdown' => [
                     'items' => $items,
                     'options' => [
-                            'class'=>'dropdown-menu-right',
+                        'class'=>'dropdown-menu-right',
                         //'style' => 'min-width:auto'
                     ],
                 ],
@@ -155,7 +156,7 @@ $this->beginBlock('page');
             ],
             [
                 'attribute'=>'imagesAttribute',
-                'label'=>'Main image',
+                'label'=>Yii::t('common', 'Main Image'),
                 'format'=>'raw',
                 'value'=>$model->getImages()->queryMainImage()->one()
                     ?
@@ -210,17 +211,13 @@ $this->beginBlock('page');
 
     <?php
     $this->beginBlock('detailView');
-        ?>
-        <div class="box-body">
-            <?=$widget->run();?>
-        </div>
-        <?php
+    ?>
+    <div class="card-body">
+        <?=$widget->run();?>
+    </div>
+    <?php
     $this->endBlock();
     ?>
     {{detailView}}
 
 </div>
-<?php
-$this->endBlock();
-?>
-{{page}}

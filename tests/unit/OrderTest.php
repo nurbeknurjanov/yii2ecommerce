@@ -10,6 +10,7 @@ use eav\models\DynamicField;
 use tests\unit\fixtures\CategoryFixture;
 use extended\helpers\Helper;
 use tests\unit\fixtures\UserFixture;
+use tests\unit\fixtures\UserProfileFixture;
 use product\models\Product;
 use tests\unit\fixtures\DynamicFieldFixture;
 use tests\unit\fixtures\DynamicValueFixture;
@@ -60,20 +61,52 @@ class OrderTest extends \Codeception\Test\Unit
             ],
             'users' => [
                 'class' => UserFixture::class,
-                'dataFile'=>false,
+
                 'depends'=>[],
+            ],
+            'user_profiles' => [
+                'class' => UserProfileFixture::class,
+                'depends'=>[],
+                'dataFile'=>false,
             ],
         ];
 
-        if(in_array($this->getName(),['testOrderCreateUser', 'testOrderCreateGuestTightEmail']))
-            $fixtures['users']=[
-                'class' => UserFixture::class,
-                'dataFile'=>null,
-                'depends'=>[],
-            ];
+        if(in_array($this->getName(),['testOrderCreateUser', 'testOrderCreateGuestTightEmail'])){
+             $fixtures['users']=[
+                 'class' => UserFixture::class,
+                 'dataFile'=>null,
+                 'depends'=>[],
+             ];
+             $fixtures['users_profile']=[
+                 'class' => UserProfileFixture::class,
+                 'dataFile'=>null,
+                 'depends'=>[],
+             ];
+        }
+
         return $fixtures;
     }
 
+    public function testOrderCreateUser()
+    {
+        $user = User::find()->one();
+        Yii::$app->user->setIdentity($user);
+        $this->tester->assertFalse(Yii::$app->user->isGuest);
+
+        $model = $this->createOrder();
+        $emails = $this->tester->grabSentEmails();
+        $this->tester->assertCount(2, $emails);
+
+        $this->checkOrderTightedToUser($model, Yii::$app->user->identity);
+        $this->checkMineOrders();
+        $this->checkFirst2Emails($model);
+    }
+    public function testOrderCreateGuestTightEmail()
+    {
+        $user = $this->tester->grabFixture('users', 0);
+        /*$model = $this->createOrder(['email'=>$user->email]);
+        $this->checkOrderTightedToUser($model, $user);*/
+    }
     protected function _before()
     {
         Yii::$app->mailer->viewPath = '@order/mail';
@@ -208,32 +241,14 @@ class OrderTest extends \Codeception\Test\Unit
         $this->tester->assertTrue(Yii::$app->user->isGuest);
         $model = $this->createOrder(['email'=>'', 'phone'=>'996558011477']);
 
-        $this->checkMineOrders();
+        /*$this->checkMineOrders();
         $this->checkFirst2Emails($model);
         $this->tester->assertCount(1, $this->tester->grabSentEmails());
 
-        $this->tester->cantSeeRecord(User::class);
+        $this->tester->cantSeeRecord(User::class);*/
     }
 
-    public function testOrderCreateUser()
-    {
-        Yii::$app->user->setIdentity(User::find()->one());
-        $this->tester->assertFalse(Yii::$app->user->isGuest);
 
-        $model = $this->createOrder();
-        $emails = $this->tester->grabSentEmails();
-        $this->tester->assertCount(2, $emails);
-
-        $this->checkOrderTightedToUser($model, Yii::$app->user->identity);
-        $this->checkMineOrders();
-        $this->checkFirst2Emails($model);
-    }
-    public function testOrderCreateGuestTightEmail()
-    {
-        $user = $this->tester->grabFixture('users', 0);
-        $model = $this->createOrder(['email'=>$user->email]);
-        $this->checkOrderTightedToUser($model, $user);
-    }
 
 
 

@@ -26,6 +26,10 @@ use order\models\OrderProduct;
 use product\models\query\ProductNetworkQuery;
 use product\models\query\ProductQuery;
 use product\models\query\RatingQuery;
+use shop\models\query\ShopQuery;
+use shop\models\Shop;
+use tag\models\ObjectTag;
+use yii\base\Event;
 use yii\base\Exception;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
@@ -34,7 +38,8 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use user\models\User;
 use yii\db\AfterSaveEvent;
-use yii\helpers\Html;
+use extended\helpers\Html;
+use yii\helpers\StringHelper;
 use yii\helpers\Url;
 
 /**
@@ -95,6 +100,10 @@ use yii\helpers\Url;
  * @property ProductNetwork $productNetworkInstagram
  * @property string $externalNetworkText
  * @property string $skuText
+ * @property ObjectTag[] $productTags
+ * @property Shop $shop
+ * @property int $shop_id
+ * @property string $imageImg
  */
 class Product extends \yii\db\ActiveRecord
 {
@@ -134,7 +143,7 @@ class Product extends \yii\db\ActiveRecord
     public function setDynamicRules()
     {
         foreach ($this->valueModels as &$valueModel){
-            $valueModel->loadRequestData();
+            $valueModel->setDynamicRules();
         }
     }
 
@@ -253,7 +262,9 @@ class Product extends \yii\db\ActiveRecord
                 'slugAttribute' => 'title_url',
                 'value' => function ($event) {
                     $model = $event->sender;
-                    $title = $model->category->title_url;
+                    $title='';
+                    if($model->category)
+                        $title = $model->category->title_url;
                     return $title."/".Inflector::slug($this->title);
                 },
             ],
@@ -464,6 +475,28 @@ class Product extends \yii\db\ActiveRecord
 
             ProductNetwork::removeAll($model);
         });
+
+        $this->on(self::EVENT_AFTER_DELETE, function(Event $event){
+            /* @var $model self */
+            $model = $event->sender;
+            $productTags = $model->productTags;
+            foreach ($productTags as $productTag)
+                $productTag->delete();
+        });
+
+
+        $this->on(self::EVENT_BEFORE_DELETE, function(Event $event){
+            /* @var $model self */
+            $model = $event->sender;
+            if($model->getOrderProducts()->exists())
+                throw new Exception("Sorry. You must first detach "
+                    .Inflector::titleize(Inflector::pluralize(StringHelper::basename(Order::class)), true)." from the "
+                    .Inflector::titleize(StringHelper::basename(self::class), true).' '.$this->title, 400);
+
+            $comments = $model->comments;
+            foreach ($comments as $comment)
+                $comment->delete();
+        });
     }
 
     /**
@@ -488,7 +521,7 @@ class Product extends \yii\db\ActiveRecord
                 'extensions' => 'gif, jpg, jpeg, png',
                 'mimeTypes' => 'image/jpeg, image/png, image/gif',
                 'maxFiles'=>10,
-                'maxSize'=>1024*1024*4,//4 mb
+                'maxSize'=>1024*1024*8,//8 mb
             ],
             ['type', 'default', 'value'=>NULL,],
             ['group_id', 'integer'],
@@ -498,6 +531,7 @@ class Product extends \yii\db\ActiveRecord
             [['rating_count','enabled'], 'default',  'value'=>0,],
             ['enabled', 'boolean'],
             ['groupedProductsAttribute', 'groupedProductsAttributeValidation'],
+            ['shop_id', 'required'],
         ];
     }
 
@@ -520,17 +554,22 @@ class Product extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('common', 'ID'),
-            'user_id' => Yii::t('common', 'User ID'),
+            'user_id' => Yii::t('common', 'User'),
             'title' => Yii::t('common', 'Title'),
             'description' => Yii::t('common', 'Description'),
-            'created_at' => Yii::t('common', 'Created At'),
-            'updated_at' => Yii::t('common', 'Updated At'),
+            'created_at' => Yii::t('common', 'Created date'),
+            'updated_at' => Yii::t('common', 'Updated date'),
             'status' => Yii::t('common', 'Status'),
             'imagesAttribute' => Yii::t('common', 'Images'),
             'sku' => Yii::t('product', 'SKU'),
             'price' => Yii::t('product', 'Price'),
-            'buyWithThisAttribute' => Yii::t('product', 'Buy with'),
-            'enabled' => Yii::t('product', 'Enabled'),
+            'enabled' => Yii::t('common', 'Enabled'),
+            'category_id'=>Yii::t('category', 'Category'),
+            'shop_id'=>Yii::t('product', 'Shop'),
+            'type'=>Yii::t('common', 'Type'),
+            'discount'=>Yii::t('product', 'Discount'),
+            'buyWithThisAttribute'=>Yii::t('product', 'Buy with this'),
+            'groupedProductsAttribute'=>Yii::t('product', 'Grouped Products'),
         ];
     }
 
@@ -563,7 +602,7 @@ class Product extends \yii\db\ActiveRecord
     }
     public function getUrl()
     {
-        return Url::to(['/product/product/view', 'id'=>$this->id, 'title_url'=>$this->title_url]);
+        return ['/product/product/view', 'id'=>$this->id, 'product_title_url'=>$this->title_url];
     }
     public function getComments()
     {
@@ -579,7 +618,7 @@ class Product extends \yii\db\ActiveRecord
         return [
             self::TYPE_PROMOTE=>Yii::t('product', 'Promotion'),
             self::TYPE_POPULAR=>Yii::t('product', 'Popular'),
-            self::TYPE_NOVELTY=>Yii::t('product', 'Novelties'),
+            self::TYPE_NOVELTY=>Yii::t('product', 'New'),
         ];
     }
     public function getTypeArray()
@@ -745,13 +784,13 @@ ON m.max_mark = r.mark
 
 
 
-    public function getProductOrders()
+    public function getOrderProducts()
     {
         return $this->hasMany(OrderProduct::class, ['product_id'=>'id']);
     }
     public function getOrders()
     {
-        return $this->hasMany(Order::class, ['id'=>'order_id'])->via('productOrders')->from(['o'=>Order::tableName()]);
+        return $this->hasMany(Order::class, ['id'=>'order_id'])->via('orderProducts')->from(['o'=>Order::tableName()]);
     }
 
     /**
@@ -811,6 +850,138 @@ ON m.max_mark = r.mark
         if($group_id==$this->group_id)
             return true;
         return false;
+    }
+
+
+    public function getThumbImg(string $thumbType, $options=[], $width='auto', $height='auto')
+    {
+        $model = $this;
+
+        $thumbAttribute = 'thumb'.ucfirst($thumbType);
+        if((new FileImageProduct)->$thumbAttribute===false)
+            throw new Exception("There is no $thumbType thumb type for ".Inflector::titleize(StringHelper::basename($model::className()), true));
+
+        if(!isset($options['alt']))
+            $options['alt']=$model->title;
+
+
+        $cssSize = "width:{$width};height:{$height};";
+        if(isset($options['style']))
+            $options['style'].=$cssSize;
+        else
+            $options['style']=$cssSize;
+        if($model->mainImage)
+            return $model->mainImage->getThumbImg($thumbType, $options);
+
+        if($width=='auto'){
+            $widthAttribute = 'thumb'.ucfirst($thumbType).'Width';
+            $width = (new FileImageProduct)->$widthAttribute.'px';
+        }
+        if($height=='auto'){
+            $heightAttribute = 'thumb'.ucfirst($thumbType).'Height';
+            $height = (new FileImageProduct)->$heightAttribute.'px';
+        }
+
+        return Html::noImg($width, $height, $options);
+    }
+    public function getImageImg($options=[], $width='auto', $height='auto')
+    {
+        $model = $this;
+        if(!isset($options['alt']))
+            $options['alt']=$model->title;
+
+
+        $cssSize = "width:{$width};height:{$height};";
+        if(isset($options['style']))
+            $options['style'].=$cssSize;
+        else
+            $options['style']=$cssSize;
+
+        if($model->mainImage)
+            return $model->mainImage->getImageImg($options);
+
+        if($width=='auto')
+            $width = (new FileImageProduct)->imageWidth.'px';
+
+        if($height=='auto')
+            $height = (new FileImageProduct)->imageHeight.'px';
+
+
+        if($this->mainImage)
+            return $this->mainImage->getImageImg($options);
+
+        return Html::noImg($width, $height, $options);
+    }
+    public function fields()
+    {
+        return [
+            'id',
+            'title',
+            'url' => function (self $model) {
+                return Url::to($model->url);
+            },
+            'price',
+            'priceCurrency' => function (self $model) {
+                return Yii::$app->formatter->asCurrency($model->price);
+            },
+            'mainThumbUrl' => function (self $model) {
+                $fip = new FileImageProduct;
+                if($mainImage = $model->mainImage)
+                    return $mainImage->getThumbUrl('md');
+                else
+                    return Html::noImgUrl($fip->thumbMdWidth, $fip->thumbMdHeight);
+            },
+            'rating',
+            'typeClass',
+            'discount',
+            'group_id',
+            'valuesText',
+            'sku',
+            'statusText' => function (self $model) {
+                return $model->statusText;
+            },
+            'description',
+            'isNovelty',
+        ];
+    }
+    public function extraFields()
+    {
+        return [
+            'images' => function (self $model) {
+                return $model->images;
+            },
+            'values' => function (self $model) {
+                return $model->values;
+            },
+            'mainThumbUrlMd' => function (self $model) {
+                if($mainImage = $model->mainImage)
+                    return $mainImage->getThumbUrl('md');
+                else
+                    return Html::noImgUrl(400,400);
+            },
+            'mainImageUrl' => function (self $model) {
+                if($mainImage = $model->mainImage)
+                    return $mainImage->imageUrl;
+            },
+            'category' => function (self $model) {
+                return $model->category;
+            },
+        ];
+    }
+
+
+
+    /**
+     * @return ShopQuery
+     * */
+    public function getShop()
+    {
+        return $this->hasOne(Shop::class, ['id'=>'shop_id']);
+    }
+
+    public function getProductTags()
+    {
+        return $this->hasMany(ObjectTag::class, ['model_id'=>'id'])->andOnCondition(['object_tag.model_name'=>self::class]);
     }
 
 }

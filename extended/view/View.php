@@ -32,6 +32,22 @@ class View extends \yii\web\View
         Yii::$container->set($assetBundle,[
             'css'=>[],
             'js'=>[],
+            'depends' => [
+            ],
         ]);
     }
+
+    public function init()
+    {
+        parent::init();
+        if(Yii::$app->id=='app-api')
+            return $this->bootstrapAssetBundles=false;
+        if(Yii::$app->request->isConsoleRequest)
+            return $this->bootstrapAssetBundles=false;
+        if(Yii::$app->request->isAjax)
+            return $this->bootstrapAssetBundles=false;
+        $this->bootstrapAssetBundles=true;
+    }
+
+    public $bootstrapAssetBundles;
 }

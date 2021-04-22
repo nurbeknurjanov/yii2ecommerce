@@ -9,7 +9,7 @@ $('[name="DeliveryForm[role][]"], [name="DeliveryForm[subscribe][]"]').change(fu
         subscribe.push($(this).val())
     });
     $.ajax({
-        url: baseUrlWithLanguage+'/user/manage/index/select',
+        url: baseUrlWithLanguage+'/user/manage/user/select',
         type:'get',
         data:{
             'UserSearch[rolesAttribute]':roles,

@@ -8,9 +8,10 @@ use yii\bootstrap\Alert;
 /* @var $form yii\widgets\ActiveForm */
 
 $this->title = Yii::t('user', 'Change password');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'My profile'), 'url' => ['/user/profile/profile']];
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<h1><?= Html::encode($this->title) ?></h1>
 <div class="user-form">
 
     <?php

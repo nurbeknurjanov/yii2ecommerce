@@ -1,5 +1,4 @@
-$(document).on('click', '.showBasket',function(){
-    var $this = $(this);
+$('body').on('click', '.showBasket',function(){
     var price = 0;
     var count = 1;
     if($(this).data('group_id')){
@@ -31,14 +30,20 @@ $(document).on('click', '.showBasket',function(){
         price = $(this).data('price');
         $('#orderproduct-price').val(price);
         $('#orderproduct-price').next().html(price);
-        $('#orderproduct-count').val($(this).data('count'));
+        $('#orderproduct-count').val($(this).attr('data-count'));
     }
     $('#basketModal').modal('show');
     return false;
 });
 
-$('#basketModal').on('shown.bs.modal', function() {
-    $('#orderproduct-count').select();
+$('body').on('shown.bs.modal', '#basketModal', function () {
+    $('#orderproduct-count').keyup().select();
+});
+$('body').on('hidden.bs.modal', '#basketModal', function () {
+    $('#basketForm .form-group').removeClass('has-error').removeClass('has-success')
+    $('#basketForm .help-block').html('');
+    $('#basketForm .error-summary').hide('');
+    $('#basketForm .error-summary ul').html('');
 });
 
 $(document).on('change', 'select#orderproduct-product_id',function(){
@@ -51,7 +56,9 @@ $(document).on('change', 'select#orderproduct-product_id',function(){
 });
 
 $(document).on('keyup', '#orderproduct-count',function(){
-    var amount = $('#orderproduct-price').val()*$(this).val();
+    let count = parseFloat($(this).val()) || 1;
+    let price = $('#orderproduct-price').val();
+    let amount = count * price;
     $('#orderproduct-price').next().html(amount);//title of price
 });
 
@@ -98,6 +105,7 @@ $('body').on('beforeSubmit', '#basketForm', function ()
                 },{
                     // settings
                     //timer: 10000000,
+                    z_index: 1050,
                     type: data.type,
                     //element: 'body',
                     placement: {
@@ -105,13 +113,15 @@ $('body').on('beforeSubmit', '#basketForm', function ()
                         align: 'right'
                     }
                 });
-            var product_id = $form.find('[name="OrderProduct[product_id]"]').val();
-            //var count = $form.find('[name="OrderProduct[count]"]').val();
-            $('#showBasket-'+product_id).data('count', data.countProduct);
-            $('#showBasket-'+product_id).addClass('alreadyInBasket');
-            $('#basketCountSpan').html(data.messageBasket);
-            if(data.countProduct>0)
-                $('#basketCountSpan').parent().addClass('basketActive');
+            if(data.type=='success'){
+                var product_id = $form.find('[name="OrderProduct[product_id]"]').val();
+                //var count = $form.find('[name="OrderProduct[count]"]').val();
+                $('#showBasket-'+product_id).data('count', data.countProduct);
+                $('#showBasket-'+product_id).addClass('alreadyInBasket');
+                $('#basketCountSpan').html(data.messageBasket);
+                if(data.countProduct>0)
+                    $('#basketCountSpan').parent().addClass('basketActive');
+            }
         }
     });
     $('#basketModal').modal('hide');

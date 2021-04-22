@@ -43,6 +43,12 @@ class TokenController extends Controller
         }
     }
 
+
+    public function actionKoko()
+    {
+        Yii::$app->session->setFlash('success', Yii::t('user', 'You successfully changed your email.'));
+        return $this->goAlert();
+    }
     public function actionRun($token)
     {
         if($model = $this->findModelByToken($token)){
@@ -103,38 +109,6 @@ class TokenController extends Controller
                         Yii::$app->session->setFlash('success', Yii::t('user', 'You successfully changed your email.'));
                         break;
                     }
-
-                    case Token::ACTION_SHARE_LINK_TO_REGISTER: {
-                        return $this->redirect(['/user/guest/signup']);
-                        break;
-                    }
-
-                    case Token::ACTION_INVITE_FROM_ORDER: {
-
-                        $model->refresh();
-                        $user = $model->user;
-
-                        Yii::$app->mailer->compose()
-                            ->setTo([$user->email=>$user->fullName,])
-                            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                            ->setSubject(Yii::t('user', 'You successfully signed up.'))
-                            ->setHtmlBody(Yii::t('user', 'You successfully signed up.'))
-                            ->send();
-
-                        Yii::$app->session->setFlash('success', Yii::t('user', 'You successfully signed up.'));
-
-                        Yii::$app->user->login($user);
-
-                        if(!$user->password_hash){
-                            Yii::$app->session->setFlash('info', Yii::t('user', 'Please, set your password.'));
-                            return $this->redirect(['/user/profile/set-password', 'next'=>"profileData"]);
-                        }
-                        Yii::$app->session->setFlash('info', Yii::t('user', 'Please, fill in your profile data.'));
-                        return $this->redirect(['/user/profile/edit-profile']);
-                        break;
-                    }
-
-
 
                 }
             } catch (Exception $e) {

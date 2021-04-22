@@ -28,6 +28,6 @@ class GiiAsset extends AssetBundle
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
         'yii\bootstrap\BootstrapPluginAsset',
-        'mii\TypeAheadAsset',
+        //'mii\TypeAheadAsset',
     ];
 }

@@ -10,9 +10,9 @@ $this->title = Yii::t('common', 'Create Tag');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Tags'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="tag-create box">
+<div class="tag-create card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

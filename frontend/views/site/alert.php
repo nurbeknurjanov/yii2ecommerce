@@ -27,7 +27,7 @@ use yii\bootstrap\Alert;
                     'body' => Yii::$app->session->getFlash('errorMessage', null, true),
                 ]);
 
-            foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
+            /*foreach (Yii::$app->session->getAllFlashes() as $type => $message) {
                 echo Alert::widget([
                     'options' => [
                         'class' => 'alert-'.($type=='error'?'danger':$type),
@@ -35,7 +35,8 @@ use yii\bootstrap\Alert;
                     'body' => Yii::$app->session->getFlash($type, null, true),
                 ]);
                 //$session->removeFlash($type);
-            }
+            }*/
+            echo \common\widgets\Alert::widget();
             ?>
         </div>
     </div>

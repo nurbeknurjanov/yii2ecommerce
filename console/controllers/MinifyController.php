@@ -46,7 +46,6 @@ class MinifyController extends Controller
         shell_exec("php $dir/yii asset $dir/themes/sakura/assets.php          $dir/frontend/config/assets/assets-sakura.php");
         shell_exec("php $dir/yii asset $dir/themes/sakura_light/assets.php    $dir/frontend/config/assets/assets-sakura-light.php");
         shell_exec("php $dir/yii asset $dir/themes/bootstrap/assets.php       $dir/frontend/config/assets/assets-bootstrap.php");
-        shell_exec("php $dir/yii asset $dir/themes/landing/assets.php         $dir/landing/config/assets-landing.php");
         //php yii asset themes/landing/assets.php         landing/config/assets-landing.php
     }
 }

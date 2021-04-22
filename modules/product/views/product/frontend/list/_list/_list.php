@@ -19,13 +19,7 @@ $basketProducts = Basket::findAll();
 <div class="col-lg-3 col-sm-3 col-xs-4 list-block"  >
     <div>
         <a href="<?=Url::to($model->url)?>" class="<?=$model->typeClass?>" data-discount="<?=$model->discount?>" >
-            <?php
-            if($mainImage = $model->mainImage)
-                //if($mainImage = $model->getImages()->queryMainImage()->one())
-                echo $mainImage->getImg('sm');
-            else
-                echo Html::noImg();
-            ?>
+            <?=$model->getThumbImg('sm')?>
         </a>
         <div class="title"><?=Html::a(StringHelper::truncate($model->title, 30), $model->url, ['class'=>'title']);?></div>
         <div><?=Yii::$app->formatter->asCurrency($model->price);?></div>
@@ -43,7 +37,7 @@ $basketProducts = Basket::findAll();
         <?=Html::a(Yii::t('product', 'Buy'), 'javascript:void(0);',
             [
                 'id'=>'showBasket-'.$model->id,
-                'class'=>'btn btn-warning btn-sm showBasket '.(isset($basketProducts[$model->id])?"showBasketActive":null),
+                'class'=>'btn btn-warning btn-sm showBasket '.(isset($basketProducts[$model->id])?"alreadyInBasket":null),
                 'data'=>[
                     'count'=>isset($basketProducts[$model->id]) ? $basketProducts[$model->id]['count']:1,
                     'product_id'=>$model->id,
@@ -51,6 +45,6 @@ $basketProducts = Basket::findAll();
                     'title'=>$model->title,
                     'group_id'=>$model->group_id,
                 ],
-            ]);?>
+            ])?>
     </div>
 </div>

@@ -8,6 +8,7 @@
 
 namespace category\models;
 
+use eav\models\DynamicField;
 use extended\helpers\Helper;
 use file\models\File;
 use file\models\FileImage;
@@ -22,8 +23,10 @@ use yii\behaviors\SluggableBehavior;
 use yii\db\AfterSaveEvent;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use extended\helpers\Inflector;
+use yii\helpers\Url;
+use yii\helpers\StringHelper;
+use extended\helpers\Html;
 
 /**
  * This is the model class for table "category".
@@ -46,7 +49,11 @@ use extended\helpers\Inflector;
  * @property integer $product_count
  * @property boolean $isRoot
  * @property boolean $isLeaf
+ * @property boolean $hasChildren
  * @property boolean $enabled
+ * @property array $url
+ * @method self getThumbImg(string $thumbType, $options=[], $width='auto', $height='auto')
+ * @property string imageImg
  */
 class Category extends \yii\db\ActiveRecord
 {
@@ -211,6 +218,14 @@ class Category extends \yii\db\ActiveRecord
                 'mimeTypes' => 'image/jpeg, image/png, image/gif',
                 'maxSize'=>1024*1024*4,//4 mb
             ],
+            [
+                'imageAttribute',
+                'image',
+                'minWidth' => 825,
+                'minHeight' => 233,
+                'extensions' => 'gif, jpg, jpeg, png',
+                'mimeTypes' => 'image/jpeg, image/png, image/gif',
+            ],
             ['data', 'jsonValidation', ],
             [['title_url'], 'default', 'value'=>''],
             [['product_count','enabled'], 'default', 'value'=>0],
@@ -241,8 +256,10 @@ class Category extends \yii\db\ActiveRecord
             'rgt' => Yii::t('common', 'Rgt'),
             'depth' => Yii::t('common', 'Depth'),
             'title' => Yii::t('common', 'Title'),
+            'text' => Yii::t('common', 'Text'),
+            'title_url' => Yii::t('common', 'Url'),
             'enabled' => Yii::t('common', 'Enabled'),
-            'imageAttribute'=>'Image',
+            'imageAttribute'=>Yii::t('common', 'Image'),
         ];
     }
 
@@ -280,6 +297,10 @@ class Category extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Product::class, ["category_id"=>"childrenIDs"]);
     }
+    public function getDynamicFields()
+    {
+        return $this->hasMany(DynamicField::class, ["category_id"=>"childrenIDs"]);
+    }
 
     public function init()
     {
@@ -287,9 +308,21 @@ class Category extends \yii\db\ActiveRecord
         $this->on(self::EVENT_BEFORE_DELETE, function(Event $event){
             /* @var $model self */
             $model = $event->sender;
+
             if($model->children(1)->count()>0)
                 throw new Exception("This item has childs. You can not delete this item.", 400);
+
+            if($model->getDynamicFields()->exists())
+                throw new Exception("Sorry. You must first detach "
+                    .Inflector::titleize(Inflector::pluralize(StringHelper::basename(DynamicField::class)), true)." from the "
+                    .Inflector::titleize(StringHelper::basename(self::class), true).' '.$model->title, 400);
+
+            if($model->getProducts()->exists())
+                throw new Exception("Sorry. You must first detach "
+                    .Inflector::titleize(Inflector::pluralize(StringHelper::basename(Product::class)), true)." from the "
+                    .Inflector::titleize(StringHelper::basename(self::class), true).' '.$model->title, 400);
         });
+
 
         $this->on(static::EVENT_AFTER_INSERT, [$this, 'deleteCache']);
         $this->on(static::EVENT_AFTER_UPDATE, [$this, 'deleteCache']);
@@ -310,7 +343,7 @@ class Category extends \yii\db\ActiveRecord
     }
 
 
-    public function deleteCache()
+    public static function deleteCache()
     {
         Yii::$app->cache->flush();
     }
@@ -378,6 +411,10 @@ class Category extends \yii\db\ActiveRecord
         }
     }
 
+    public function getHasChildren()
+    {
+        return !$this->isLeaf;
+    }
     public function getIsLeaf()
     {
         $delta = $this->rgt - $this->lft;
@@ -404,7 +441,7 @@ class Category extends \yii\db\ActiveRecord
 
     public function getUrl()
     {
-        return ['/product/product/list', 'category_id'=>$this->id, 'title_url'=>$this->title_url];
+        return ['/product/product/list', 'category_title_url'=>$this->title_url];
     }
 
     public function t($field)
@@ -417,5 +454,42 @@ class Category extends \yii\db\ActiveRecord
         if($this->hasAttribute($language_field) && $this->$language_field)
             return $this->$language_field;
         throw new Exception("Field for language not found.");*/
+    }
+
+
+
+    public function fields()
+    {
+        return [
+            'id',
+            'title' => function (self $model) {
+                return $model->t('title');
+            },
+            'label' => function (self $model) {
+                return $model->t('title');
+            },
+            'url' => function (self $model) {
+                $url = Url::to($model->url);
+                return $url;
+            },
+            'left' => 'lft',
+            'right' => 'rgt',
+            'depth',
+            'isLeaf',
+            'hasChildren',
+            'text',
+            'tree',
+        ];
+    }
+    public function extraFields()
+    {
+        return [
+            'imageUrl' => function (self $model) {
+                return $model->image ? $model->image->imageUrl:null;
+            },
+            'parents' => function (self $model) {
+                return $model->parents()->all();
+            },
+        ];
     }
 }

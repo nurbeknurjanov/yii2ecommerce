@@ -14,10 +14,10 @@ use extended\helpers\StringHelper;
 $this->title = Yii::t('common', 'Articles');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="article-index box">
+<div class="article-index card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Alert::widget() ?>
 
         <?php  echo $this->render('_search', ['model' => $searchModel]); ?>

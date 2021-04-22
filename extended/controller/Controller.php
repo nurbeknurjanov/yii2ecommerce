@@ -31,13 +31,13 @@ class Controller extends \yii\web\Controller
 
     protected function performAjaxValidation($model, $attributes = null)
     {
+
         if(!Yii::$app->request->isPjax && Yii::$app->request->isAjax)
         {
             if($model->load(Yii::$app->request->post()))
             {
                 Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                //return ActiveForm::validate($model, $attributes); //never use it, use echo with die function instead of return
-                echo json_encode(ActiveForm::validate($model, $attributes));
+                Yii::$app->response->data = ActiveForm::validate($model, $attributes); //never use it, use echo with die function instead of return
                 Yii::$app->end();
             }
         }

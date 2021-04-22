@@ -10,18 +10,18 @@ use country\models\Region;
 /* @var $searchModel country\models\search\RegionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('common', 'Regions');
+$this->title = Yii::t('country', 'States/Provinces');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="region-index box">
+<div class="region-index card">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Alert::widget() ?>
         <?php
 		if(Yii::$app->user->can('createRegion'))
-            echo Html::a(Yii::t('common', 'Create region'), ['create'], ['class' => 'btn btn-success']);
+            echo Html::a(Yii::t('country', 'Create State/Province'), ['create'], ['class' => 'btn btn-success']);
         ?>
     </div>
 

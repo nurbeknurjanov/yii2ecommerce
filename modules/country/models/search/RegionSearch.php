@@ -57,10 +57,10 @@ class RegionSearch extends Region
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
+            'region.id' => $this->id,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'region.name', $this->name]);
 
         $query->joinWith('country');
         $query->andFilterWhere(['like', 'country.name', $this->country_id]);

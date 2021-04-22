@@ -10,7 +10,7 @@
 namespace order\assets;
 
 use country\assets\CountryAsset;
-use extended\vendor\BootstrapSelectAsset;
+use common\assets\BootstrapSelectAsset;
 use order\models\Order;
 use yii\helpers\Url;
 use yii\web\AssetBundle;

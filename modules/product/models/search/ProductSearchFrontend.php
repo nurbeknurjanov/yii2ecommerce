@@ -32,6 +32,14 @@ class ProductSearchFrontend extends ProductSearch
         $rules[]= ['q', 'safe'];
         return $rules;
     }
+
+    public $noveltyAttribute;
+    public $popularAttribute;
+    public function formName()
+    {
+        return "";
+    }
+
     /**
      * Creates data provider instance with search query applied
      *
@@ -39,12 +47,6 @@ class ProductSearchFrontend extends ProductSearch
      *
      * @return ActiveDataProvider
      */
-    public $noveltyAttribute;
-    public $popularAttribute;
-    public function formName()
-    {
-        return "";
-    }
     public function search($params)
     {
         /* @var ProductQuery $query */
@@ -65,29 +67,29 @@ class ProductSearchFrontend extends ProductSearch
         $sort = $dataProvider->sort;
         $sort->attributes['price'] = [
             'label' => Yii::t('product-sort', 'price'),
-            'desc' => ['price'=> SORT_DESC],
             'asc' => ['price' => SORT_ASC],
+            'desc' => ['price'=> SORT_DESC],
         ];
         $sort->attributes['rating'] = [
             'label' => Yii::t('product-sort', 'rating'),
-            'desc' => ['rating'=> SORT_DESC],
-            'asc' => ['rating' => SORT_ASC],
+            'asc' => ['rating' => SORT_DESC],//here is a desc instead of acs
+            'desc' => ['rating'=> SORT_ASC],
         ];
         $sort->attributes['noveltyAttribute'] = [
             'label' => Yii::t('product-sort', 'novelties'),
-            'asc' => ['noveltyAttribute' => SORT_ASC],
-            'desc' => ['noveltyAttribute'=> SORT_DESC],
+            'asc' => ['noveltyAttribute' => SORT_DESC],//here is a desc instead of acs
+            'desc' => ['noveltyAttribute'=> SORT_ASC],
         ];
         $sort->attributes['popularAttribute'] = [
             'label' => Yii::t('product-sort', 'popular'),
-            'asc' => ['popularAttribute' => SORT_ASC],
-            'desc' => ['popularAttribute'=> SORT_DESC],
+            'asc' => ['popularAttribute' => SORT_DESC],//here is a desc instead of acs
+            'desc' => ['popularAttribute'=> SORT_ASC],
         ];
 
         //$sort->defaultOrder = ['id'=>SORT_ASC];
         //$sort->defaultOrder = ['rating'=>SORT_DESC, 'popularAttribute'=>SORT_DESC, 'noveltyAttribute'=>SORT_DESC];
         if(!$sort->attributeOrders)
-            $query->addOrderBy(['rating'=>SORT_DESC,'popularAttribute'=>SORT_DESC,'noveltyAttribute'=>SORT_DESC]);
+            $query->addOrderBy(['rating'=>SORT_DESC, 'popularAttribute'=>SORT_DESC, 'noveltyAttribute'=>SORT_DESC]);
 
         $query->select(['product.*']);
         $query->addSelect(new Expression("IF(FIND_IN_SET(".Product::TYPE_NOVELTY.", product.type), 1, 0) AS noveltyAttribute"));

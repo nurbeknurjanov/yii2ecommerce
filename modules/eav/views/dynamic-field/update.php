@@ -11,14 +11,14 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model eav\models\DynamicField */
 
-$this->title = 'Update dynamic field: ' . ' ' . $model->label;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Dynamic fields'), 'url' => ['index']];
+$this->title = Yii::t('eav', 'Update dynamic field') . ' ' . $model->label;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('eav', 'Dynamic fields'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->label, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
-<div class="dynamic-field-update box">
+<div class="dynamic-field-update card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

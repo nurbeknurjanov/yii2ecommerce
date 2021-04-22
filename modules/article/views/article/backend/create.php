@@ -11,16 +11,13 @@ $this->title = Yii::t('common', 'Create Article');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Articles'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="article-create box">
+<div class="article-create card">
 
-    <?php $this->beginBlock('form') ?>
-        <div class="box-body">
-            <?= $this->render('_form', [
-                'model' => $model,
-            ]) ?>
-        </div>
-    <?php $this->endBlock() ?>
-    {{form}}
+  <div class="card-body">
+      <?= $this->render('_form', [
+          'model' => $model,
+      ]) ?>
+  </div>
 
 
 </div>

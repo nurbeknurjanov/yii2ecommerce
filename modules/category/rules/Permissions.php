@@ -19,7 +19,7 @@ class Permissions
         $auth = Yii::$app->authManager;
         $guestRole = $auth->getRole(User::ROLE_GUEST);
         $userRole = $auth->getRole(User::ROLE_USER);
-        $managerRole = $auth->getRole(User::ROLE_MANAGER);
+        $managerRole = $auth->getRole(User::ROLE_ADMINISTRATOR);
 
 
         $createCategory = $auth->createPermission('createCategory');

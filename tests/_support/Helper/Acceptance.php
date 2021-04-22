@@ -87,12 +87,23 @@ class Acceptance extends \Codeception\Module
         $I->click(['css'=>'.form-group button']);
         //$I->click(['name'=>'login-button']);
 
-        $user= User::find()->one();
-        /*echo "\n";
+        //$user = $I->grabRecord(User::class);//пашет если haveFixtures
+        //$user= User::find()->one();//пашет если haveFixtures
+        //\Codeception\Util\Debug::debug($user);
+        /* echo "\n";
         echo $user->name."\n";
         echo $user->email."\n";
-        echo "\n";*/
-        $I->waitForText($user->fullName);
+        echo "\n"; */
+        //$I->waitForText($user->fullName);
+
+        $name = $I->grabFromDatabase('user',  'name',   [
+                                    'email' => $login,
+                                ]);
+        if(!$name)
+            $name = $I->grabFromDatabase('user',  'name',   [
+                                            'username' => $login,
+                                        ]);
+        $I->waitForText($name);
     }
 
     public function showBasket(AcceptanceTester $I, Product $model, $hiddenField=true)
@@ -106,13 +117,13 @@ class Acceptance extends \Codeception\Module
         $I->waitForElementVisible('#basketModal');
 
         if($hiddenField)
-            $I->seeInField("input[name='{$orderProduct->formName()}[product_id]'][type=hidden]", $model->id);
+            $I->seeInField("input[name='{$orderProduct->formName()}[product_id]'][type=hidden]", (string) $model->id);
         else{
             $I->waitForElement("select[name='{$orderProduct->formName()}[product_id]']");
             $I->seeOptionIsSelected("select[name='{$orderProduct->formName()}[product_id]']", $model->title);
         }
-        $I->seeInField($orderProduct->formName().'[price]', $model->price);
-        $I->seeInField($orderProduct->formName().'[count]', 1);
+        $I->seeInField($orderProduct->formName().'[price]',(string) $model->price);
+        $I->seeInField($orderProduct->formName().'[count]', '1');
         //$I->cantSeeInField('user[name]', 'Miles');
         //$I->grabValueFrom('input[name=api]');
     }

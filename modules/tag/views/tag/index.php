@@ -12,11 +12,11 @@ use common\widgets\Alert;
 $this->title = Yii::t('common', 'Tags');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="tag-index box">
+<div class="tag-index card">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Alert::widget() ?>
         <?php
 		if(Yii::$app->user->can('createTag'))

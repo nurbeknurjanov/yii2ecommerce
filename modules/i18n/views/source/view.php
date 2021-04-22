@@ -10,10 +10,10 @@ $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'I18n Source Messages'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="i18n-source-message-view box">
+<div class="i18n-source-message-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
@@ -24,7 +24,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </div>
 
-    <div class="box-body">
+    <div class="card-body">
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [

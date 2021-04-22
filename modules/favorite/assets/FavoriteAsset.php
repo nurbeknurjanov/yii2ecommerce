@@ -38,17 +38,10 @@ class FavoriteAsset extends AssetBundle
         $addFavorite = Yii::t('favorite', 'Add to favorites');
         $removeFavorite = Yii::t('favorite', 'Remove from favorites');
 
-
-
-
         $view->registerJs("
-            $('body').on('click', '.addToFavorite, .removeFromFavorite',function(e){
-                if($(this).attr('title')=='$addFavorite')
-                    $(this).attr('title', '$removeFavorite');
-                else if($(this).attr('title')=='$removeFavorite')
-                    $(this).attr('title', '$addFavorite');
-            });
-        ", $view::POS_READY, 'favorite');
+            var addFavoriteTitle = '{$addFavorite}';
+            var removeFavoriteTitle = '{$removeFavorite}';
+        ", $view::POS_HEAD, 'favorite');
 
         return parent::register($view);
     }

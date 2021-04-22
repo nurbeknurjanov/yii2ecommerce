@@ -53,7 +53,7 @@ class ProductController extends Controller
     public function init()
     {
         parent::init();
-        if(Yii::$app->id=='app-frontend')
+        if(strpos(Yii::$app->id, 'app-frontend')!==false)
             $this->defaultAction = 'list';
     }
 
@@ -168,6 +168,12 @@ class ProductController extends Controller
         $searchModel = new ProductSearchBackend;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $query = $dataProvider->query;
+        /* @var $query ProductQuery */
+        if(!Yii::$app->user->can(User::ROLE_ADMINISTRATOR))
+            $query->andWhere(['product.user_id'=>Yii::$app->user->id]);
+
+
         return $this->render('backend/index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -250,6 +256,48 @@ class ProductController extends Controller
         });
     }
 
+    public function getTitle(ProductSearchFrontend $searchModel, $dataProvider)
+    {
+        $fullPageCategoryTitle = null;
+        $fullPageSearchTitle = null;
+        $topTitle = null;
+        $breadCrumbTitle = $menuTitle = $pageTitle = $title = Yii::t('product', 'All products');
+        if($searchModel->category_id && $category = $searchModel->category){
+            $pageTitle=null;
+            $breadCrumbTitle = $menuTitle = $title = $category->title;
+            if($category->hasChildren)
+                $fullPageCategoryTitle = $title;
+            else
+                $pageTitle = $title;
+        }
+
+        foreach ($searchModel->valueModels as &$valueModel)
+            if($valueModel->isNotEmpty)
+                $title.=' - '.$valueModel->getValueText(',');
+
+        if($searchModel->q){
+            $menuTitle=null;
+            $breadCrumbTitle = $topTitle = $title = Yii::t('common', 'Search results');
+
+            $nProducts = Yii::t('product', '{n, plural, =0{no products} =1{# product} other{# products}} found.',
+                ['n'=>$dataProvider->totalCount]);
+
+            $fullPageSearchTitle = $pageTitle = Yii::t('product',
+                'For query "{q}" - {nProducts}',
+                ['nProducts'=>$nProducts, 'q'=>Html::encode($searchModel->q)]);
+        }
+
+
+        return [
+            $title,
+            $pageTitle,
+            $fullPageCategoryTitle,
+            $fullPageSearchTitle,
+            $topTitle,
+            $menuTitle,
+            $breadCrumbTitle,
+        ];
+    }
     /**
      * Lists all Product models.
      * @return mixed
@@ -261,31 +309,38 @@ class ProductController extends Controller
 
         $searchModel->trigger($searchModel::EVENT_INIT_DYNAMIC_FIELDS);
         $searchModel->loadDynamicData();
-        $searchModel->eavSearch($dataProvider);
+        $relationName = 'values';
+        $viewStyle = Yii::$app->response->cookies->get('viewStyle')?:Yii::$app->request->cookies->get('viewStyle');
+        if($viewStyle=='asList')
+            $relationName = 'valuesWithFields';
+        $searchModel->eavSearch($dataProvider, $relationName);
 
         //\Yii::beginProfile('blockProfile');
         //\Yii::endProfile('blockProfile');
 
+        $titles = $this->getTitle($searchModel, $dataProvider);
+
         if(Yii::$app->request->isPjax){
             return $this->renderAjax('frontend/list/list', [
-                'title' => null,
+                'title'=>$titles[0],
+                'pageTitle'=>$titles[1],
+                'fullPageCategoryTitle'=>$titles[2],
+                'fullPageSearchTitle'=>$titles[3],
+                'topTitle'=>$titles[4],
+                'menuTitle'=>$titles[5],
+                'breadCrumbTitle'=>$titles[6],
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
             ]);
-            /*return $this->renderPartial('list', [
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);*/
         }
-        if(Yii::$app->request->isAjax && Yii::$app->request->headers->get('forEav'))
-            return $this->renderAjax('@app/views/layouts/product/_sidebar_eav', [
-                'title' => null,
-                'model' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
-
         return $this->render('frontend/list/list', [
-            'title'=>null,
+            'title'=>$titles[0],
+            'pageTitle'=>$titles[1],
+            'fullPageCategoryTitle'=>$titles[2],
+            'fullPageSearchTitle'=>$titles[3],
+            'topTitle'=>$titles[4],
+            'menuTitle'=>$titles[5],
+            'breadCrumbTitle'=>$titles[6],
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -308,15 +363,29 @@ class ProductController extends Controller
 
         $dataProvider->query->favorite();
 
+        $title = Yii::t('favorite', 'Favorites');
+
         if(Yii::$app->request->isPjax){
             return $this->renderAjax('frontend/list/list', [
-                'title' => Yii::t('favorite', 'Favorites'),
+                'title' => $title,
+                'pageTitle' => $title,
+                'topTitle'=>$title,
+                'breadCrumbTitle'=>$title,
+                'menuTitle'=>null,
+                'fullPageCategoryTitle'=>null,
+                'fullPageSearchTitle'=>null,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
             ]);
         }
         return $this->render('frontend/list/list', [
-            'title' => Yii::t('favorite', 'Favorites'),
+            'title' => $title,
+            'pageTitle' => $title,
+            'topTitle'=>$title,
+            'breadCrumbTitle'=>$title,
+            'menuTitle'=>null,
+            'fullPageCategoryTitle'=>null,
+            'fullPageSearchTitle'=>null,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -332,15 +401,29 @@ class ProductController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
 
+        $title = $searchModel->typeText;
+
         if(Yii::$app->request->isPjax){
             return $this->renderAjax('frontend/list/list', [
-                'title' => $searchModel->typeText,
+                'title' => $title,
+                'pageTitle' => $title,
+                'topTitle'=>$title,
+                'breadCrumbTitle'=>$title,
+                'menuTitle'=>null,
+                'fullPageCategoryTitle'=>null,
+                'fullPageSearchTitle'=>null,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
             ]);
         }
         return $this->render('frontend/list/list', [
-            'title' => $searchModel->typeText,
+            'title' => $title,
+            'pageTitle' => $title,
+            'topTitle'=>$title,
+            'breadCrumbTitle'=>$title,
+            'menuTitle'=>null,
+            'fullPageCategoryTitle'=>null,
+            'fullPageSearchTitle'=>null,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -356,15 +439,29 @@ class ProductController extends Controller
 
         $dataProvider->query->viewed();
 
+        $title = Yii::t('product', 'Viewed products');
+
         if(Yii::$app->request->isPjax){
             return $this->renderAjax('frontend/list/list', [
-                'title' => Yii::t('product', 'Viewed products'),
+                'title' => $title,
+                'pageTitle' => $title,
+                'topTitle'=>$title,
+                'breadCrumbTitle'=>$title,
+                'menuTitle'=>null,
+                'fullPageCategoryTitle'=>null,
+                'fullPageSearchTitle'=>null,
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider,
             ]);
         }
         return $this->render('frontend/list/list', [
-            'title' => Yii::t('product', 'Viewed products'),
+            'title' => $title,
+            'pageTitle' => $title,
+            'topTitle'=>$title,
+            'breadCrumbTitle'=>$title,
+            'menuTitle'=>null,
+            'fullPageCategoryTitle'=>null,
+            'fullPageSearchTitle'=>null,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -517,12 +614,14 @@ class ProductController extends Controller
     public function actionDelete($id)
     {
         try {
-            $model = $this->findModel($id);
-            $model->delete();
+            $this->findModel($id)->delete();
+            Yii::$app->session->setFlash('success', 'You have successfully deleted the item.');
+            if(strpos(Yii::$app->request->referrer,'view')!==false)
+                return $this->redirect($this->defaultAction);
         } catch (Exception $e) {
             Yii::$app->session->setFlash('error', $e->getMessage());
         }
-        return $this->redirect(['index']);
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
 

@@ -16,9 +16,9 @@ $this->title = 'Create dynamic field';
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Dynamic fields'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="dynamic-field-create box">
+<div class="dynamic-field-create card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

@@ -6,13 +6,13 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model country\models\Country */
 
-$this->title = Yii::t('common', 'Create Country');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Countries'), 'url' => [Yii::$app->controller->defaultAction]];
+$this->title = Yii::t('country', 'Create Country');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('country', 'Countries'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="countries-create box">
+<div class="countries-create card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

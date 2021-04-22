@@ -18,17 +18,16 @@ class ProductUrlRule extends Component implements UrlRuleInterface
     public function createUrl($manager, $route, $params)
     {
         if ($route === 'product/product/view') {
-            if (isset($params['title_url']) && $params['title_url']){
-                $title_url = $params['title_url'];
-                $id = $params['id'];
-                unset($params['title_url']);
+            $product_title_url = isset($params['product_title_url']) ? $params['product_title_url']:null;
+            if($product_title_url){
+                $url = $product_title_url."-".$params['id'];
+
+                unset($params['product_title_url']);
                 unset($params['id']);
-                if(!$params)
-                    return $title_url."-".$id;
-                return $title_url."-".$id."?".http_build_query($params);
-            }else{
-                unset($params['title_url']);
-                return $route."?".http_build_query($params);
+
+                if($params)
+                    $url.="?".http_build_query($params);
+                return $url;
             }
         }
         return false;
@@ -36,17 +35,10 @@ class ProductUrlRule extends Component implements UrlRuleInterface
 
     public function parseRequest($manager, $request)
     {
-        $pathInfo = $request->getPathInfo();
-        $pathInfo = trim($pathInfo, '/');
-
-        if(strpos($pathInfo, 'upload')!==false)
-            return false;
-
-        $pathInfo = explode("-", $pathInfo);
-        if($pathInfo){
+        $pathInfo = trim($request->getPathInfo(), '/');
+        if($pathInfo = explode("-", $pathInfo)){
             $last = $pathInfo[count($pathInfo)-1];
             if($last && is_numeric($last)){
-                //echo 'product<br>';
                 $params = $_GET;
                 $params['id'] = $last;
                 return ['product/product/view', $params ];

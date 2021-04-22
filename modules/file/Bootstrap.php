@@ -35,7 +35,6 @@ class Bootstrap implements BootstrapInterface {
     public function bootstrap($app)
     {
         $view = $app->view;
-        FileAsset::register($view);
 
         if (!isset(Yii::$app->get('i18n')->translations['file*'])) {
             Yii::$app->get('i18n')->translations['file*'] = [
@@ -44,9 +43,13 @@ class Bootstrap implements BootstrapInterface {
             ];
         }
 
-        if(!Yii::$app->request->isAjax)
+        if($app->view->bootstrapAssetBundles)
+        {
+            FileAsset::register($view);
             $view->on(View::EVENT_END_BODY, function () use ($view) {
                 echo FileVideoNetworkWidget::widget();
             });
+        }
+
     }
 }

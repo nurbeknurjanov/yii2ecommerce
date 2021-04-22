@@ -14,16 +14,16 @@ use yii\grid\GridView;
 /* @var $this yii\web\View */
 /* @var $model order\models\Order */
 
-$this->title = $model->id;
+$this->title = $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Orders'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 
 $this->beginBlock('page');
 ?>
-<div class="order-view box">
+<div class="order-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?php
 		if(Yii::$app->user->can('updateOrder', ['model' => $model]))
             echo Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
@@ -91,6 +91,16 @@ $this->beginBlock('page');
                 'value'=>$model->paymentTypeText,
             ],
             [
+                'attribute'=>'online_payment_type',
+                'value'=>$model->onlinePaymentTypeText,
+                'visible'=>$model->isPaymentOnline,
+            ],
+            [
+                'attribute'=>'online_payment_status',
+                'value'=>$model->onlinePaymentStatusText,
+                'visible'=>$model->isPaymentOnline,
+            ],
+            [
                 'attribute'=>'status',
                 'value'=>$model->statusText,
             ],
@@ -102,7 +112,7 @@ $this->beginBlock('page');
     ?>
 
     <?php $this->beginBlock('detailView') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?=$widget->run() ?>
             <?=GridView::widget([
                 'dataProvider' => new \yii\data\ArrayDataProvider([

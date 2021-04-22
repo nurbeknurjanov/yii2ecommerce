@@ -11,6 +11,7 @@ return [
     'components'=>[
         'cronMailer' => [
             'class' => 'delivery\CronMailer',
+            'viewPath' => '@user/mail'
         ],
     ],
     'params'=>array_merge(Yii::$app->params , [

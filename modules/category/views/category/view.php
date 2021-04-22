@@ -13,10 +13,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $this->beginBlock('page');
 ?>
-<div class="category-view box">
+<div class="category-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?php
 		if(Yii::$app->user->can('updateCategory', ['model' => $model]))
             echo Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
@@ -47,7 +47,7 @@ $this->beginBlock('page');
             [
                 'attribute'=>'imageAttribute',
                 'format'=>'raw',
-                'value'=>$model->image ? $model->image->img:null,
+                'value'=>$model->imageImg,
             ],
             'text:raw',
             'product_count',
@@ -59,7 +59,7 @@ $this->beginBlock('page');
     ?>
 
     <?php $this->beginBlock('detailView') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?=$widget->run(); ?>
         </div>
     <?php $this->endBlock() ?>

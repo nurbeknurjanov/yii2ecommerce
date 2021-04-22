@@ -13,11 +13,11 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Comments'), 'url'
 $this->params['breadcrumbs'][] = Yii::t('common', 'Create');
 
 ?>
-<div class="comment-create box">
+<div class="comment-create card">
 
 
     <?php $this->beginBlock('form') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?= $this->render('_form', [
                 'model' => $model,
             ]) ?>

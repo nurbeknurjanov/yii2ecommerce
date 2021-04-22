@@ -28,6 +28,8 @@ class SakuraThemeAsset extends AssetBundle
     ];
     public $js = [
         'js/sakura.js',
+        'js/header.js',
+        'js/index.js',
         //'js/carousel.js'
     ];
     public $depends = [

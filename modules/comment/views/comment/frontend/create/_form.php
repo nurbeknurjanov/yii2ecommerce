@@ -86,7 +86,7 @@ use himiklab\yii2\recaptcha\ReCaptcha;
 
         <?php
         if(YII_ENV_PROD)
-            echo $form->field($model, 'reCaptcha')->widget(ReCaptcha::class)
+            echo $form->field($model, 'reCaptcha', ['enableAjaxValidation' => false, 'enableClientValidation' => false])->widget(ReCaptcha::class)
         ?>
 
         <?php $this->endBlock() ?>

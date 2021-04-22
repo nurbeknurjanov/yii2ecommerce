@@ -16,6 +16,7 @@ use category\models\Category;
 use eav\assets\EavAsset;
 use file\widgets\file_preview\FilePreview;
 use kartik\file\FileInput;
+use shop\models\Shop;
 
 $eavAsset = EavAsset::register($this);
 
@@ -51,14 +52,16 @@ $form = ActiveForm::begin([
 
             <?=$form->errorSummary($model);?>
 
+            <?=$form->field($model, 'shop_id')->dropDownList(ArrayHelper::map(Shop::find()->mineOrDefault()->all(),'id','title'),
+                ['prompt'=>'Select',]) ?>
             <?= $form->field($model, 'price', [
                 'template' => "{label}\n<div class=\"col-lg-4\" >{input}{error}</div>",
-                'parts'=>[  '{input}'=> Html::inputWithSymbol($model, 'price', Yii::$app->formatter->currencySymbol)],
+                'parts'=>[  '{input}'=> Html::inputWithSymbol($model, 'price', [], Yii::$app->formatter->currencySymbol)],
             ]) ?>
             <?=$form->field($model, "discount")->begin(); ?>
             <?=Html::activeLabel($model, "discount", ['class'=>'col-lg-3 control-label',]) ?>
             <div class="col-lg-4">
-                <?=Html::inputWithSymbol($model, 'discount', '%')?>
+                <?=Html::inputWithSymbol($model, 'discount', [],'%')?>
                 <?= Html::error($model, "discount", ['class'=>'help-block']) ?>
             </div>
             <div class="col-lg-5">
@@ -113,7 +116,7 @@ $form = ActiveForm::begin([
                 foreach ($model->valueModels as $field_id=>$valueModel){
                     $fieldModel=$model->fieldModels[$field_id];
                     echo $form->field($valueModel, "[$fieldModel->id]value",
-                        ['parts'=>['{input}'=>$fieldModel->getFieldWithUnit($valueModel, "[$fieldModel->id]value") ]]);
+                        ['parts'=>['{input}'=>$fieldModel->getField($valueModel, "[$fieldModel->id]value") ]]);
                 }
                 ?>
             </div>
@@ -140,7 +143,7 @@ $form = ActiveForm::begin([
     <div class="form-group">
         <div class="col-lg-12" >
             <div class="col-lg-12" style="text-align: right">
-                <?= Html::submitButton('Multiple save', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+                <?= Html::submitButton(Yii::t('product', 'Update all'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
             </div>
         </div>
     </div>

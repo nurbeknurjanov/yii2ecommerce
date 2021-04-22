@@ -16,7 +16,7 @@ if($models){
     <br/>
     <br/>
     <h1><?=Yii::t('product', 'Buy with this product');?></h1>
-    <div class="index-product-list">
+    <div class="buyWithThisProducts">
         <?php
         foreach ($models as $data) {
             ?>

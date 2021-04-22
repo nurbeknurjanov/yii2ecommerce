@@ -10,8 +10,12 @@ use yii\i18n\PhpMessageSource;
 use \yii\i18n\MessageSource;
 use extended\i18n\MissingTranslationEventHandler AS MTEH;
 
+Yii::$container->set('yii\bootstrap\BootstrapAsset',[
+    'css' => [],
+]);
+
 Yii::$container->set('yii\grid\GridView', [
-    'options'=>['class'=>'grid-view box-body table-responsive'],
+    'options'=>['class'=>'grid-view card-body table-responsive'],
     //'options'=>['class'=>'grid-view box-body table-responsive no-padding'],
     'tableOptions'=>['class'=>'table table-bordered'],
     //'tableOptions'=>['class'=>'table table-hover'],
@@ -38,7 +42,7 @@ Yii::$container->set(\yii\grid\ActionColumn::class, [
                 'data-pjax' => '0',
                 'class'=>'btn btn-xs btn-primary',
             ];
-            return Html::a('<span class="fa fa-pencil"></span>', $url, $options);
+            return Html::a('<span class="fa fa-pencil-alt"></span>', $url, $options);
         },
         'delete'=>function ($url, $model, $key){
             $options = [
@@ -111,10 +115,11 @@ return [
         'view' => [
             'theme' => [
                 'class'=>'extended\view\Theme',
-                'id'=>'adminlte',
+                'id'=>'adminlte3',
                 'pathMap' => [
-                    '@app/views' => '@themes/adminlte',
-                    '@user/views' => '@themes/adminlte',
+                    '@app/views' => '@themes/adminlte3',
+                    //'@user/views' => '@themes/adminlte',
+                    //'@app/views' => '@vendor/hail812/yii2-adminlte3/src/views'
                 ],
             ],
         ],

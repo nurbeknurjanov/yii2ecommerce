@@ -86,19 +86,19 @@ use kartik\datetime\DateTimePicker;
 $this->title = <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>;
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-index">
+<div class="card">
 
-    <h1><?= "<?= " ?>Html::encode($this->title) ?></h1>
 <?php if(!empty($generator->searchModelClass)): ?>
 <?= "    <?php " . ($generator->indexWidgetType === 'grid' ? "// " : "") ?>echo $this->render('_search', ['model' => $searchModel]); ?>
 <?php endif; ?>
+    <?= "<?= Alert::widget() ?>\n" ?>
 
-    <p>
-        <?= "<?= Alert::widget() ?>\n" ?>
+
+    <div class="card-header">
         <?= "<?php\n\t\t" ?>if(Yii::$app->user->can('create<?=StringHelper::basename($generator->modelClass);?>'))
-            <?= "echo " ?>Html::a(<?= $generator->generateString('Create ' . lcfirst(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>, ['create'], ['class' => 'btn btn-success']);
+            <?= "echo " ?>Html::a(<?= $generator->generateString('Create ' . strtolower(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>, ['create'], ['class' => 'btn btn-success']);
         ?>
-    </p>
+    </div>
 
 <?php if ($generator->indexWidgetType === 'grid'): ?>
     <?= "<?= " ?>GridView::widget([
@@ -128,7 +128,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                 'value'=>function($data){
                     return $data-><?=$column->name;?>Text;
                 },
-                'filter'=>$searchModel-><?=$column->name;?>Values,
+                'filter'=>$searchModel-><?=$column->name;?>Options,
             ],
 <?php
             }
@@ -140,7 +140,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                 'value'=>function($data){
                     return $data-><?=$column->name;?>Text;
                 },
-                'filter'=>$searchModel-><?=$column->name;?>Values,
+                'filter'=>$searchModel-><?=$column->name;?>Options,
             ],
 <?php
         }
@@ -153,7 +153,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
                 'attribute'=>'<?=$column->name;?>',
                 'format'=>'raw',
                 'value'=>function($data){
-                    return $data-><?=strtolower($littleComment);?> ? $data-><?=strtolower($littleComment);?>->title:null;
+                    return $data-><?=lcfirst($littleComment);?> ? $data-><?=lcfirst($littleComment);?>->title:null;
                 },
                 'filter'=>ArrayHelper::map(\<?=$column->comment;?>::find()->all(), 'id', 'title'),
             ],

@@ -4,8 +4,24 @@ RewriteBase /
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d 
+#RewriteCond %{HTTP_HOST} ^demo\.sakura\.com [NC]
 
 RewriteRule . index.php
+
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{HTTP_HOST} ^m\.sakura\.com [NC]
+
+#RewriteRule . app.php
+
+#RewriteCond %{REMOTE_ADDR} !=123.45.67.89
+#RewriteCond %{REQUEST_URI} !=/construction.php
+#RewriteCond %{HTTP_USER_AGENT} AltaVista [OR]
+#RewriteCond %{HTTP_USER_AGENT} Googlebot [OR]
+#RewriteCond %{HTTP_USER_AGENT} msnbot [OR]
+#RewriteCond %{HTTP_USER_AGENT} Slurp
+DirectoryIndex index.php
+
 
 php_flag display_startup_errors on
 php_flag display_errors on

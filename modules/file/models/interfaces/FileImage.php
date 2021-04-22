@@ -13,7 +13,9 @@ namespace file\models\interfaces;
 
 interface FileImage extends File
 {
-    public function getImg($thumbType='xs', $options=[]);
-    public function getThumbUrl(string $type='xs');
+    public function getThumbImg(string $thumbType, $options=[]);
+    public function getImageImg($options=[]);
+
+    public function getThumbUrl(string $thumbType);
     public function getImageUrl();
 }

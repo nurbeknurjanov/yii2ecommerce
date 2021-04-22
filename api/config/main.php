@@ -1,6 +1,7 @@
 <?php
 
 use yii\web\Request;
+use yii\web\Response;
 
 $params = array_merge(
     require(__DIR__ . '/../../common/config/params.php'),
@@ -23,6 +24,15 @@ return [
                 return true;
             return (new \common\components\RejectIP())->beforeAction(Yii::$app->controller->action);
         },*/
+    'container' => [
+        'definitions' => [
+            'cookie'=>[
+                'class'=>\yii\web\Cookie::class,
+                'expire' => time() + 3600*24*7,
+                'domain' => '.sakuracommerce.com'
+            ],
+        ],
+    ],
     'components' => [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -51,44 +61,57 @@ return [
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser',
             ],
+            //'baseUrl'=>'http://api.sakura.com',
             'baseUrl'=>str_replace('/api/web', '', (new Request)->baseUrl),
             //'baseUrl'=>str_replace('/web', '', (new Request)->baseUrl),
         ],
         'urlManager' => [
-            'baseUrl'=>str_replace('/api/web', '', (new Request)->baseUrl).'#',
+            'baseUrl'=>str_replace('/api/web', '', (new Request)->baseUrl),
+            //'baseUrl'=>str_replace('/api/web', '', (new Request)->baseUrl).'/#',
             //'baseUrl'=>str_replace('/web', '', (new Request)->baseUrl),
             'class' => 'api\components\UrlManager',
             'enablePrettyUrl' => true,
             'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
-                ['class' => 'yii\rest\UrlRule', 'controller' => ['phase', 'page']],
+                ['class' => 'yii\rest\UrlRule', 'controller' => ['phase', 'page', 'product']],
                 ['class' => 'yii\rest\UrlRule', 'controller' => ['v1/phase']],
                 ['class' => 'yii\rest\UrlRule', 'controller' => ['v2/phase']],
+                //'order/order-product/group-products'=>'order-product/group-products',
+                'product/product/list'=>'product/index',
+                'product/product/favorites'=>'product/favorites',
             ],
         ],
         'response'=>[
             'on beforeSend'=>function ($event) {
                 $response = $event->sender;
+                /* @var \yii\web\Response $response */
 
                 $data = $response->data;
                 $response->data = null;
 
                 $response->data['statusCode'] = $response->statusCode;
                 $response->data['statusMessage'] = $response->statusText;
-                if($data)
+                if($data!==null)
                     $response->data['data'] =  $data;
-                //print_r($response->data); die();
-                //$response->data = serialize($response->data);
-
-                if(isset($_GET['format']))
-                    $response->format = $_GET['format'];
 
                 return $response->data;
             },
-            'format'=>\yii\web\Response::FORMAT_JSON,
+            'format'=>Response::FORMAT_JSON,
             //'format'=>\yii\web\Response::FORMAT_XML,
             //'format'=>\yii\web\Response::FORMAT_RAW,
+        ],
+        'view' => [
+            'theme' => [
+                'class'=>'extended\view\Theme',
+                'id'=>'sakura',
+                'pathMap' => [
+                    '@app/views' => '@themes/sakura',
+                ],
+            ],
+        ],
+        'assetManager' => [
+            'bundles' => require __DIR__.'/assets.php',
         ],
     ],
     'modules' => [

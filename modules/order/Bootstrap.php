@@ -25,10 +25,7 @@ class Bootstrap implements BootstrapInterface {
      */
     public function bootstrap($app) {
 
-        Yii::setAlias("@coupon", __DIR__.'/coupon');
-
         $view = Yii::$app->view;
-        OrderAsset::register($view);
 
         if (!isset(Yii::$app->get('i18n')->translations['order*'])) {
             Yii::$app->get('i18n')->translations['order*'] = [
@@ -37,10 +34,14 @@ class Bootstrap implements BootstrapInterface {
             ];
         }
 
-        if(!$app->request->isConsoleRequest && $app->id!='app-backend' &&
-            !$app->request->isAjax )
-            $view->on(View::EVENT_END_BODY, function () use ($view) {
-                echo $view->render('@order/views/order/_basket_modal');
-            });
+        if($app->view->bootstrapAssetBundles)
+        {
+            OrderAsset::register($view);
+            if(!in_array($app->id, ['app-backend', 'app-frontend-app']))
+                $view->on(View::EVENT_END_BODY, function () use ($view) {
+                    echo $view->render('@order/views/order/_basket_modal');
+                });
+        }
+
     }
 }

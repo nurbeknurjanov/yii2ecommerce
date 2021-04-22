@@ -12,10 +12,10 @@ use extended\helpers\Helper;
     ]) ?>
 
     <div class='row'>
-        <div class="col-lg-3">
-            <?=$this->render('_sidebar_eav', ['model' => $this->params['searchModel']]); ?>
+        <div class="col-lg-3 col-md-3 col-sm-12">
+            <?=$this->render('_sidebar_eav', ['searchModel' => $this->params['searchModel']]); ?>
         </div>
-        <div class="col-lg-9">
+        <div class="col-lg-9 col-md-9 col-sm-12">
             <?= Alert::widget() ?>
             <?=$content;?>
         </div>

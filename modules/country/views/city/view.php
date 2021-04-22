@@ -10,10 +10,10 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Cities'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="city-view box">
+<div class="city-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?php
 		if(Yii::$app->user->can('updateCity', ['model' => $model]))
             echo Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </div>
 
-    <div class="box-body">
+    <div class="card-body">
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [

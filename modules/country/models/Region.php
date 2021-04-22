@@ -58,7 +58,8 @@ class Region extends \yii\db\ActiveRecord
             [['country_id'], 'integer'],
             [['country_id'], 'default', 'value'=>NULL],
             [['name'], 'default', 'value'=>''],
-            [['name'], 'string', 'max' => 30]
+            [['name'], 'string', 'max' => 30],
+            ['name', 'unique', 'targetAttribute' => ['name', 'country_id']],
         ];
     }
 
@@ -69,8 +70,8 @@ class Region extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('common', 'ID'),
-            'name' => Yii::t('common', 'Name'),
-            'country_id' => Yii::t('common', 'Country ID'),
+            'name' => Yii::t('country', 'State/Province name'),
+            'country_id' => Yii::t('country', 'Country'),
         ];
     }
 
@@ -112,4 +113,5 @@ class Region extends \yii\db\ActiveRecord
         return Yii::$app->dbCountries;
     }
 
+    const REGION_NEW_YORK=3956;
 }

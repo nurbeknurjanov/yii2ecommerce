@@ -19,9 +19,10 @@ if($image){
             'form'=>'anotherForm',
             'confirm'=>Yii::t('common', 'Are you sure you want to delete this item?')]]);
     ?>
+    <div class="clear"></div>
     <div class="file-preview-frame krajee-default  kv-preview-thumb" style="display: block; height: auto">
         <a href="<?=$image->imageUrl;?>" data-lightbox="file-preview">
-            <?=$image->getImg($thumbType);?>
+            <?=$image->getThumbImg($thumbType);?>
         </a>
         <div class="file-thumbnail-footer">
             <div title="<?=$image->title;?>" class="file-footer-caption"><?=$image->title;?></div>

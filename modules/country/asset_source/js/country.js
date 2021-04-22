@@ -1,7 +1,7 @@
 /**
  * Created by nurbek on 3/14/18.
  */
-
+//it is depending dropdowns
 $(document).on('change', 'select.country_id', function () {
     var $this = $(this);
     $.ajax({
@@ -14,6 +14,7 @@ $(document).on('change', 'select.country_id', function () {
             var url = new Url($("select.region_id").data('url').toString());
             url.query.country_id=$this.val();
             $("select.region_id").data('url', url.toString());
+            $("select.region_id").attr('data-url', url.toString());
             $("select.region_id" ).html( data ).selectpicker('refresh').trigger('change');
         }
     });
@@ -31,6 +32,7 @@ $(document).on('change', 'select.region_id', function () {
             var url = new Url($("select.city_id").data('url').toString());
             url.query.region_id=$this.val();
             $("select.city_id").data('url', url.toString());
+            $("select.city_id").attr('data-url', url.toString());
             $("select.city_id" ).html( data ).selectpicker('refresh').trigger('change');
         }
     });

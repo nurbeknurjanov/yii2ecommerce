@@ -70,7 +70,7 @@ class OrderProduct extends \yii\db\ActiveRecord
             'order_id' => Yii::t('common', 'Order'),
             'product_id' => Yii::t('product', 'Product'),
             'price' => Yii::t('product', 'Price'),
-            'count' => Yii::t('order', 'Count'),
+            'count' => Yii::t('order', 'Quantity'),
             'amount' => Yii::t('order', 'Amount'),
         ];
     }

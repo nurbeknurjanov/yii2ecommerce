@@ -16,13 +16,11 @@ use extended\helpers\Helper;
 use yii\web\JsExpression;
 
 /* @var $this \extended\view\View */
-/* @var $model product\models\search\ProductSearch */
+/* @var $searchModel product\models\search\ProductSearch */
 /* @var $form yii\widgets\ActiveForm */
 
 $request = Yii::$app->request;
-if(isset($this->assetManager->bundles['all']))
-    $this->clearAssetBundle(EavAsset::class);
-$eavAsset = EavAsset::register($this);
+
 if(isset($this->params['searchModel'])){
     $searchModel = $this->params['searchModel'];
 }
@@ -33,7 +31,7 @@ else{
 $action = ['/product/product/list'];
 if($searchModel->category){
     $action['category_id'] = $searchModel->category->id;
-    //$action['title_url'] = $searchModel->category->title_url;
+    //$action['category_title_url'] = $searchModel->category->title_url;
 }
 ?>
 
@@ -85,10 +83,10 @@ if($searchModel->category){
     </div>
     <?php
     $priceContent = ob_get_clean();
-    echo $form->field($model, 'price', ['parts'=>['{input}'=>$priceContent]])
+    echo $form->field($searchModel, 'price', ['parts'=>['{input}'=>$priceContent]])
     ?>
 
-    <?=$form->field($model, 'category_id')->dropDownList(
+    <?=$form->field($searchModel, 'category_id')->dropDownList(
         ArrayHelper::map(Category::find()->defaultFrom()->defaultOrder()
             ->enabled()->selectTitle()->all(), 'id', 'title'),
         [
@@ -99,11 +97,11 @@ if($searchModel->category){
             //'data-size'=>5,
             'encode'=>false,
             'data'=>[
-                'id'=>$model->id,
+                'id'=>$searchModel->id,
             ],
         ]); ?>
 
-    <img src="<?=$eavAsset->baseUrl;?>/images/loading.gif" id="loading" />
+    <img src="<?=$this->assetManager->publish((new EavAsset)->sourcePath."/images/loading.gif")[1]?>" id="loading" />
     <div class="eavFields">
         <?php
         echo $this->render('@eav/views/dynamic-field/fields/_fields_for_search',[
@@ -113,7 +111,7 @@ if($searchModel->category){
         ?>
     </div>
 
-    <?php // echo $form->field($model, 'q') ?>
+    <?php // echo $form->field($searchModel, 'q') ?>
     <div class="form-group">
         <?php //echo Html::submitButton(Yii::t('product', 'Search'), ['class' => 'btn btn-primary submitButton']) ?>
         <?php //echo Html::button(Yii::t('product', 'Reset'), ['class' => 'btn btn-default resetButton']) ?>

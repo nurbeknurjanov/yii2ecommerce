@@ -13,6 +13,7 @@ use Yii;
 use AcceptanceTester;
 use tests\unit\fixtures\ProductBuyWithThisFixture;
 use tests\unit\fixtures\UserFixture;
+use tests\unit\fixtures\UserProfileFixture;
 use tests\unit\fixtures\DynamicFieldFixture;
 use tests\unit\fixtures\DynamicValueFixture;
 
@@ -43,6 +44,10 @@ class ProductCest
             ],
             'users' => [
                 'class' => UserFixture::class,
+                'depends'=>[],
+            ],
+             'user_profiles' => [
+                'class' => UserProfileFixture::class,
                 'depends'=>[],
             ],
         ];
@@ -80,19 +85,19 @@ class ProductCest
 
         $I->amOnPage(Url::to(['/product/product/type', 'type'=>Product::TYPE_PROMOTE]));
         $product->type = Product::TYPE_PROMOTE;
-        $I->waitForText($product->typeText, null, 'h1');
+        $I->waitForText($product->typeText, null, 'h1.title');
         $I->see($asus->title);
         $I->dontSee($bag->title);
 
         $I->amOnPage(Url::to(['/product/product/type', 'type'=>Product::TYPE_POPULAR]));
         $product->type = Product::TYPE_POPULAR;
-        $I->waitForText($product->typeText, null, 'h1');
+        $I->waitForText($product->typeText, null, 'h1.title');
         $I->see($asus->title);
         $I->dontSee($bag->title);
 
         $I->amOnPage(Url::to(['/product/product/type', 'type'=>Product::TYPE_NOVELTY]));
         $product->type = Product::TYPE_NOVELTY;
-        $I->waitForText($product->typeText, null, 'h1');
+        $I->waitForText($product->typeText, null, 'h1.title');
         $I->see($asus->title);
         $I->dontSee($bag->title);
 
@@ -174,8 +179,8 @@ class ProductCest
         $I->wait(1);
         $I->seeInCurrentUrl("priceFrom=800");
         $I->seeInCurrentUrl("priceTo=600");
-        $I->seeInField('priceFrom', 800);
-        $I->seeInField('priceTo', 600);
+        $I->seeInField('priceFrom', (string) 800);
+        $I->seeInField('priceTo',  (string) 600);
         $I->dontSeeLink($asus->title);
 
         $I->fillField("priceFrom", 700);
@@ -183,8 +188,8 @@ class ProductCest
         $I->wait(1);
         $I->seeInCurrentUrl("priceFrom=700");
         $I->seeInCurrentUrl("priceTo=1000");
-        $I->seeInField('priceFrom', 700);
-        $I->seeInField('priceTo', 1000);
+        $I->seeInField('priceFrom',  (string)  700);
+        $I->seeInField('priceTo',  (string) 1000);
         $I->seeLink($asus->title);
 
 

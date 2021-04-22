@@ -50,16 +50,16 @@ BootboxAsset::register($this);
             $menuItems[] = ['label' => 'Products', 'url' => ['/product/product/index']];
         if(Yii::$app->user->can('indexCategory'))
             $menuItems[] = ['label' => 'Categories', 'url' => ['/category/category/index']];
-        if(Yii::$app->user->can(User::ROLE_MANAGER))
+        if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR))
             $menuItems[] = ['label' => 'Dynamic fields', 'url' => ['/eav/dynamic-field/index']];
 
         $menuItems['modules'] = ['label'=>'Modules'];
         if(Yii::$app->user->can('indexUser'))
             $menuItems['modules']['items']['user'] = [
-                'label' => 'Users', 'url' => ['/user/manage/index/index'],
+                'label' => 'Users', 'url' => ['/user/manage/user/index'],
             ];
 
-        if(Yii::$app->user->can(User::ROLE_MANAGER)){
+        if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR)){
             $menuItems['modules']['items']['user']['items'][] =  [
                 'label' => 'RBAC',
                 'url'=>'javascript:void(0)',
@@ -90,7 +90,7 @@ BootboxAsset::register($this);
             $menuItems['modules']['items'][] = [
                 'label' => 'Comments',  'url'=>['/comment/comment/index'],
             ];
-        if(Yii::$app->user->can(User::ROLE_MANAGER))
+        if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR))
             $menuItems['modules']['items'][] = [
                 'label' => 'Files',  'url'=>['/file/file-manage/index'],
             ];
@@ -100,7 +100,7 @@ BootboxAsset::register($this);
             $menuItems['modules']['items'][] = ['label' => 'Articles', 'url' => ['/article/article/index']];
         if(Yii::$app->user->can('indexTag'))
             $menuItems['modules']['items'][] = ['label' => 'Tags', 'url' => ['/tag/tag/index']];
-        if(Yii::$app->user->can(User::ROLE_MANAGER)){
+        if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR)){
             $menuItems['modules']['items'][] =                 [
                 'label' => 'I18N',
                 'url'=>'javascript:void(0)',

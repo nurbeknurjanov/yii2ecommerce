@@ -25,6 +25,7 @@ $('body').on('click', '.addToCompare',function(e){
     });
 
 
+    $(this).attr('title',removeCompareTitle);
     $(this).attr('href', $(this).attr('href').replace(new RegExp("add",'g'),"remove"));
     $(this).removeClass('addToCompare');
     $(this).addClass('removeFromCompare');
@@ -59,7 +60,7 @@ $('body').on('click', '.removeFromCompare',function(e){
         }
     });
 
-
+    $(this).attr('title',addCompareTitle);
     $(this).attr('href', $(this).attr('href').replace(new RegExp("remove",'g'),"add") );
     $(this).removeClass('removeFromCompare');
     $(this).addClass('addToCompare');

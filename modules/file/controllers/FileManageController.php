@@ -40,7 +40,7 @@ class FileManageController extends \file\controllers\FileController
                     [
                         'actions' => [ 'index', 'view', 'update'],
                         'allow' => true,
-                        'roles' => [User::ROLE_MANAGER],
+                        'roles' => [User::ROLE_ADMINISTRATOR],
                     ],
                 ],
             ],

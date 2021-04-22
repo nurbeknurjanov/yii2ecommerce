@@ -15,15 +15,19 @@ use file\models\FileImage;
 
 class FileImageCategory extends FileImage
 {
-    public function getImg($thumbType=false, $options=[])
-    {
-        return Html::img($this->imageUrl, $options);
-    }
-
-    public $thumbXs=false;
+    public $padding = false;
     public $thumbSm=false;
     public $thumbMd=false;
 
-    public $imageWidth=50;
-    public $imageHeight=50;
+    public $thumbXsWidth=177;
+    public $thumbXsHeight=50;
+
+    public $imageWidth=825;
+    public $imageHeight=233;
+
+    public function init()
+    {
+        parent::init();
+        $this->on(static::EVENT_AFTER_DELETE, [Category::class, 'deleteCache']);
+    }
 }

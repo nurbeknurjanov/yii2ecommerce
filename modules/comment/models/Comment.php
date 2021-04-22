@@ -132,14 +132,7 @@ class Comment extends \yii\db\ActiveRecord
         return $this->hasMany(FileImage::class, ['model_id' => 'id'])
             ->queryClassName(self::class)->queryImages();
     }
-    /**
-     * @return \file\models\query\FileQuery
-     */
-    public function getMainImage()
-    {
-        return $this->hasOne(FileImage::class, ['model_id' => 'id'])
-            ->queryClassName(self::class)->queryMainImage();
-    }
+
 
     /**
      * @return \file\models\query\FileQuery
@@ -213,11 +206,8 @@ class Comment extends \yii\db\ActiveRecord
             ['created_at', 'safe'],
             [['reCaptcha'], ReCaptchaValidator::className(),
                 'when'=>function($model){
-                    return YII_ENV_PROD;
+                    return YII_ENV_PROD && !Yii::$app->request->isAjax;
                 },
-                'whenClient'=>new JsExpression("function (attribute, value) {
-                                        return ".(YII_ENV_PROD).";
-                                    }"),
             ]
         ];
     }

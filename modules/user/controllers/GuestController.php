@@ -26,6 +26,7 @@ use yii\base\InvalidArgumentException;
 use yii\base\InvalidParamException;
 use yii\web\BadRequestHttpException;
 use yii\web\Cookie;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
 use yii\helpers\Url;
@@ -85,11 +86,47 @@ class GuestController extends Controller
 
         Yii::$app->user->login($user, 3600 * 24 * 30);
 
-        if(isset(Yii::$app->user->identity->language) && Yii::$app->user->identity->language){
+        /*if(isset(Yii::$app->user->identity->language) && Yii::$app->user->identity->language){
             return $this->goBackWithLanguage();
-        }
+        }*/
         return $this->goBack();
     }
+
+    public function behaviors1()
+    {
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'actions' => ['login'],
+                        'allow' => true,
+                        'matchCallback' => function($rule, $action){
+                            return Yii::$app->user->can('login');
+                        },
+                    ],
+                    [
+                        'actions' => ['login'],
+                        'allow' => false,
+                        'matchCallback' => function($rule, $action){
+                            return !Yii::$app->user->can('login');
+                        },
+                        'denyCallback'=>function($rule, $action){
+                            if(!Setting::getValue(Setting::ALLOW_LOGIN))
+                                throw new ForbiddenHttpException("Sorry, we are not currently accepting to login");
+                            throw new ForbiddenHttpException;
+                        },
+                    ],
+                ],
+                /*'denyCallback'=>function($rule, $action){
+                   //if($action->id=='')
+                        //throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+                throw new ForbiddenHttpException("Sorry");
+                },*/
+            ],
+        ];
+    }
+
 
     public function behaviors()
     {
@@ -106,7 +143,7 @@ class GuestController extends Controller
                         'allow' => true,
                         'matchCallback' => function($rule, $action)
                         {
-                            return in_array(Yii::$app->id, ['app-frontend', 'app-frontend-test']);
+                            return strpos(Yii::$app->id, 'app-frontend')!==false;
                         }
                     ],
                     [
@@ -115,7 +152,7 @@ class GuestController extends Controller
                         'roles' => ['?'],
                         'matchCallback' => function($rule, $action)
                             {
-                                return in_array(Yii::$app->id, ['app-frontend', 'app-frontend-test']);
+                                return strpos(Yii::$app->id, 'app-frontend')!==false;
                             }
                     ],
                 ],
@@ -135,20 +172,13 @@ class GuestController extends Controller
 
     public function actionSignup()
     {
-        if(Yii::$app->request->get('from')){
-            Yii::$app->response->cookies->add(new Cookie([
-                'name' => 'from',
-                'value' => Yii::$app->request->get('from'),
-                'expire' => time() + 3600*24,
-            ]));
-        }
         $model = new SignupForm();
         $model->scenario='step1';
         if(isset($_SESSION['SignupForm']))
             $model->attributes = $_SESSION['SignupForm'];
         $this->performAjaxValidation($model);
         if ($model->load(Yii::$app->request->post()) && $model->validate()){
-            foreach ($_POST['SignupForm'] as $attribute=>$value)
+            foreach ($model->attributes as $attribute=>$value)
                 $_SESSION['SignupForm'][$attribute]=$value;
             return $this->redirect(['signup2']);
         }
@@ -164,8 +194,19 @@ class GuestController extends Controller
         if(isset($_SESSION['SignupForm']))
             $model->attributes = $_SESSION['SignupForm'];
         $this->performAjaxValidation($model);
+
         if ($model->load(Yii::$app->request->post()) && $model->validate()){
-            $user = $model->signup();
+
+            try {
+                $user = $model->signup();
+
+                unset($_SESSION['SignupForm']);
+                Yii::$app->session->setFlash('success', Yii::t('user', 'Thank you for signing up. We have sent to your email a link to activate your account.'));
+                return $this->goAlert();
+
+            } catch (Exception $e) {
+                Yii::$app->session->setFlash('error', $e->getMessage());
+            }
 
             /*$gravatar = new Gravatar([
                 'email' => $user->email,
@@ -177,11 +218,8 @@ class GuestController extends Controller
                 $user->imageAttribute->tempName = (new File())->copy($gravatar->imageUrl);
                 $user->save(false);
             }*/
-
-            unset($_SESSION['SignupForm']);
-            Yii::$app->session->setFlash('success', Yii::t('user', 'Thank you for signing up. We have sent to your email a link to activate your account.'));
-            return $this->goAlert();
         }
+
         return $this->render('signup/step2', [
             'model' => $model,
         ]);
@@ -216,7 +254,7 @@ class GuestController extends Controller
             $getParams=[];
         $params = array_merge($request->resolve()[1], $getParams);
 
-        $params['language'] = Yii::$app->user->identity->language;
+        //$params['language'] = Yii::$app->user->identity->language;
         unset($params['code']);
         unset($params['state']);
         if(Yii::$app->request->get('authclient'))
@@ -236,9 +274,9 @@ class GuestController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->login())
         {
-            if(isset(Yii::$app->user->identity->language) && Yii::$app->user->identity->language){
+            /*if(isset(Yii::$app->user->identity->language) && Yii::$app->user->identity->language){
                 return $this->goBackWithLanguage();
-            }
+            }*/
             return $this->goBack();
         } else {
             return $this->render('login', [

@@ -94,12 +94,12 @@ class CronEmailMessage extends \yii\db\ActiveRecord
 
     const STATUS_OPEN = 0;
     const STATUS_SENT = 1;
-    public $statusValues = [
+    public $statusOptions = [
         self::STATUS_OPEN=>'Open',
         self::STATUS_SENT=>'Sent',
     ];
     public function getStatusText()
     {
-        return isset($this->statusValues[$this->status]) ? $this->statusValues[$this->status]:null;
+        return isset($this->statusOptions[$this->status]) ? $this->statusOptions[$this->status]:null;
     }
 }

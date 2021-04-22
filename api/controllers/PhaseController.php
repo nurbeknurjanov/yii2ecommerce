@@ -160,11 +160,5 @@ class PhaseController extends ActiveController
         $this->findModel($id)->delete();
         Yii::$app->getResponse()->setStatusCode(204, 'Phase successfully deleted');
     }*/
-    /*public function actionIndex()
-    {
-        $searchModel = new PhaseSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        return $dataProvider;
-    }*/
 
 } 

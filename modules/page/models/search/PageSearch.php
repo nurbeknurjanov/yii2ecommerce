@@ -25,7 +25,7 @@ class PageSearch extends Page
     {
         return [
             [['id'], 'integer'],
-            [['url', 'title', 'text'], 'safe'],
+            [['title_url', 'title', 'text'], 'safe'],
         ];
     }
 
@@ -65,7 +65,7 @@ class PageSearch extends Page
             'id' => $this->id,
         ]);
 
-        $query->andFilterWhere(['like', 'url', $this->url])
+        $query->andFilterWhere(['like', 'title_url', $this->title_url])
             ->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'text', $this->text]);
 

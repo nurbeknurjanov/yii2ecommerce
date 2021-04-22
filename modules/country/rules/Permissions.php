@@ -17,7 +17,7 @@ class Permissions
     public static function run()
     {
         $auth = Yii::$app->authManager;
-        $managerRole = $auth->getRole(User::ROLE_MANAGER);
+        $managerRole = $auth->getRole(User::ROLE_ADMINISTRATOR);
 
 
         $createCountry = $auth->createPermission('createCountry');

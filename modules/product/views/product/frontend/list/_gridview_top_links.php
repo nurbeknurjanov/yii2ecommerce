@@ -12,20 +12,18 @@ use \product\assets\ProductAsset;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\bootstrap\ButtonDropdown;
-if(isset($this->assetManager->bundles['all']))
-    $this->clearAssetBundle(ProductAsset::class);
-$productAsset = ProductAsset::register($this);
+
 ?>
 
-<img src="<?=$productAsset->baseUrl;?>/img/loading.gif" id="pjaxLoading" style="display: none;" />
+<img src="<?=$this->assetManager->publish((new ProductAsset)->sourcePath.'/img/loading.gif')[1]?>" id="pjaxLoading" style="display: none;" />
 
 <div class="list-view-top">
     <div class="sort-block sort-ordinal">
         <?=Yii::t('product', 'Sort by');?>:
         <?=$dataProvider->sort->link('price');?>,
-        <?=$dataProvider->sort->link('noveltyAttribute');?>,
-        <?=$dataProvider->sort->link('popularAttribute');?>,
-        <?=$dataProvider->sort->link('rating');?>
+        <?=$dataProvider->sort->link('rating',['class'=>'reverse']);?>,
+        <?=$dataProvider->sort->link('popularAttribute',['class'=>'reverse']);?>,
+        <?=$dataProvider->sort->link('noveltyAttribute',['class'=>'reverse']);?>
     </div>
     <div class="list-style-block">
 

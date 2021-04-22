@@ -70,7 +70,7 @@ class RegionController extends Controller
                         }
                     ],
                     [
-                        'actions' => ['select-picker', 'select-region'],
+                        'actions' => ['select-picker', 'select-region',  'find-one'],
                         'allow' => true,
                     ],
                 ],
@@ -84,11 +84,17 @@ class RegionController extends Controller
         ];
     }
 
-    public function actionSelectPicker($q=null, array $value=null, $country_id=null)
+    public function actionFindOne($q, $country_id)
+    {
+        $model = Region::find()->countryQuery($country_id)->andWhere(['like', 'name', $q.'%', false])->one();
+        return $model ? $model->id:null;
+    }
+
+    public function actionSelectPicker($q=null, array $value=[], $country_id=null)
     {
         /* @var RegionQuery $query */
         $query = (new Region)->getOrderedQuery($value, $q);
-        $query->andFilterWhere(['country_id'=>$country_id]);
+        $query->andWhere(['country_id'=>$country_id]);
         $models = $query->all();
         $return = Html::tag('option', Yii::t('common','Select'), ['value'=>'']);
         foreach($models as $model)
@@ -108,6 +114,7 @@ class RegionController extends Controller
             $return.=Html::tag('option', $model->name, ['value'=>$model->id]);
         return $return;
     }
+
 
     /**
      * Lists all Region models.
@@ -185,7 +192,9 @@ class RegionController extends Controller
     {
         try {
             $this->findModel($id)->delete();
-            return $this->redirect($this->defaultAction);
+            Yii::$app->session->setFlash('success', 'You have successfully deleted the item.');
+            if(strpos(Yii::$app->request->referrer,'view')!==false)
+                return $this->redirect($this->defaultAction);
         } catch (Exception $e) {
             Yii::$app->session->setFlash('error', $e->getMessage());
         }

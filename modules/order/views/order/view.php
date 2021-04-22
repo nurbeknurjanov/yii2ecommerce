@@ -45,7 +45,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     [
                         'attribute'=>'address',
                         'format'=>'raw',
-                        'value'=>$model->city->name.': '.$model->address,
+                        'value'=>implode(', ',
+                            [$model->country->name, $model->region->name, $model->city->name,  $model->address]),
                     ],
                     [
                         'attribute'=>'delivery_id',

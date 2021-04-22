@@ -22,6 +22,7 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\behaviors\AttributeBehavior;
 use yii\helpers\Html;
+use yii\helpers\Inflector;
 use yii\web\UploadedFile;
 use yii\db\Expression;
 use yii\web\Request;
@@ -244,13 +245,13 @@ class File extends ActiveRecord implements \file\models\interfaces\File
     }
     public function getShortModelNameLower()
     {
-        return strtolower($this->shortModelName);
+        return Inflector::camel2id($this->shortModelName);
     }
     public function getModelUrl()
     {
         $route_view = '/'.$this->shortModelNameLower.'/'.$this->shortModelNameLower. "/view";
         if($this->model_name==User::class)
-            $route_view = '/'.$this->shortModelNameLower.'/manage/index/view';
+            $route_view = '/'.$this->shortModelNameLower.'/manage/user/view';
         return [$route_view,   'id'=>$this->model_id];
     }
     public function getModelTitle()

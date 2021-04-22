@@ -23,14 +23,14 @@ class Bootstrap implements BootstrapInterface {
      */
     public function bootstrap($app) {
 
-        if($app->id!='app-console')
-            Yii::$app->view->registerAssetBundle(LikeAsset::class);
-
         if (!isset(Yii::$app->get('i18n')->translations['like*'])) {
             Yii::$app->get('i18n')->translations['like*'] = [
                 'class' => 'yii\i18n\PhpMessageSource',
                 'basePath' => __DIR__ . '/messages',
             ];
         }
+
+        if($app->view->bootstrapAssetBundles)
+            Yii::$app->view->registerAssetBundle(LikeAsset::class);
     }
 }

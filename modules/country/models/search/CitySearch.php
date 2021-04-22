@@ -20,6 +20,7 @@ class CitySearch extends City
         return [
             [['id', 'region_id'], 'safe'],
             [['name'], 'safe'],
+            [['country_id'], 'safe'],
         ];
     }
 
@@ -57,13 +58,14 @@ class CitySearch extends City
         }
 
         $query->andFilterWhere([
-            'id' => $this->id,
+            'city.id' => $this->id,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'city.name', $this->name]);
 
-        $query->joinWith('region');
+        $query->joinWith('region.country');
         $query->andFilterWhere(['like', 'region.name', $this->region_id]);
+        $query->andFilterWhere(['like', 'country.name', $this->country_id]);
 
 
         return $dataProvider;

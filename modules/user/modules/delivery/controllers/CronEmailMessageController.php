@@ -26,7 +26,7 @@ class CronEmailMessageController extends Controller
                     [
                         'actions' => ['view', 'delete', 'index', 'update', 'send-messages'],
                         'allow' => true,
-                        'roles' => [User::ROLE_MANAGER],
+                        'roles' => [User::ROLE_ADMINISTRATOR],
                     ],
                 ]
             ],

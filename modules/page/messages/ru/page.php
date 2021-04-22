@@ -12,4 +12,7 @@ return [
     'Thank you for contacting us. We will call to you as soon as possible.'=>'Спасибо за ваш запрос. Мы в скором времени перезвоним вам.',
     'You have requested to call back.'=>'Вас запросили перезвонить.',
     'Pages'=>'Страницы',
+
+    'Update Page'=>'Править Страницу',
+    'Create Page'=>'Создать Страницу',
 ];

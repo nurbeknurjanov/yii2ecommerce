@@ -64,8 +64,7 @@ $(".zoom-container").imagezoomsl({
     magnifierborder: '1px solid #888',
 });
 
-
-$(".zoom-image").mouseover(function(){
+$('body').on('mouseover', '.zoom-image', function () {
     $(".product-thumbnail").removeClass('active');
     $(this).parent().addClass('active');
     var that = this;
@@ -79,7 +78,9 @@ $(".zoom-image").mouseover(function(){
             .fadeIn(300);
     });
 });
-$(document).on('click', '.tracker, .zoom-container', function () {
+
+
+$('body').on('click', '.tracker, .zoom-container', function () {
     $('a[href="'+$('.zoom-container').attr('data-large')+'"]').click();
 });
 

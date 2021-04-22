@@ -2,13 +2,18 @@
 
 use yii\helpers\Url;
 use tests\unit\fixtures\UserFixture;
+use tests\unit\fixtures\UserProfileFixture;
 use user\models\Token;
 use yii\test\ActiveFixture;
 use user\models\LoginForm;
 use user\models\User;
+use user\models\UserProfile;
 use user\models\PasswordResetRequestForm;
 use user\models\ResetPasswordForm;
 use user\models\SignupForm;
+use country\models\Country;
+use country\models\Region;
+use country\models\City;
 
 class UserCest
 {
@@ -25,6 +30,11 @@ class UserCest
                 'depends'=>[],
                 'dataFile'=>false,
             ],
+            'user_profiles' => [
+                'class' => UserProfileFixture::class,
+                'depends'=>[],
+                'dataFile'=>false,
+            ],
         ];
         return $fixtures;
     }
@@ -38,6 +48,11 @@ class UserCest
             $I->haveFixtures([
                 'users' => [
                     'class' => UserFixture::class,
+                    'depends'=>[],
+                    'dataFile'=>null,
+                ],
+                'user_profiles' => [
+                    'class' => UserProfileFixture::class,
                     'depends'=>[],
                     'dataFile'=>null,
                 ],
@@ -84,6 +99,13 @@ class UserCest
         $I->login($I, $user->email, 321321);
         $I->waitForText($user->fullName);
     }
+    public function me(AcceptanceTester $I, \Helper\Acceptance $helper)
+    {
+        $I->amOnPage(Url::to(['/user/token/koko',
+            'token'=>$I->grabFromDatabase('user_token', 'token')]));
+
+        $I->waitForElement('.alert-success');
+    }
     public function changeEmail(AcceptanceTester $I, \Helper\Acceptance $helper)
     {
         $user = $I->grabFixture('users', 0);
@@ -113,8 +135,10 @@ class UserCest
         $emails = $I->getEmails();
         $I->amOnPage('/assets/mails/'.$emails[0]);
         $I->waitForText(Yii::t('user', 'Approve to change your email.'));
+        $token = $I->grabFromDatabase('user_token', 'token');
+        sleep(1);
         $I->amOnPage(Url::to(['/user/token/run',
-            'token' => $I->grabFromDatabase('user_token', 'token')]));
+            'token' => $token]));
         $I->waitForElement('.alert-success');
 
 
@@ -170,9 +194,18 @@ class UserCest
         $user = $I->grabFixture('users', 0);
         $I->openMenu($I);
         $I->click(Yii::t('user', 'Edit profile'));
-        $I->see(Yii::t('user', 'Edit profile'), 'h1');
 
         $I->fillField($user->formName().'[name]', 'Nick Carter');
+
+        $I->click(Yii::t('user', 'Profile'));
+
+        $userProfile = new UserProfile();
+        $I->fillField($userProfile->formName()."[address]", 'some address');
+        $I->selectOption($userProfile->formName()."[country_id]", Country::COUNTRY_USA);
+        $I->selectOption($userProfile->formName()."[region_id]", Region::REGION_NEW_YORK);
+        $I->selectOption($userProfile->formName()."[city_id]", City::CITY_NEW_YORK);
+
+        $I->click(Yii::t('user', 'Personal details'));
         $I->click(Yii::t('common', 'Save'));
         $I->waitForElement('.alert-success');
         $I->reloadPage();
@@ -186,7 +219,6 @@ class UserCest
         $I->openMenu($I);
 
         $I->click(Yii::t('user', 'Change password'));
-        $I->see(Yii::t('user', 'Change password'), 'h1');
 
         $I->fillField($user->formName().'[password]', 123123);
         $I->fillField($user->formName().'[password_new]', 321321);

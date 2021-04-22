@@ -8,10 +8,7 @@
 
 namespace order\models;
 
-use product\models\Product;
 use Yii;
-use yii\web\Cookie;
-use yii\helpers\Html;
 
 
 
@@ -45,34 +42,19 @@ class Basket
 
     public static function deleteAll()
     {
-        Yii::$app->response->cookies->remove('coupon_id');
         Yii::$app->response->cookies->remove('basketProducts');
     }
     public static function delete($product_id)
     {
         $basketProducts = self::findAll();
         unset($basketProducts[$product_id]);
-        Yii::$app->response->cookies->add(new Cookie([
-            'name' => 'basketProducts',
-            'value' => $basketProducts,
-            'expire' => time() + 3600*24*7,
-        ]));
+        Yii::$app->response->cookies->add(Yii::$container->get('cookie', [],  ['name'=>'basketProducts', 'value'=>$basketProducts]));
     }
 
 
     public static function update(OrderProduct $orderProduct)
     {
-        $basketProducts = self::findAll();
-        $basketProducts[$orderProduct->product_id] = [
-            'product_id'=>$orderProduct->product_id,
-            'count'=>$orderProduct->count,
-            'price'=>$orderProduct->price,
-        ];
-        Yii::$app->response->cookies->add(new Cookie([
-            'name' => 'basketProducts',
-            'value' => $basketProducts,
-            'expire' => time() + 3600*24*7,
-        ]));
+        self::create($orderProduct);
     }
 
     public static function create(OrderProduct $orderProduct)
@@ -83,11 +65,13 @@ class Basket
             'count'=>$orderProduct->count,
             'price'=>$orderProduct->price,
         ];
-        Yii::$app->response->cookies->add(new Cookie([
+        Yii::$app->response->cookies->add(Yii::$container->get('cookie', [],   ['name'=>'basketProducts', 'value'=>$basketProducts]));
+
+        /*Yii::$app->response->cookies->add(new Cookie([
             'name' => 'basketProducts',
             'value' => $basketProducts,
             'expire' => time() + 3600*24*7,
-        ]));
+        ]));*/
     }
 
     public static function findAll()

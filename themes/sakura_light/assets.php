@@ -48,7 +48,6 @@ return [
         //product detail
         \kartik\file\FileInputAsset::class,
         \kartik\file\SortableAsset::class,
-        \kartik\file\DomPurifyAsset::class,
         \like\assets\LikeAsset::class,
         \favorite\assets\FavoriteAsset::class,
         \product\assets\ProductAsset::class,

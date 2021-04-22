@@ -17,6 +17,7 @@ use file\models\behaviours\FileVideoNetworkBehavior;
 use tag\models\ObjectTag;
 use tag\models\Tag;
 use Yii;
+use yii\base\Event;
 use yii\behaviors\AttributeBehavior;
 use yii\db\AfterSaveEvent;
 use yii\helpers\ArrayHelper;
@@ -159,7 +160,13 @@ class Article extends \yii\db\ActiveRecord
             self::TYPE_NEWS=>Yii::t('article', 'News'),
         ];
 
-
+        $this->on(self::EVENT_AFTER_DELETE, function(Event $event){
+            /* @var $model self */
+            $model = $event->sender;
+            $articleTags = $model->articleTags;
+            foreach ($articleTags as $articleTag)
+                $articleTag->delete();
+        });
     }
 
 
@@ -220,7 +227,7 @@ class Article extends \yii\db\ActiveRecord
     }
     public function getArticleTags()
     {
-        return $this->hasMany(ObjectTag::class, ['model_id'=>'id'])->andOnCondition(['model_name'=>self::class]);
+        return $this->hasMany(ObjectTag::class, ['model_id'=>'id'])->andOnCondition(['object_tag.model_name'=>self::class]);
     }
     public function getTags()
     {

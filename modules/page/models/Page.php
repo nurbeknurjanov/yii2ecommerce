@@ -14,12 +14,14 @@ use file\models\behaviours\FileImageBehavior;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "{{%page}}".
  *
  * @property integer $id
- * @property string $url
+ * @property array $url
+ * @property string $title_url
  * @property string $title
  * @property string $text
  * @property FileImage[] $images
@@ -72,11 +74,15 @@ class Page extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['url', 'title'], 'required'],
+            [['title_url', 'title'], 'required'],
+            [['title_url'], 'unique'],
+            ['title_url', 'match',
+                'pattern' => '/^[a-z0-9_-]+$/',
+                'message' => Yii::t('page', 'Url can only contain alphanumeric characters, underscores and dashes.')],
             [['text'], 'string'],
             [['text'], 'default', 'value'=>NULL],
-            [['url', 'title'], 'default', 'value'=>''],
-            [['url', 'title'], 'string', 'max' => 255]
+            [['title_url', 'title'], 'default', 'value'=>''],
+            [['title_url', 'title'], 'string', 'max' => 255]
         ];
     }
 
@@ -87,7 +93,7 @@ class Page extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('common', 'ID'),
-            'url' => Yii::t('common', 'Url'),
+            'title_url' => Yii::t('common', 'Url'),
             'title' => Yii::t('common', 'Title'),
             'text' => Yii::t('common', 'Text'),
             'imagesAttribute' => Yii::t('common', 'Images'),
@@ -116,11 +122,18 @@ class Page extends \yii\db\ActiveRecord
     public function extraFields()
     {
         return [
-            'url',
+            'url' => function (self $model) {
+                return Url::to($model->url);
+            },
             'images' => function (self $model) {
                 return $model->images;
             },
         ];
+    }
+
+    public function getUrl()
+    {
+        return ['/page/page/view', 'page_title_url'=>$this->title_url];
     }
 
 }

@@ -1,5 +1,4 @@
 <?php
-
 use yii\helpers\ArrayHelper;
 
 // NOTE: Make sure this file is not accessible when deployed to production

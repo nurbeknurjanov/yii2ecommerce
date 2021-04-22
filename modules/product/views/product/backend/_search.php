@@ -33,7 +33,7 @@ use extended\helpers\Helper;
                     ArrayHelper::map(Category::find()
                         ->defaultFrom()->defaultOrder()
                         ->selectTitle()->all(), 'id', 'title'),
-                    ['prompt'=>'Select',
+                    ['prompt'=>Yii::t('common', 'Select'),
                         'class'=>'form-control eavSelectForSearchInBackend',
                         'encode'=>false,]) ?>
             <div class="well eavFields">
@@ -42,7 +42,7 @@ use extended\helpers\Helper;
                 {
                     $fieldModel=$model->fieldModels[$field_id];
                     echo $form->field($valueModel, "[$fieldModel->id]value",
-                        ['parts'=>['{input}'=>$fieldModel->getFieldWithUnit($valueModel, "[$fieldModel->id]value") ]]);
+                        ['parts'=>['{input}'=>$fieldModel->getField($valueModel, "[$fieldModel->id]value") ]]);
                 }
                 ?>
             </div>
@@ -50,28 +50,21 @@ use extended\helpers\Helper;
         </div>
         <div class="col-lg-4">
             <?= $form->field($model, 'description') ?>
-
-            <?php $this->beginBlock('sku') ?>
             <?= $form->field($model, 'sku') ?>
-            <?php $this->endBlock() ?>
-            {{sku}}
         </div>
         <div class="col-lg-4">
-            <?php $this->beginBlock('dateSearch') ?>
-                <?=$form->field($model, 'created_at',['parts'=>[
-                    '{input}'=> $model->getBehavior('dateSearchCreatedAt')->getWidgetFilter(true)
-                ]])?>
-                <?=$form->field($model, 'updated_at',['parts'=>[
-                    '{input}'=> $model->getBehavior('dateSearchUpdatedAt')->getWidgetFilter(true)
-                ]])?>
-            <?php $this->endBlock() ?>
-            {{dateSearch}}
+            <?=$form->field($model, 'created_at',['parts'=>[
+                '{input}'=> $model->getBehavior('dateSearchCreatedAt')->getWidgetFilter(true)
+            ]])?>
+            <?=$form->field($model, 'updated_at',['parts'=>[
+                '{input}'=> $model->getBehavior('dateSearchUpdatedAt')->getWidgetFilter(true)
+            ]])?>
         </div>
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('product', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('product', 'Reset'), ['class' => 'btn btn-default',
+        <?= Html::submitButton(Yii::t('common', 'Search'), ['class' => 'btn btn-primary']) ?>
+        <?= Html::resetButton(Yii::t('common', 'Reset'), ['class' => 'btn btn-default',
             'onclick'=>"javascript:window.location.href='".Url::to(['/'.Yii::$app->controller->route])."'"]) ?>
     </div>
 
@@ -79,4 +72,4 @@ use extended\helpers\Helper;
 
 </div>
 
-<p><?= Html::button(Yii::t('common', 'Advanced search'), ['class' => 'btn btn-success advancedSearchButton']) ?></p>
+<div style="text-align: right"><?= Html::button(Yii::t('common', 'Advanced search'), ['class' => 'btn btn-success advancedSearchButton']) ?></div>

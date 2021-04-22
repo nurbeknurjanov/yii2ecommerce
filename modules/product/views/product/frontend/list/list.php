@@ -23,23 +23,46 @@ use yii\grid\GridViewAsset;
 
 
 
+
+
 GridViewAsset::register($this);
-$this->context->layout ='/product/main_products';
+
+$this->context->layout ='main';
+if($this->theme->id=='bootstrap')
+    $this->context->layout ='/product/main_products';
+
 $viewStyle = Yii::$app->response->cookies->get('viewStyle')?:Yii::$app->request->cookies->get('viewStyle');
 
-$this->render('_title_and_breadcrums',
-    ['title'=>$title, 'searchModel'=>$searchModel, 'dataProvider'=>$dataProvider,]);
-$this->params['title'] = $this->title.' - '.Yii::$app->name;
-if(Yii::$app->request->isPjax)
-    $this->title = $this->params['title'];
-$this->params['description'] = $this->title;
-?>
 
-<?php
+$this->params['searchModel'] = $searchModel;
+$this->params['category'] = $category = $searchModel->category;
+
+$this->title = $title;
+$this->params['description'] = $this->title;
+if(Yii::$app->request->isPjax)
+    $this->title = $this->title.' | '.Yii::$app->name;
+
+$this->params['fullPageSearchTitle'] = $fullPageSearchTitle;
+$this->params['fullPageCategoryTitle'] = $fullPageCategoryTitle;
+$this->params['topTitle'] = $topTitle;
+$this->params['menuTitle'] = $menuTitle;
 
 /*(new \kartik\base\Widget(['pjaxContainerId'=>'productsPjax']))->registerWidgetJs("
-alert('Hey');
-");*/
+    ");*/
+
+
+if($category) {
+    $this->params['breadcrumbs'][] =
+        [
+            'label' => Yii::t('product', 'All products'),
+            'url' => ['/product/product/list']
+        ];
+    foreach ($category->parents()->all() as $parent)
+        $this->params['breadcrumbs'][] = ['label' => $parent->title, 'url' => $parent->url];
+}
+
+$this->params['breadcrumbs'][] = $breadCrumbTitle;
+
 
 Pjax::begin([
     'id'=>'productsPjax',
@@ -47,22 +70,13 @@ Pjax::begin([
     //'formSelector'=>'#leftSearchForm',
     'timeout'=>6000,
 ]);
+
+
 ?>
 
 <?= Alert::widget() ?>
-<?php
-if(!$searchModel->category_id || $searchModel->category->isLeaf){
-    if(Yii::$app->request->get('q')){
-        ?>
-        <h1><?= $this->params['titleH1'] ?></h1>
-        <?php
-    }else{
-        ?>
-        <h1 class="title"><?= $this->title ?></h1>
-        <?php
-    }
-}
-?>
+
+<h1 class="title"><?= $pageTitle ?></h1>
 <?=$this->render('_gridview_top_links', ['dataProvider' => $dataProvider, 'viewStyle'=>$viewStyle])?>
 <?= ListView::widget([
     'id'=>'listView',

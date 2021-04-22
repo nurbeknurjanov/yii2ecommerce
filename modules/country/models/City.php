@@ -29,8 +29,9 @@ class City extends \yii\db\ActiveRecord
         return '{{%city}}';
     }
 
+    const CITY_NEW_YORK=48019;
     const BIG_VALUES=[
-        //36718,37006
+        //self::CITY_NEW_YORK
     ];
     public function behaviors()
     {
@@ -67,7 +68,9 @@ class City extends \yii\db\ActiveRecord
             [['region_id'], 'integer'],
             [['name'], 'default', 'value'=>''],
             [['region_id'], 'default', 'value'=>0],
-            [['name'], 'string', 'max' => 30]
+            [['name'], 'string', 'max' => 30],
+            [['country_id'], 'safe'],
+            ['name', 'unique', 'targetAttribute' => ['name', 'region_id']],
         ];
     }
 
@@ -78,8 +81,9 @@ class City extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('common', 'ID'),
-            'name' => Yii::t('common', 'Name'),
-            'region_id' => Yii::t('common', 'Region ID'),
+            'name' => Yii::t('country', 'City name'),
+            'region_id' => Yii::t('country', 'State/Province'),
+            'country_id' => Yii::t('country', 'Country'),
         ];
     }
 
@@ -113,4 +117,5 @@ class City extends \yii\db\ActiveRecord
         return Yii::$app->dbCountries;
     }
 
+    public $country_id;
 }

@@ -9,7 +9,7 @@ use johnitvn\ajaxcrud\CrudAsset;
 /* @var $searchModel johnitvn\rbacplus\models\AuthItemSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('rbac', 'Roles Manager');
+$this->title = Yii::t('rbac', 'Roles');
 $this->params['breadcrumbs'][] = $this->title;
 
 CrudAsset::register($this);

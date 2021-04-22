@@ -3,18 +3,18 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use file\widgets\file_preview\FilePreview;
-
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model page\models\Page */
 
 $this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Pages'), 'url' => [Yii::$app->controller->defaultAction]];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('page', 'Pages'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="page-view box">
+<div class="page-view card">
 
-    <div class="box-header">
+    <div class="card-header">
         <?php
 		if(Yii::$app->user->can('updatePage', ['model' => $model]))
             echo Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
@@ -31,12 +31,16 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </div>
 
-    <div class="box-body">
+    <div class="card-body">
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [
                 'id',
-                'url:url',
+                [
+                    'attribute'=>'title_url',
+                    'format'=>'raw',
+                    'value'=>Html::a($model->title_url, Yii::$app->urlManagerFrontend->createAbsoluteUrl(Url::to($model->url))),
+                ],
                 'title',
                 'text:raw',
                 [

@@ -17,7 +17,7 @@ use \common\assets\NotifyAsset;
 use \common\assets\PerfectScrollbarAsset;
 use common\assets\LightboxAsset;
 use yii\grid\GridViewAsset;
-use extended\vendor\BootstrapSelectAsset;
+use common\assets\BootstrapSelectAsset;
 use themes\bootstrap\assets\BootstrapThemeAsset;
 use yii\helpers\Url;
 
@@ -38,14 +38,14 @@ $this->theme->baseUrl = $themeBundle->baseUrl;
 
 if(!isset($this->params['title'])){
     if($this->title)
-        $this->params['title'] = $this->title;
+        $this->params['title'] = $this->title.' | '.Yii::$app->name;
     else
-        $this->params['title'] = Yii::t('common', Yii::$app->name);
+        $this->params['title'] = Yii::$app->name.' - '.Yii::$app->params['slogan'];
 }
 if(!isset($this->params['keywords']))
-    $this->params['keywords'] = 'ecommerce, yii2, php, shop, store, cms, platform';
-if(!isset($this->params['description']))
-    $this->params['description'] = Yii::t('common', 'Ecommerce platform based on Yii2 PHP Framework');
+    $this->params['keywords'] = Yii::$app->params['keywords'];
+if(empty($this->params['description']))
+    $this->params['description'] = Yii::$app->params['description'];
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -90,12 +90,12 @@ if(!isset($this->params['description']))
     echo Nav::widget([
         'encodeLabels'=>false,
         'options' => ['class' => 'navbar-nav navbar-left'],
-        'items' => $items['leftItems'],
+        'items' => $items['left'],
     ]);
     echo Nav::widget([
         'encodeLabels'=>false,
         'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => $items['rightItems'],
+        'items' => $items['right'],
     ]);
     NavBar::end();
     ?>
@@ -108,8 +108,8 @@ if(!isset($this->params['description']))
 <footer class="footer">
     <div class="container">
         <p class="pull-left"> <label><?=Yii::t('common', 'Contacts')?></label> <br/>
-            <i class="glyphicon glyphicon-envelope"></i> nurbek.nurjanov@mail.ru <br>
-            <i class="glyphicon glyphicon-phone-alt" style="top:0"></i> <span>+996 558 01-14-77</span>
+            <i class="glyphicon glyphicon-envelope"></i> <?=Yii::$app->params['supportEmail']?> <br>
+            <i class="glyphicon glyphicon-phone-alt" style="top:0"></i> <span><?=Yii::$app->params['supportPhone']?></span>
         </p>
 
         <p class="pull-right"><?=Yii::$app->name?><br> <?=Yii::t('common', 'All rights reserved');?> &copy; 2018</p>
@@ -117,6 +117,22 @@ if(!isset($this->params['description']))
 </footer>
 
 <?php $this->endBody() ?>
+<?php
+if (YII_ENV_PROD){
+    ?>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-117109569-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-117109569-1');
+    </script>
+    <?php
+}
+?>
+
 </body>
 </html>
 <?php $this->endPage() ?>

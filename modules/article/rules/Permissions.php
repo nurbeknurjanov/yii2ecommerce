@@ -18,7 +18,7 @@ class Permissions
     {
         $auth = Yii::$app->authManager;
         $guestRole = $auth->getRole(User::ROLE_GUEST);
-        $managerRole = $auth->getRole(User::ROLE_MANAGER);
+        $managerRole = $auth->getRole(User::ROLE_ADMINISTRATOR);
 
 
         $createArticle = $auth->createPermission('createArticle');

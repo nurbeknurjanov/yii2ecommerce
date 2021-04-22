@@ -33,6 +33,7 @@ $('body').on('click', '.addToFavorite',function(e){
     });
 
 
+    $(this).attr('title', removeFavoriteTitle);
     $(this).attr('href', $(this).attr('href').replace(new RegExp("create",'g'),"delete"));
     $(this).removeClass('addToFavorite');
     $(this).addClass('removeFromFavorite');
@@ -69,7 +70,7 @@ $('body').on('click', '.removeFromFavorite',function(e){
         }
     });
 
-
+    $(this).attr('title', addFavoriteTitle);
     $(this).attr('href', $(this).attr('href').replace(new RegExp("delete",'g'),"create") );
     $(this).removeClass('removeFromFavorite');
     $(this).addClass('addToFavorite');

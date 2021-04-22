@@ -21,10 +21,10 @@ use extended\helpers\StringHelper;
 $this->title = Yii::t('common', 'Files');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="file-index box">
+<div class="file-index card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Alert::widget() ?>
     </div>
 

@@ -54,6 +54,7 @@ class ProductSearch extends Product
             [['price'], 'number'],
             [['type', 'sku','enabled', 'imagesAttribute'], 'safe'],
             ['category_id', 'safe'],
+            ['shop_id', 'safe'],
         ];
     }
 
@@ -136,17 +137,12 @@ class ProductSearch extends Product
     }
 
 
-    public function eavSearch(&$dataProvider)
+    public function eavSearch(&$dataProvider, $relationName='values')
     {
         /* @var ProductQuery $query */
         $query=$dataProvider->query;
 
         $valueModels = array_filter($this->valueModels);
-        $viewStyle = Yii::$app->response->cookies->get('viewStyle')?:Yii::$app->request->cookies->get('viewStyle');
-        if(Yii::$app->id=='app-backend' || $viewStyle=='asList')
-            $relationName = 'valuesWithFields';
-        else
-            $relationName = 'values';
         $query->joinWith([$relationName=>function(DynamicValueQuery $dynamicValueQuery) use ($valueModels, $query) {
             $dynamicValueQuery->defaultFrom();
             $condition=[];

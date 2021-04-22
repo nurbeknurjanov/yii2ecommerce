@@ -72,6 +72,14 @@ a.desc:after {
     content: "\e156";
 }
 
+/* cool, very cool */
+.sort-ordinal a.reverse.asc:after {
+    content: "\e156";
+}
+.sort-ordinal a.reverse.desc:after {
+    content: "\e155";
+}
+
 
 
 

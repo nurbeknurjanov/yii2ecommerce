@@ -29,7 +29,7 @@ return [
             'loginUrl'=>['/user/guest/login'],
             'identityCookie' => [
                 'name' => '_frontendUserCookie', // unique for backend
-                'path' => '/frontend_cookie_dir', // correct path for backend app. /
+                //'path' => '/frontend_cookie_dir', // correct path for backend app. /
                 //'domain' => 'sakura.com',
             ]
         ],
@@ -61,7 +61,14 @@ return [
             ],
         ],
         'assetManager' => [
+            //this mode determines, if production or testing, then it includes only compressed files
             'bundles' => (YII_ENV_PROD||YII_ENV_TEST) ? (!isset($_COOKIE['theme']) || $_COOKIE['theme']=='sakura' ? require 'assets/assets-sakura.php':[]):[] ,
+
+            //this includes only compressed all.js and all.css files
+            //'bundles' => !isset($_COOKIE['theme']) || $_COOKIE['theme']=='sakura' ? require 'assets/assets-sakura.php':[] ,
+
+            //this includes all assets files
+            //'bundles' => [] ,
         ],
         'authClientCollection' => [
             'class' => 'yii\authclient\Collection',
@@ -69,8 +76,8 @@ return [
                 //https://developers.facebook.com/apps/
                 'facebook' => [
                     'class' => 'yii\authclient\clients\Facebook',
-                    'clientId' => '',
-                    'clientSecret' => '',
+                    'clientId' => '1492252481090244',
+                    'clientSecret' => 'bc474b6f7c76b1de1bf3697659861eaa',
                     //'authUrl' => 'https://www.facebook.com/dialog/oauth?display=popup',
                     //'scope'=>'user_photos'
                     //'scope'=>'email'
@@ -81,18 +88,18 @@ return [
                 //https://console.developers.google.com/project/tidy-outlet-106516/apiui/credential/oauthclient/634077512000-g0jci99968hevgebbl2pgtqadkb3dg4f.apps.googleusercontent.com
                 'google'=>[
                     'class' => 'yii\authclient\clients\Google',
-                    'clientId' => '',//new
-                    'clientSecret' => '',
+                    'clientId' => '634077512000-g0jci99968hevgebbl2pgtqadkb3dg4f.apps.googleusercontent.com',//new
+                    'clientSecret' => 'sJYNs3CejnbZVcTiCDJHCQxv',
                     'scope'=>'profile email',
                     'returnUrl' => "http://demo.sakuracommerce.com/user/guest/auth?authclient=google",
-                
+                    //'scope'=>'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login',
                 ],
                 //https://vk.com/apps?act=manage
                 'vkontakte' => [
                     //'class' => 'yii\authclient\clients\VKontakte',
                     'class' => 'extended\authclient\VKontakte',
-                    'clientId' => '',
-                    'clientSecret' => '',
+                    'clientId' => '5066354',
+                    'clientSecret' => '9PRXniCaNLbLZGfpT1bN',
                 ],
             ],
         ],
@@ -109,8 +116,8 @@ return [
 
             // the global settings for the facebook widget
             'facebook' => [
-                'appId' => '',
-                'secret' => '',
+                'appId' => '1492252481090244',
+                'secret' => 'bc474b6f7c76b1de1bf3697659861eaa',
             ],
         ],
     ],*/

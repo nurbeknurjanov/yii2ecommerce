@@ -20,6 +20,7 @@ class ProductFixture extends ActiveFixture
     public $depends = [
         UserFixture::class,
         CategoryFixture::class,
+        ShopFixture::class,
     ];
 
     public function getData()

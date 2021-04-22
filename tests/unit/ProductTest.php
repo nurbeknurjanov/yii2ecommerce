@@ -6,6 +6,7 @@ use eav\models\DynamicField;
 use tests\unit\fixtures\CategoryFixture;
 use extended\helpers\Helper;
 use tests\unit\fixtures\UserFixture;
+use tests\unit\fixtures\UserProfileFixture;
 use product\models\Product;
 use tests\unit\fixtures\DynamicFieldFixture;
 use tests\unit\fixtures\DynamicValueFixture;
@@ -47,6 +48,10 @@ class ProductTest extends \Codeception\Test\Unit
             ],
             'users' => [
                 'class' => UserFixture::class,
+                'depends'=>[],
+            ],
+             'user_profiles' => [
+                'class' => UserProfileFixture::class,
                 'depends'=>[],
             ],
         ];
@@ -154,13 +159,13 @@ class ProductTest extends \Codeception\Test\Unit
         $request->cookieValidationKey = '123123';
         $request->baseUrl = Yii::$app->request->baseUrl;
         $request->scriptUrl = Yii::$app->request->scriptUrl;
-        $request->url = $product->url;
+        $request->url = Url::to($product->url);
         $route = $request->resolve()[0];
         $route = trim($route, "/");
         $route = preg_replace('/^(' . Yii::$app->language . '|mouse)|inend$/', '', $route);
         $route = trim($route, "/");
         $request->pathInfo = $route;
-        $this->tester->assertNotNull($request->pathInfo);
+        $this->tester->assertNotNull($request->pathInfo);;
         $this->tester->assertEquals($request->pathInfo, 'product/product/view');
     }
     public function testParseUrl()
@@ -168,7 +173,7 @@ class ProductTest extends \Codeception\Test\Unit
         $product = $this->testProductCreate();
 
         $request = Yii::$app->request;
-        $request->setPathInfo($product->url);
+        $request->setPathInfo(Url::to($product->url));
         $request->resolve();
 
         $this->tester->assertNotNull($request->get('id'));

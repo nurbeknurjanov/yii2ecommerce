@@ -15,10 +15,10 @@ use kartik\file\FileInput;
 use file\models\FileImage;
 use file\widgets\file_preview\FilePreview;
 use product\models\Product;
-use extended\vendor\BootstrapSelectAsset;
 use eav\assets\EavAsset;
 use mihaildev\ckeditor\CKEditor;
 use mihaildev\elfinder\ElFinder;
+use shop\models\Shop;
 
 /* @var $this yii\web\View */
 /* @var $model \product\models\Product */
@@ -45,117 +45,114 @@ $eavAsset = EavAsset::register($this);
     $this->params['form'] = $form;
     ?>
 
-    <?php $this->beginBlock('fields') ?>
-        <?=$form->errorSummary($model);?>
-        <div class="col-lg-6">
+    <?=$form->errorSummary($model);?>
 
-            <?=$form->field($model, 'title')->textInput(['maxlength' => true]) ?>
-            <?php $this->beginBlock('sku') ?>
-                <?= $form->field($model, 'sku', [
-                    'template' => "{label}\n<div class=\"col-lg-4\" >{input}{error}</div>",
-                ]) ?>
-            <?php $this->endBlock() ?>
-            {{sku}}
-            <?= $form->field($model, 'price', [
-                'template' => "{label}\n<div class=\"col-lg-4\" >{input}{error}</div>",
-                'parts'=>[  '{input}'=> Html::inputWithSymbol($model, 'price', Yii::$app->formatter->currencySymbol)],
-            ]) ?>
-            <?=$form->field($model, "discount")->begin(); ?>
-                <?=Html::activeLabel($model, "discount", ['class'=>'col-lg-3 control-label',]) ?>
-                <div class="col-lg-4">
-                    <?=Html::inputWithSymbol($model, 'discount', '%')?>
-                    <?= Html::error($model, "discount", ['class'=>'help-block']) ?>
-                </div>
-                <div class="col-lg-5">
-                    <!--old price-->
-                </div>
-            <?=$form->field($model, "discount")->end(); ?>
+  <div class="row">
+    <div class="col-lg-6">
 
-            <?php
-            if(!Yii::$app->request->isPost)
-                $model->type = $model->typeArray;
-            echo $form->field($model, 'type')->checkboxList($model->typeValues, ['style'=>'padding-top:7px']);
+        <?=$form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+        <?=$form->field($model, 'shop_id')->dropDownList(ArrayHelper::map(Shop::find()->mineOrDefault()->all(),'id','title'),
+            ['prompt'=>'Select',]) ?>
+        <?= $form->field($model, 'sku', [
+            'template' => "{label}\n<div class=\"col-lg-4\" >{input}{error}</div>",
+        ]) ?>
+        <?= $form->field($model, 'price', [
+            'template' => "{label}\n<div class=\"col-lg-4\" >{input}{error}</div>",
+            'parts'=>[  '{input}'=> Html::inputWithSymbol($model, 'price', [], Yii::$app->formatter->currencySymbol)],
+        ]) ?>
+        <?=$form->field($model, "discount")->begin(); ?>
+        <?=Html::activeLabel($model, "discount", ['class'=>'col-lg-3 control-label',]) ?>
+      <div class="col-lg-4">
+          <?=Html::inputWithSymbol($model, 'discount', [],'%')?>
+          <?= Html::error($model, "discount", ['class'=>'help-block']) ?>
+      </div>
+      <div class="col-lg-5">
+        <!--old price-->
+      </div>
+        <?=$form->field($model, "discount")->end(); ?>
+
+        <?php
+        if(!Yii::$app->request->isPost)
+            $model->type = $model->typeArray;
+        echo $form->field($model, 'type')->checkboxList($model->typeValues, ['style'=>'padding-top:7px']);
+        ?>
+        <?= $form->field($model, 'status')->radioList($model->statusValues, ['style'=>'padding-top:7px']) ?>
+        <?= $form->field($model, 'description')->widget(CKEditor::className(),[
+            'editorOptions' => ElFinder::ckeditorOptions('elfinder',[
+                'preset' => 'full',
+                'inline' => false,
+                'resize_enabled'=>true,
+                'height'=>300,
+                'toolbarGroups'=>[
+                    ['name' => 'clipboard', 'groups' => [
+                        'mode',
+                        'doctools'
+                    ]],
+                    ['name' => 'editing', 'groups' => [ 'tools']],]
+            ]),
+        ]); ?>
+
+        <?=$form->field($model, 'buyWithThisAttribute',['parts'=>['{input}'=>
+            (new Product)->getWidgetSelectPicker($model, 'buyWithThisAttribute',
+                Product::find()->notTheSame($model), ['multiple'=>true])]]) ?>
+
+        <?php
+        if($model->canBeParentOfGroup){
             ?>
-            <?= $form->field($model, 'status')->radioList($model->statusValues, ['style'=>'padding-top:7px']) ?>
-            <?= $form->field($model, 'description')->widget(CKEditor::className(),[
-                'editorOptions' => ElFinder::ckeditorOptions('elfinder',[
-                    'preset' => 'full',
-                    'inline' => false,
-                    'resize_enabled'=>true,
-                    'height'=>300,
-                    'toolbarGroups'=>[
-                        ['name' => 'clipboard', 'groups' => [
-                            'mode',
-                            'doctools'
-                        ]],
-                        ['name' => 'editing', 'groups' => [ 'tools']],]
-                ]),
-            ]); ?>
-
-            <?=$form->field($model, 'buyWithThisAttribute',['parts'=>['{input}'=>
-                (new Product)->getWidgetSelectPicker($model, 'buyWithThisAttribute',
-                    Product::find()->notTheSame($model), ['multiple'=>true])]]) ?>
-
+            <?=$form->field($model, 'groupedProductsAttribute',['parts'=>['{input}'=>
+                (new Product)->getWidgetSelectPicker($model, 'groupedProductsAttribute',
+                    Product::find()->not($model), ['multiple'=>true])]]) ?>
             <?php
-            if($model->canBeParentOfGroup){
-                ?>
-                <?=$form->field($model, 'groupedProductsAttribute',['parts'=>['{input}'=>
-                    (new Product)->getWidgetSelectPicker($model, 'groupedProductsAttribute',
-                        Product::find()->not($model), ['multiple'=>true])]]) ?>
-                <?php
-            }
-            ?>
+        }
+        ?>
 
-        </div>
-        <div class="col-lg-6">
-            <?php $this->beginBlock('category_id') ?>
-                <?=$form->field($model, 'category_id')->dropDownList(ArrayHelper::map(
-                        Category::find()->defaultFrom()->defaultOrder()
-                            ->selectTitle()->enabled()->all(), 'id', 'title'),
-                [
-                    'prompt'=>'Select',
-                    'class'=>'form-control eavSelect',
-                    'encode'=>false,
+    </div>
+    <div class="col-lg-6">
+        <?php $this->beginBlock('category_id') ?>
+        <?=$form->field($model, 'category_id')->dropDownList(ArrayHelper::map(
+            Category::find()->defaultFrom()->defaultOrder()
+                ->selectTitle()->enabled()->all(), 'id', 'title'),
+            [
+                'prompt'=>'Select',
+                'class'=>'form-control eavSelect',
+                'encode'=>false,
                 'data'=>[
                     'object_id'=>$model->id,
                 ],
             ]); ?>
-            <?php $this->endBlock() ?>
-            {{category_id}}
-            <img src="<?=$eavAsset->baseUrl;?>/images/loading.gif" id="loading" style="display: none;" />
-            <div class="well eavFields">
-                <?php
-                foreach ($model->valueModels as $field_id=>$valueModel){
-                    $fieldModel=$model->fieldModels[$field_id];
-                    echo $form->field($valueModel, "[$fieldModel->id]value",
-                        ['parts'=>['{input}'=>$fieldModel->getFieldWithUnit($valueModel, "[$fieldModel->id]value") ]]);
-                }
-                ?>
-            </div>
+        <?php $this->endBlock() ?>
+      {{category_id}}
+      <img src="<?=$eavAsset->baseUrl;?>/images/loading.gif" id="loading" style="display: none;" />
+      <div class="well eavFields">
+          <?php
+          foreach ($model->valueModels as $field_id=>$valueModel){
+              $fieldModel=$model->fieldModels[$field_id];
+              echo $form->field($valueModel, "[$fieldModel->id]value",
+                  ['parts'=>['{input}'=>$fieldModel->getField($valueModel, "[$fieldModel->id]value") ]]);
+          }
+          ?>
+      </div>
 
-            <?php
-            $imagesAttributeField = $form->field($model, 'imagesAttribute[]');//->fileInput(['hiddenOptions'=>['value'=>'123']]);
-            $imagesAttributeField->parts['{input}'] =  FilePreview::widget(['images'=>$model->images]);
-            $imagesAttributeField->parts['{input}'].=FileInput::widget([
-                'model' => $model,
-                'attribute' => 'imagesAttribute[]',
-                'options' => ['multiple' => true, 'hiddenOptions'=>['value'=>'']],
-            ]);
-            $imagesAttributeField->template = "{label}\n<div class=\"col-lg-9\">{input}</div>\n
+        <?php
+        $imagesAttributeField = $form->field($model, 'imagesAttribute[]');//->fileInput(['hiddenOptions'=>['value'=>'123']]);
+        $imagesAttributeField->parts['{input}'] =  FilePreview::widget(['images'=>$model->images]);
+        $imagesAttributeField->parts['{input}'].=FileInput::widget([
+            'model' => $model,
+            'attribute' => 'imagesAttribute[]',
+            'options' => ['multiple' => true, 'hiddenOptions'=>['value'=>'']],
+        ]);
+        $imagesAttributeField->template = "{label}\n<div class=\"col-lg-9\">{input}</div>\n
                         <div class=\"col-lg-9 col-lg-offset-3\">{error}</div>";
-            $imagesAttributeField->labelOptions =  ['class' => 'col-lg-3 control-label'];
-            echo $imagesAttributeField;
-            ?>
+        $imagesAttributeField->labelOptions =  ['class' => 'col-lg-3 control-label'];
+        echo $imagesAttributeField;
+        ?>
 
-            <?=$form->field($model,'enabled')->checkbox([], false)?>
-        </div>
-    <?php $this->endBlock() ?>
-    {{fields}}
+        <?=$form->field($model,'enabled')->checkbox([], false)?>
+    </div>
+  </div>
 
 
-    <?php $this->beginBlock('additional-fields') ?>
-    <?php $this->endBlock() ?>
-    {{additional-fields}}
+
 
 
     <div class="clear"></div>

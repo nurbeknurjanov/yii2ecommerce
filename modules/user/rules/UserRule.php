@@ -2,6 +2,8 @@
 
 namespace user\rules;
 
+use extended\helpers\ArrayHelper;
+use shop\models\UserShop;
 use Yii;
 use yii\base\Exception;
 use yii\rbac\Rule;
@@ -15,7 +17,7 @@ class UserRule extends Rule
     {
         if(!($userModel = User::findOne($userID)))
             return false;
-        if(Yii::$app->user->can(User::ROLE_MANAGER))
+        if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR))
             return true;
 
         $roleOrPermission=$item->name;
@@ -23,7 +25,14 @@ class UserRule extends Rule
             case $roleOrPermission == 'viewUser' || $roleOrPermission == 'deleteUser' || $roleOrPermission == 'updateUser':{
                 if(!isset($params['model']))
                     throw new Exception("model parameter is missing.");
-                return $params['model']->id==Yii::$app->user->id;
+                if($params['model']->id==Yii::$app->user->id)
+                    return true;
+
+                if(Yii::$app->authManager->checkAccess($userID, User::ROLE_MANAGER)){
+                    $shops_id = ArrayHelper::map(Yii::$app->user->identity->userShops, 'shop_id','shop_id');
+                    return  UserShop::find(['shop_id'=>$shops_id, 'user_id'=>$params['model']->id]);
+                }
+
                 break;
             }
         }

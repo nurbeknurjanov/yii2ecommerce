@@ -10,10 +10,10 @@ $this->title = Yii::t('common', 'Create setting');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Settings'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="setting-create box">
+<div class="setting-create card">
 
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

@@ -15,6 +15,7 @@ use Yii;
 use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Console;
+use yii\helpers\Url;
 
 class CleanController extends Controller
 {
@@ -54,11 +55,13 @@ class CleanController extends Controller
         exec("rm -R $dir/backend/runtime/*");
         exec("rm -R $dir/console/runtime/*");
         exec("rm -R $dir/frontend/runtime/*");
+        exec("rm -R $dir/api/runtime/*");
         exec("rm -R $dir/tests/_output/*");
 
         exec("rm -R $dir/landing/web/assets/*");
         exec("rm -R $dir/backend/web/assets/*");
         exec("rm -R $dir/frontend/web/assets/*");
+        exec("rm -R $dir/api/web/assets/*");
         echo "cleaned!\n";
     }
     private function isSakuraBranch()

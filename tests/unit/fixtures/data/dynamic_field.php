@@ -83,7 +83,7 @@ return [
 "l":"l",
 "xl":"xl",
 "xxl":"xxl",
-"xxxl":"xxl"
+"xxxl":"xxxl"
 }',
         'rule' => '',
         'default_value' => '',

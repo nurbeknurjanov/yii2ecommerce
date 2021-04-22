@@ -15,10 +15,10 @@ $this->title = Yii::t('product', 'Create Product');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('product', 'Products'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="product-create box">
+<div class="product-create card">
 
     <?php $this->beginBlock('form') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?= $this->render('_form', [
                 'model' => $model,
             ]) ?>

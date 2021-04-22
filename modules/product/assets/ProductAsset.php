@@ -56,13 +56,9 @@ class ProductAsset extends AssetBundle
         $addCompare = Yii::t('product', 'Add to compare');
         $removeCompare = Yii::t('product', 'Remove from compare');
         $view->registerJs("
-            $('body').on('click', '.addToCompare, .removeFromCompare',function(e){
-                if($(this).html()=='$addCompare')
-                    $(this).html('$removeCompare');
-                else if($(this).html()=='$removeCompare')
-                    $(this).html('$addCompare');
-            });
-        ", $view::POS_READY, 'compare');
+            var addCompareTitle = '{$addCompare}';
+            var removeCompareTitle = '{$removeCompare}';
+        ", $view::POS_HEAD, 'compare');
         FavoriteAsset::register($view);
         return parent::register($view);
     }

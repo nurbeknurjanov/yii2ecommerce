@@ -20,7 +20,7 @@ class Rule extends \yii\rbac\Rule
     public $name = 'orderRule';
     public function execute($userID, $item, $params)
     {
-        if(Yii::$app->user->can(User::ROLE_MANAGER))
+        if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR))
             return true;
 
         $userModel = User::findOne($userID);

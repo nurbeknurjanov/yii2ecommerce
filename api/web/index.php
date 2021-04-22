@@ -18,7 +18,8 @@ require(__DIR__ . '/../config/bootstrap.php');
 $config = ArrayHelper::merge(
     require(__DIR__ . '/../../common/config/main.php'),
     YII_ENV_PROD ? []:require(__DIR__ . '/../../common/config/main-local.php'),
-    require(__DIR__ . '/../config/main.php')
+    require(__DIR__ . '/../config/main.php'),
+    require(__DIR__ . '/../config/main-local.php')
 );
 
 

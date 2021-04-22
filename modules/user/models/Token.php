@@ -11,7 +11,6 @@ use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\behaviors\AttributeBehavior;
 use yii\helpers\Html;
-use yii\web\Cookie;
 
 /**
  * This is the model class for table "user_token".
@@ -52,8 +51,6 @@ class Token extends ActiveRecord
                 'value' => function($event){
                     $model = $event->sender;
                     /* @var self $model */
-                    if($model->action==self::ACTION_SHARE_LINK_TO_REGISTER)
-                        return null;
                     return date('Y-m-d H:i:s', time()+3600*24*7);
                 },
             ],
@@ -65,8 +62,6 @@ class Token extends ActiveRecord
                 'value' => function($event){
                     $model = $event->sender;
                     /* @var self $model */
-                    if($model->action==self::ACTION_SHARE_LINK_TO_REGISTER)
-                        return 1;
                     return 0;
                 },
             ],
@@ -154,8 +149,11 @@ class Token extends ActiveRecord
     protected function checkRunnable()
     {
         if(!$this->isRunnable){
-            if($this->run==1 && $this->reusable==0)
+            if($this->run==1 && $this->reusable==0){
+                if($this->action==self::ACTION_ACTIVATE_ACCOUNT)
+                    throw new Exception('You have already activated your account');
                 throw new Exception('The token can not be run twice.');
+            }
             if($this->expire_date && $this->expire_date<date('Y-m-d H:i:s'))
                 throw new Exception('The token is expired.');
         }
@@ -177,10 +175,7 @@ class Token extends ActiveRecord
                     $user->updateAttributes(['email'=>$this->data]);
                 break;
             }
-            case self::ACTION_SHARE_LINK_TO_REGISTER: {
-                Yii::$app->session->set('referrer_id', $user->id);
-                break;
-            }
+
             case self::ACTION_INVITE_FROM_ORDER:{
                 $data = json_decode($this->data, JSON_FORCE_OBJECT);
                 if(isset($data['email']) && $data['email']){

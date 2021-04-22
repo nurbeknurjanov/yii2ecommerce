@@ -22,10 +22,8 @@ class Bootstrap implements BootstrapInterface {
      * @param \yii\base\Application $app The application currently running
      * @return void
      */
-    public function bootstrap($app) {
-
-        Yii::$app->view->registerAssetBundle(ArticleAsset::class);
-
+    public function bootstrap($app)
+    {
         if (!isset(Yii::$app->get('i18n')->translations['tag*'])) {
             Yii::$app->get('i18n')->translations['tag*'] = [
                 'class' => 'yii\i18n\PhpMessageSource',

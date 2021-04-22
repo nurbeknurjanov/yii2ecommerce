@@ -35,22 +35,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>$model->statusText,
             ],
             'description:raw',
-            [
-                'attribute'=>'language',
-                'format'=>'raw',
-                'value'=>$model->languageText,
-            ],
-            [
-                'attribute'=>'time_zone',
-                'format'=>'raw',
-                'value'=>$model->timeZoneText,
-            ],
             'created_at:datetime',
             'updated_at:datetime',
             [
                 'attribute'=>'imageAttribute',
                 'format'=>'raw',
-                'value'=>$model->image ? $model->image->img : null,
+                'value'=>$model->image ? $model->image->getThumbImg('sm') : null,
             ],
             [
                 'attribute'=>'imagesAttribute',

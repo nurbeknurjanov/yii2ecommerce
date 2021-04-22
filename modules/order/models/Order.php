@@ -11,7 +11,6 @@ namespace order\models;
 use country\models\City;
 use country\models\Country;
 use country\models\Region;
-use coupon\models\Coupon;
 use product\models\Product;
 use user\models\create\TokenCreate;
 use user\models\create\UserCreate;
@@ -44,6 +43,7 @@ use yii\helpers\Html;
  * @property Region $region
  * @property Country $country
  * @property string $address
+ * @property string $zip_code
  * @property string $description
  * @property integer $delivery_id
  * @property array $deliveryValues
@@ -67,11 +67,10 @@ use yii\helpers\Html;
  * @property string $statusText
  * @property array $statusValues
  * @property OrderProduct[] $orderProducts
- * @property integer $coupon_id
- * @property Coupon $coupon
  * @property string $title
  * @property OrderProduct[] $basketProducts
  * @property integer $latestID
+ * @property bool $isPaymentOnline
  */
 class Order extends \yii\db\ActiveRecord
 {
@@ -85,7 +84,7 @@ class Order extends \yii\db\ActiveRecord
 
     public function getTitle()
     {
-        return Yii::t('order', 'Order').' №:'.$this->id;
+        return Yii::t('order', 'Order').' #'.$this->id;
     }
 
 
@@ -103,16 +102,29 @@ class Order extends \yii\db\ActiveRecord
             [
                 'class' => AttributeBehavior::class,
                 'attributes' => [
-                    self::EVENT_BEFORE_INSERT => 'user_id',
+                    self::EVENT_INIT => 'user_id',
+                ],
+                'value' => function ($event) {
+                    return Yii::$app->user->id;
+                },
+            ],
+            [
+                'class' => AttributeBehavior::class,
+                'attributes' => [
+                    self::EVENT_BEFORE_VALIDATE => 'name',
+                    self::EVENT_BEFORE_INSERT => 'name',
+                    self::EVENT_BEFORE_UPDATE => 'name',
                 ],
                 'value' => function ($event) {
                     /* @var $model self */
                     $model = $event->sender;
-                    if(Yii::$app->user->identity){
-                        $model->name = Yii::$app->user->identity->fullName;
-                        $model->email = Yii::$app->user->identity->email;
-                        return Yii::$app->user->id;
+                    if($model->user_id){
+                        if(!$model->name)
+                            $model->name = $model->user->fullName;
+                        if(!$model->email)
+                            $model->email = $model->user->email;
                     }
+                    return $model->name;
                 },
             ],
             'ip'=>[
@@ -121,27 +133,7 @@ class Order extends \yii\db\ActiveRecord
                     self::EVENT_BEFORE_INSERT => 'ip',
                 ],
                 'value' => function ($event) {
-                    /* @var $model self */
-                    $model = $event->sender;
                     return Yii::$app->request->userIP;
-                },
-            ],
-            [
-                'class' => AttributeBehavior::class,
-                'attributes' => [
-                    self::EVENT_BEFORE_INSERT => 'country_id',
-                    self::EVENT_INIT => 'country_id',
-                ],
-                'value' => function ($event) {
-                    /* @var $model self */
-                    $model = $event->sender;
-                    //$model->country_id=some id;
-                    //$model->region_id=some id;
-                    if(!$model->country_id && !$model->region_id && $model->city_id){
-                        $model->region_id = $model->city->region_id;
-                        $model->country_id = $model->city->region->country_id;
-                    }
-                    return $model->country_id;
                 },
             ],
             [
@@ -168,8 +160,33 @@ class Order extends \yii\db\ActiveRecord
                     return $order->basketProducts;
                 },
             ],
+            [
+                'class' => AttributeBehavior::class,
+                'attributes' => [
+                    self::EVENT_INIT_BASKET_PRODUCTS_API => 'basketProducts',
+                ],
+                'value' => function ($event) {
+                    /* @var $model self */
+                    $order = $event->sender;
+                    $order->amount=0;
+                    $basketPostProducts = [];
+                    if(Yii::$app->request->post('OrderProduct'))
+                        $basketPostProducts = Yii::$app->request->post('OrderProduct');
+                    foreach ($basketPostProducts as $product_id=>$basketPostProductData) {
+                        $orderProduct = new OrderProduct;
+                        $orderProduct->product_id=$product_id;
+                        $orderProduct->price=$basketPostProductData['price'];
+                        $orderProduct->count=$basketPostProductData['count'];
+
+                        $order->amount+=$orderProduct->price * (float) $orderProduct->count;
+                        $order->basketProducts[$product_id]=$orderProduct;
+                    }
+                    return $order->basketProducts;
+                },
+            ],
         ];
     }
+    const EVENT_INIT_BASKET_PRODUCTS_API='EVENT_INIT_BASKET_PRODUCTS_API';
     const EVENT_INIT_BASKET_PRODUCTS='EVENT_INIT_BASKET_PRODUCTS';
     public $basketProducts=[];
     public function loadBasketProducts($data)
@@ -200,15 +217,14 @@ class Order extends \yii\db\ActiveRecord
     }
     public function saveWithOrderProducts()
     {
-        if($this->payment_type==$this::PAYMENT_TYPE_ONLINE)
-            $this->online_payment_status = $this::ONLINE_PAYMENT_STATUS_PAID;
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if($this->save() && $this->saveOrderProducts()){
-                $transaction->commit();
-                $this->trigger($this::EVENT_AFTER_INSERT_DELAY);
-                return true;
-            }
+            if(!$this->save())
+                throw new Exception(Html::errorSummary($this));
+            $this->saveOrderProducts();
+            $transaction->commit();
+            $this->trigger($this::EVENT_AFTER_INSERT_DELAY);
+            return true;
         } catch (\Exception $e) {
             $transaction->rollBack();
             throw new Exception($e->getMessage());
@@ -263,7 +279,20 @@ class Order extends \yii\db\ActiveRecord
     }
     public function forceCreateAndBind()
     {
-        $user = UserCreate::createUserInactiveForce(['email'=>$this->email, 'name'=>$this->name, 'subscribe'=>$this->subscribe]);
+        $user = UserCreate::createUserInactiveForce([
+            'email'=>$this->email,
+            'name'=>$this->name,
+            'phone'=>$this->phone,
+            'subscribe'=>$this->subscribe,
+        ],
+            [
+                'country_id'=>$this->country_id,
+                'region_id'=>$this->region_id,
+                'city_id'=>$this->city_id,
+                'address'=>$this->address,
+                'zip_code'=>$this->zip_code,
+            ]
+        );
         $user->sendActivateToken();
         $user->tightOrders();
     }
@@ -301,24 +330,68 @@ class Order extends \yii\db\ActiveRecord
             Basket::deleteAll();
 
             //send invite
+
+            if(!Yii::$app->user->isGuest && $this->email){
+                $user = Yii::$app->user->identity;
+                if(!$user->name)
+                    $user->updateAttributes(['name'=>$this->name]);
+                if(!$user->phone)
+                    $user->updateAttributes(['phone'=>$this->phone]);
+
+                $userProfile = $user->userProfileObject;
+                $userProfile->attributes = [
+                    'country_id'=>$this->country_id,
+                    'region_id'=>$this->region_id,
+                    'city_id'=>$this->city_id,
+                    'address'=>$this->address,
+                    'zip_code'=>$this->zip_code,
+                ];
+                $userProfile->save(false);
+            }
+
             if(Yii::$app->user->isGuest && $this->email){
                 $user = User::findByUsernameOrEmail($this->email);
                 if($user){
+
+                    if(!$user->name)
+                        $user->updateAttributes(['name'=>$this->name]);
+                    if(!$user->phone)
+                        $user->updateAttributes(['phone'=>$this->phone]);
+
+                    $userProfile = $user->userProfileObject;
+                    $userProfile->attributes = [
+                        'country_id'=>$this->country_id,
+                        'region_id'=>$this->region_id,
+                        'city_id'=>$this->city_id,
+                        'address'=>$this->address,
+                        'zip_code'=>$this->zip_code,
+                    ];
+                    $userProfile->save(false);
+
+
+
                     $user->tightOrders();
-                    if($user->status!=$user::STATUS_INACTIVE)
+                    if($user->isNotActive)
                         $user->sendActivateToken();
                 }else{
                     if($this->userAction==self::USER_ACTION_INVITE)
                         $this->sendInviteToRegister();
-                    if($this->userAction==self::USER_ACTION_BIND)
+                    if($this->userAction==self::USER_ACTION_BIND){
                         $this->forceCreateAndBind();
+                        $this->refresh();
+                        $this->save();
+                    }
                 }
             }
         });
 
-
-
-
+        $this->on(self::EVENT_BEFORE_DELETE, function(Event $event){
+            /* @var $model self */
+            $model = $event->sender;
+            $orderProducts = $model->orderProducts;
+            foreach ($orderProducts as $orderProduct)
+                $orderProduct->delete();
+        });
 
     }
 
@@ -329,7 +402,7 @@ class Order extends \yii\db\ActiveRecord
     {
         return [
             self::DELIVERY_PICKUP=>Yii::t('order', 'Pickup'),
-            self::DELIVERY_SERVICE=>Yii::t('order', '{name} Delivery service', ['name'=>Yii::$app->params['name']]),
+            self::DELIVERY_SERVICE=>Yii::t('order', '{name} Delivery service', ['name'=>Yii::$app->name]),
             self::DELIVERY_COMPANY_DHL=>'DHL',
         ];
     }
@@ -413,38 +486,32 @@ class Order extends \yii\db\ActiveRecord
             ['email', 'email'],
             ['amount', 'number'],
             [['delivery_id', 'amount', 'payment_type'], 'default'],
-            [['name', 'email', 'phone', 'address'], 'string', 'max' => 255],
-            [['city_id', 'address', 'payment_type', 'delivery_id'], 'required'],
-            [['country_id','region_id',], 'safe'],
+            [['email', 'phone', 'address'], 'string', 'max' => 255],
+            [[ 'payment_type', 'delivery_id'], 'required'],
+            [['country_id','region_id', 'city_id', 'address'], 'required'],
+              [['zip_code'], 'default', 'value'=>''],
             ['subscribe', 'boolean'],
-            [
-                'phone', 'required', 'when'=>function(self $model)
-                                        {
-                                            return !$model->email;
-                                        },
-                'whenClient' => "function (attribute, value) {
-                                        //alert(attribute.id);
-                                        //return !$('#order-email').val();
-                                        return !$('[name=\"Order[email]\"]').val();
-                                    }",
-                'on'=>Order::SCENARIO_GUEST,
-            ],
-            [
-                'email', 'required', 'when'=>function(self $model)
-                                        {
-                                            return !$model->phone;
-                                        },
-                'whenClient' => "function (attribute, value) {
-                                                        return !$('[name=\"Order[phone]\"]').val();
-                                                    }",
-                'on'=>Order::SCENARIO_GUEST,
-            ],
+            [['email'], 'required', 'on'=>Order::SCENARIO_GUEST, 'when'=>function(self $model)
+                              {
+                                  return !$model->phone;
+                              },
+                               'whenClient' => "function (attribute, value) {
+                                                    return !$('#order-phone').val();
+                                                }"
+                          ],
+            [['phone'], 'required', 'on'=>Order::SCENARIO_GUEST, 'when'=>function(self $model)
+                              {
+                                  return !$model->email;
+                              },
+                              'whenClient' => "function (attribute, value) {
+                                                      return !$('#order-email').val();
+                                                  }"
+                          ],
             ['!user_id', 'safe'],
             ['userAction', 'safe'],
-            ['payment_type', 'required'],
             ['online_payment_type', 'required', 'when'=>function(self $model)
                                         {
-                                            return $model->payment_type==$model::PAYMENT_TYPE_ONLINE;
+                                            return $model->isPaymentOnline;
                                         },
                 'whenClient' => "isPaymentOnline",
             ],
@@ -460,16 +527,17 @@ class Order extends \yii\db\ActiveRecord
             'id' => Yii::t('common', 'ID'),
             'user_id' => Yii::t('common', 'User'),
             'name' => Yii::t('order', 'Name'),
+            'nameAttribute' => Yii::t('order', 'Name'),
             'email' => Yii::t('order', 'Email'),
             'phone' => Yii::t('order', 'Phone'),
-            'country_id' => Yii::t('order', 'Country'),
-            'region_id' => Yii::t('order', 'Region'),
-            'city_id' => Yii::t('order', 'City'),
+            'country_id' => Yii::t('country', 'Country'),
+            'region_id' => Yii::t('country', 'State/Province'),
+            'city_id' => Yii::t('country', 'City'),
             'address' => Yii::t('order', 'Address'),
             'description' => Yii::t('order', 'Description'),
             'delivery_id' => Yii::t('order', 'Delivery'),
             'created_at' => Yii::t('order', 'Date of order'),
-            'updated_at' => Yii::t('common', 'Updated At'),
+            'updated_at' => Yii::t('common', 'Updated date'),
             'amount' => Yii::t('order', 'Amount'),
             'payment_type' => Yii::t('order', 'Payment type'),
             'status' => Yii::t('product', 'Status'),
@@ -493,13 +561,7 @@ class Order extends \yii\db\ActiveRecord
         return $this->hasMany(OrderProduct::class, ['order_id' => 'id']);
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCoupon()
-    {
-        return $this->hasOne(Coupon::class, ['id' => 'coupon_id']);
-    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -541,5 +603,9 @@ class Order extends \yii\db\ActiveRecord
         if($model)
             return $model->id;
         return 0;
+    }
+    public function getIsPaymentOnline()
+    {
+        return $this->payment_type==self::PAYMENT_TYPE_ONLINE;
     }
 }

@@ -69,7 +69,7 @@ class CityController extends Controller
                         }
                     ],
                     [
-                        'actions' => ['select-picker', 'select-city'],
+                        'actions' => ['select-picker', 'select-city',   'find-one'],
                         'allow' => true,
                     ],
                 ],
@@ -82,12 +82,19 @@ class CityController extends Controller
             ],
         ];
     }
+    public function actionFindOne($q, $region_id)
+    {
+        $model = City::find()->regionQuery($region_id)->andWhere(['like', 'name', $q.'%', false])->one();
+        return $model ? $model->id:null;
+    }
 
+    //$value is standard url value[]=1&value[]=2 selected values params
+    //or it can be only one value=1 value, that works, despite array type
     public function actionSelectPicker($q=null, array $value=null, $region_id=null)
     {
         $query = (new City)->getOrderedQuery($value, $q);
 
-        $query->andFilterWhere(['region_id'=>$region_id]);
+        $query->andWhere(['region_id'=>$region_id]);
 
         $models = $query->all();
         $return = Html::tag('option', Yii::t('common','Select'), ['value'=>'']);
@@ -186,7 +193,9 @@ class CityController extends Controller
     {
         try {
             $this->findModel($id)->delete();
-            return $this->redirect($this->defaultAction);
+            Yii::$app->session->setFlash('success', 'You have successfully deleted the item.');
+            if(strpos(Yii::$app->request->referrer,'view')!==false)
+                return $this->redirect($this->defaultAction);
         } catch (Exception $e) {
             Yii::$app->session->setFlash('error', $e->getMessage());
         }

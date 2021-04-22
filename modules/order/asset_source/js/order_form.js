@@ -1,10 +1,8 @@
-
-$('.countTD input').focus(function () {
+$('body').on('focus', '.countTD input', function () {
     $(this).select();
 });
 
-
-$('.countTD input').keyup(function(){
+$('body').on('keyup', '.countTD input', function () {
     var $count = $(this);
     var $row = $count.parents('tr');
     var $price = $row.find('.priceTD');
@@ -15,8 +13,7 @@ $('.countTD input').keyup(function(){
 });
 
 
-
-$('.amountTD').bind("contentChange", function() {
+$('body').on('contentChange', '.amountTD', function () {
     var totalAmountValue=0;
     $('.amountTD').each(function () {
         totalAmountValue+=$(this).data('amount');
@@ -24,4 +21,7 @@ $('.amountTD').bind("contentChange", function() {
     $('.totalAmountTD').html(totalAmountValue+' '+$('.priceTD').data('currency'));
 });
 
+/*
+$('.amountTD').bind("contentChange", function() {
 
+});*/

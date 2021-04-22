@@ -12,26 +12,27 @@ use yii\widgets\Pjax;
 use kartik\rating\StarRating;
 use order\models\Basket;
 use product\assets\ProductAsset;
+use yii\helpers\Url;
 
-/* @var $this yii\web\View */
+/* @var $this \extended\view\View */
 /* @var $model \product\models\Product */
 
 
-$this->registerLinkTag(['rel' => 'canonical',  'href' => $model->url]);
+$this->registerLinkTag(['rel' => 'canonical',  'href' => Url::to($model->url)]);
 
 //after bootstrap it needs to update label translations
-if(isset($this->assetManager->bundles['all']))
+/*if(isset($this->assetManager->bundles['all']))
     $this->clearAssetBundle(ProductAsset::class);
-$productAsset = ProductAsset::register($this);
+$productAsset = ProductAsset::register($this);*/
 
 /*$this->registerJsFile($productAsset->baseUrl."/js/product-view.js", ['depends'=>[
     CommonAsset::class
 ]]);*/
 
 $this->render('_view/_breadcrumbs', ['model' => $model]);
-$this->params['title'] = $this->title.' | '.Yii::$app->name;
 $this->params['description'] = $this->title;
-$this->params['product'] = $model;
+$this->params['menuTitle'] = $this->title;
+
 ?>
 
 
@@ -174,7 +175,7 @@ $this->params['product'] = $model;
             ]);
         ?>
 
-        <div class="info-block">
+        <div class="info-block" >
             <h5><?=Yii::t('product', '{title} guarantees', ['title'=>Yii::$app->name]);?>:</h5>
             <ul>
                 <li class="delivery"><div><?=Yii::t('product', 'Fast delivery');?></div></li>

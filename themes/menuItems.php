@@ -8,16 +8,18 @@ use yii\helpers\Inflector;
 
 $request = Yii::$app->request;
 
-$leftItems = [
-    ['label' => Yii::t('common', 'About us'), 'url' => '/about_us', 'active'=>$request->get('url')=='about_us'],
+$left = [
+    ['label' => Yii::t('common', 'About us'),
+        'url' => ['/page/page/view', 'page_title_url'=>'about_us'],
+        'active'=>$request->get('page_title_url')=='about_us'],
     ['label' => Yii::t('product', 'Products'), 'url' => ['/product/product/list']],
 ];
 
 //profile
 if (Yii::$app->user->isGuest)
-    $menuItemProfile = ['label' => Yii::t('common', 'Login'), 'url' => ['/user/guest/login']];
+    $profile = ['label' => Yii::t('common', 'Login'), 'url' => ['/user/guest/login']];
 else
-    $menuItemProfile = [
+    $profile = [
         'label' => Yii::$app->user->identity->fullName,
         'visible'=>true,
         'items'=>[
@@ -35,26 +37,31 @@ else
     ];
 
 //favorite
-$favoritesTitle = '<i class="glyphicon glyphicon-heart"></i> '.
+$favoriteTitle = '<i class="glyphicon glyphicon-heart"></i> '.
     Html::tag('span', Yii::t('favorite', 'Favorites'), ['class'=>'caption']).
     '('.Html::tag('span', FavoriteLocal::getNProducts(), ['id'=>'favoriteCountSpan',]).')';
-$menuItemFavorites = ['label' => $favoritesTitle, 'url' => ['/product/product/favorites'], 'options'=>['class'=>'']];
+$favorite = ['label' => $favoriteTitle, 'url' => ['/product/product/favorites'], 'options'=>['class'=>'']];
 
 //compare
 $compareTitle = '<i class="glyphicon glyphicon-stats"></i> '.
-    Html::tag('span', Yii::t('product', 'Comparing products'), ['class'=>'caption']).
+    Html::tag('span', Yii::t('product', 'Compare products'), ['class'=>'caption']).
     '('.Html::tag('span', Compare::getNProducts(), ['id'=>'compareCountSpan',]).')';
-$menuItemCompare = ['label' => $compareTitle, 'url' => ['/product/compare/index']];
+$compare = ['label' => $compareTitle, 'url' => ['/product/compare/index']];
 
 //languages
-$languages = (new I18nSourceMessage)->languageValues;
-$languageItems = $languages;
+$languageItems = $languages = (new I18nSourceMessage)->languageValues;
 array_walk($languageItems, function(&$value, $key) { $value = [
     'label'=> $value,
     'url'=>[ "/".Yii::$app->controller->route]+$_GET+['language'=>$key],
     'active'=>Yii::$app->language==$key,
 ]; });
-$menuItemLanguage = ['label' => $languages[Yii::$app->language],'items'=>$languageItems];
+$language = [
+    'dropDownOptions'=>[
+        'id'=>'menu-language',
+    ],
+    'label' => $languages[Yii::$app->language],
+    'items'=>$languageItems
+];
 
 //themes
 $themes = [];
@@ -67,10 +74,16 @@ foreach(['sakura', 'sakura_light', 'bootstrap'] as $theme){
         'active'=>$this->theme->id==$theme,
     ];
 }
-$menuItemTheme = ['label' => Yii::t('common', 'Theme'), 'items' => $themes];
+$theme = [
+    'dropDownOptions'=>[
+        'id'=>'menu-theme',
+    ],
+    'label' => Yii::t('common', 'Theme'),
+    'items' => $themes
+];
 
 
-$rightItems = [
+$right = [
     /*'<li class="phoneTop"><i class="glyphicon glyphicon-phone-alt"></i>
             +996 (558) 01-14-77</li>',*/
     [
@@ -78,15 +91,15 @@ $rightItems = [
         'url' => ['/order/order/list'],
         'active'=>in_array(Yii::$app->controller->route, ['order/order/list', 'order/order/view'])
     ],
-    $menuItemFavorites,
-    $menuItemCompare,
-    $menuItemProfile,
-    $menuItemLanguage,
-    $menuItemTheme
+    $favorite,
+    $compare,
+    $profile,
+    $language,
+    $theme
 ];
 
 
 return [
-    'leftItems'=>$leftItems,
-    'rightItems'=>$rightItems
+    'left'=>$left,
+    'right'=>$right
 ];

@@ -10,7 +10,6 @@ use file\widgets\file_preview\FilePreview;
 use mihaildev\ckeditor\CKEditor;
 use mihaildev\elfinder\ElFinder;
 use product\models\Product;
-use extended\vendor\BootstrapSelectAsset;
 
 /* @var $this yii\web\View */
 /* @var $model comment\models\Comment */

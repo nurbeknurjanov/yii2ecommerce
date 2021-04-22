@@ -137,4 +137,14 @@ return [
         'file_name' => 'df877f3865752637daa540ea9cbc474f.jpg','title' => 'copy_hp_k0b38aa_585a5de83acf9_images_1810131309.jpg',
         'type' => FileImage::TYPE_IMAGE_MAIN,'created_at'=>$date,'updated_at'=>$date),
 
+
+
+    array('model_id' => '2','model_name' => \shop\models\Shop::class,
+        'file_name' => '3a066bda8c96b9478bb0512f0a43028c.jpg',
+        'title' => 'mango',
+        'type' => FileImage::TYPE_IMAGE_MAIN,'created_at'=>$date,'updated_at'=>$date),
+    array('model_id' => '4','model_name' => \shop\models\Shop::class,
+        'file_name' => '3621f1454cacf995530ea53652ddf8fb.png',
+        'title' => 'mcdonald',
+        'type' => FileImage::TYPE_IMAGE_MAIN,'created_at'=>$date,'updated_at'=>$date),
 ];

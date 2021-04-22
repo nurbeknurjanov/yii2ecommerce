@@ -20,40 +20,30 @@ class CategoryUrlRule extends Component implements UrlRuleInterface
     public function createUrl($manager, $route, $params)
     {
         if ($route === 'product/product/list') {
-            if(!isset($params['category_id'])){
-                if(!$params)
-                    return "products";
-                return "products?".http_build_query($params);
-            }
+            $url = "products";
 
-            if (isset($params['title_url']) && $params['title_url']) {
-                $title_url = $params['title_url'];
-                unset($params['title_url']);
-                unset($params[(new ProductSearchFrontend)->formName()]['category_id']);
-                unset($params['category_id']);
-                if(!$params)
-                    return $title_url;
-                return $title_url."?".http_build_query($params);
-            }else{
-                unset($params['title_url']);
-                return "products?".http_build_query($params);
-                //return $route."?".http_build_query($params);
-            }
+            $category_title_url = isset($params['category_title_url']) ? $params['category_title_url']:null;
+            unset($params['category_title_url']);
+            unset($params[(new ProductSearchFrontend)->formName()]['category_id']);
+            unset($params['category_id']);
+            if($category_title_url)
+                $url = $category_title_url;
+
+            if($params)
+                $url.= '?'.http_build_query($params);
+            return $url;
         }
         return false;
     }
 
     public function parseRequest($manager, $request)
     {
-        $pathInfo = $request->getPathInfo();
-        $pathInfo = trim($pathInfo, '/');
+        $pathInfo = trim($request->getPathInfo(), '/');
+
         if($pathInfo){
 
             if(strpos($pathInfo, 'upload')!==false)
                 return false;
-
-            if($pathInfo=='products')
-                return ['product/product/list', $_GET];
 
             $firstPath = explode('/',$pathInfo)[0];
             if($firstPath=='site')
@@ -62,17 +52,20 @@ class CategoryUrlRule extends Component implements UrlRuleInterface
             if(in_array($firstPath, $moduleIDs))
                 return false;
 
+            if($pathInfo=='products')
+                return ['product/product/list', $_GET];
+
             if($category = Category::findOne(['title_url'=>$pathInfo])){
                 $params = $_GET;
-                //$params['title_url'] = $category->title_url;
-                if($formName = (new ProductSearchFrontend())->formName()){
+                if($formName = (new ProductSearchFrontend())->formName())
                     $params[$formName]['category_id'] = $category->id;
-                    $params[$formName]['title_url'] = $category->title_url;
-                }
-                else{
+                else
                     $params['category_id'] = $category->id;
-                    $params['title_url'] = $category->title_url;
-                }
+
+                $params['category_title_url'] = $category->title_url;
+
+                if(Yii::$app->id=='app-api')
+                    return ['product/index', $params ];
                 return ['product/product/list', $params];
             }
         }

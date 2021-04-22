@@ -27,6 +27,7 @@ return [
         'enabled'=>1,
         'created_at' => $date,
         'updated_at' => $date,
+        'shop_id'=>1,
     ],
     [
         'id'=>2,
@@ -46,6 +47,7 @@ return [
         'enabled'=>1,
         'created_at' => $date,
         'updated_at' => $date,
+        'shop_id'=>1,
     ],
 
     [
@@ -66,6 +68,7 @@ return [
         'rating' => NULL,
         'rating_count' => '0',
         'enabled'=>1,
+        'shop_id'=>1,
     ],
     [
         'id' => 4,
@@ -85,6 +88,7 @@ return [
         'rating' => NULL,
         'rating_count' => '0',
         'enabled'=>1,
+        'shop_id'=>1,
     ],
     [
         'id' => 5,
@@ -104,5 +108,6 @@ return [
         'rating' => NULL,
         'rating_count' => '0',
         'enabled'=>1,
+        'shop_id'=>1,
     ]
 ];

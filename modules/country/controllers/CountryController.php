@@ -70,7 +70,7 @@ class CountryController extends Controller
                         }
                     ],
                     [
-                        'actions' => ['select-picker'],
+                        'actions' => ['select-picker', 'find-one'],
                         'allow' => true,
                     ],
                 ],
@@ -84,7 +84,12 @@ class CountryController extends Controller
         ];
     }
 
-    public function actionSelectPicker($q=null, array $value=null)
+    public function actionFindOne($q=null)
+    {
+        $model = Country::find()->andWhere(['like', 'name', $q.'%', false])->one();
+        return $model ? $model->id:null;
+    }
+    public function actionSelectPicker($q=null, array $value=[])
     {
         $query = (new Country)->getOrderedQuery($value, $q);
 
@@ -173,10 +178,13 @@ class CountryController extends Controller
     {
         try {
             $this->findModel($id)->delete();
+            Yii::$app->session->setFlash('success', 'You have successfully deleted the item.');
+            if(strpos(Yii::$app->request->referrer,'view')!==false)
+                return $this->redirect($this->defaultAction);
         } catch (Exception $e) {
             Yii::$app->session->setFlash('error', $e->getMessage());
         }
-        return $this->redirect(['index']);
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
 

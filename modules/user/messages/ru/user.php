@@ -25,7 +25,7 @@ return [
 
     'Request password reset'=>'Восстановить пароль',
     'Password reset for {appName}'=>'Восстановление пароля для {appName}',
-    'Reset password'=>'Восстановление пароля',
+    'Reset password'=>'Сбросить пароль',
     'You successfully signed up.'=>'Вы успешно зарегистрировались.',
     'Please fill out your email. A link to reset password will be sent there.'=>'Введите вашу почту. Ссылка для восстановления пароля отправиться на этот адрес.',
 
@@ -95,4 +95,12 @@ return [
     'Permissions'=>'Разрешения',
     'Rules'=>'Правила',
     'Assignments'=>'Назначения',
+
+    'Create User'=>'Создать Пользователя',
+    'Update User'=>'Править Пользователя',
+    'Blocked'=>'Заблокирован',
+    'Disable'=>'Деактивировать',
+    'Enable'=>'Aктивировать',
+    'Manager'=>'Менеджер',
+    'Administrator'=>'Администратор',
 ];

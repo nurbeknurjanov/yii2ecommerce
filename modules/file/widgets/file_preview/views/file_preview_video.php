@@ -13,6 +13,7 @@ echo \file\widgets\file_video_network\FileVideoNetworkWidget::widget();
 if($video){
     $deleteLink=Html::a('<i class="glyphicon glyphicon-trash text-danger"></i>', ['/file/file-video-network/delete', 'id'=>$video->id], ['class'=>'kv-file-remove btn btn-xs btn-default','data' =>[ 'form'=>'anotherForm','confirm'=>Yii::t('common', 'Are you sure you want to delete this item?')]]);
     ?>
+    <div class="clear"></div>
     <div class="file-preview-frame krajee-default  kv-preview-thumb" style="display: block; height: auto;">
         <?=$video->getImg($options, ['class'=>'video-image video-image-little',]);?>
         <div class="file-thumbnail-footer">

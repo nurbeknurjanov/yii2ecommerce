@@ -32,6 +32,7 @@ class FileFixture extends ActiveFixture
         Helper::emptydir(Yii::getAlias('@frontend/web/upload/comment'));
         Helper::emptydir(Yii::getAlias('@frontend/web/upload/product'));
         Helper::emptydir(Yii::getAlias('@frontend/web/upload/category'));
+        Helper::emptydir(Yii::getAlias('@frontend/web/upload/shop'));
     }
     public function afterLoad()
     {
@@ -42,5 +43,6 @@ class FileFixture extends ActiveFixture
         Helper::copyr(__DIR__.'/files/comment', Yii::getAlias('@frontend/web/upload/comment'));
         Helper::copyr(__DIR__.'/files/product', Yii::getAlias('@frontend/web/upload/product'));
         Helper::copyr(__DIR__.'/files/category', Yii::getAlias('@frontend/web/upload/category'));
+        Helper::copyr(__DIR__.'/files/shop', Yii::getAlias('@frontend/web/upload/shop'));
     }
 }

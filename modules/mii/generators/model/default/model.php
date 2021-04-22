@@ -89,12 +89,12 @@ class <?= $className ?> extends <?= '\\' . ltrim($generator->baseClass, '\\') . 
 foreach ($tableSchema->columns as $column):
 if($column->dbType=='smallint(6)')
 {
-?><?="\n\t\t"?>$this-><?= "{$column->name}" ?>Values = [
+?><?="\n\t\t"?>$this-><?= "{$column->name}" ?>Options = [
         ];<?php
 }
 if($column->dbType=='tinyint(1)')
 {
-?><?="\n\t\t"?>$this-><?= "{$column->name}" ?>Values = [
+?><?="\n\t\t"?>$this-><?= "{$column->name}" ?>Options = [
             0=>Yii::t('common', 'No'),
             1=>Yii::t('common', 'Yes')
         ];<?php
@@ -164,20 +164,20 @@ endforeach;
 
     if($column->dbType=='smallint(6)')
     {
-    ?><?="\n\t";?>public <?= "\${$column->name}" ?>Values;
+    ?><?="\n\t";?>public <?= "\${$column->name}" ?>Options;
     public function get<?=ucfirst($column->name);?>Text()
     {
-        return isset($this-><?=$column->name;?>Values[$this-><?=$column->name;?>]) ? $this-><?=$column->name;?>Values[$this-><?=$column->name;?>]:null;
+        return isset($this-><?=$column->name;?>Options[$this-><?=$column->name;?>]) ? $this-><?=$column->name;?>Options[$this-><?=$column->name;?>]:null;
     }<?php
     }
 
 
     if($column->dbType=='tinyint(1)')
     {
-    ?><?="\n\t";?>public <?= "\${$column->name}" ?>Values;
+    ?><?="\n\t";?>public <?= "\${$column->name}" ?>Options;
     public function get<?=ucfirst($column->name);?>Text()
     {
-        return isset($this-><?=$column->name;?>Values[$this-><?=$column->name;?>]) ? $this-><?=$column->name;?>Values[$this-><?=$column->name;?>]:null;
+        return isset($this-><?=$column->name;?>Options[$this-><?=$column->name;?>]) ? $this-><?=$column->name;?>Options[$this-><?=$column->name;?>]:null;
     }
 
 <?php

@@ -5,7 +5,7 @@
 /* @var $model \frontend\models\ContactForm */
 
 use yii\helpers\Html;
-use yii\bootstrap\ActiveForm;
+use yii\widgets\ActiveForm;
 use yii\captcha\Captcha;
 use yii\bootstrap\Alert;
 use \himiklab\yii2\recaptcha\ReCaptcha;
@@ -19,7 +19,6 @@ $this->endBlock();*/
 ?>
 <div class="site-contact">
     <h1 class="title"><?= Html::encode($this->title) ?></h1>
-
     <?php
     if(Yii::$app->session->hasFlash('success'))
         echo Alert::widget([
@@ -37,19 +36,22 @@ $this->endBlock();*/
         <div class="row">
             <div class="col-lg-5">
                 <?php $form = ActiveForm::begin([
+                    'action'=>['/site/contact'],
                     'id' => 'contact-form',
                     'enableAjaxValidation'=>true,
                     'enableClientValidation'=>true,
+                    'validationUrl'=>['/site/contact'],
                     //'options' => ['class' => 'form-horizontal', 'enctype' => 'multipart/form-data'],
                     'fieldConfig' => [
                         //'template' => "{label}\n<div class=\"col-lg-8\">{input}{hint}</div>\n<div class=\"col-lg-8 col-lg-offset-4\">{error}</div>",
                         //'labelOptions' => ['class' => 'col-lg-2 control-label'],
                     ],
-                ]); ?>
+                ]);
+                ?>
 
                 <?=$form->errorSummary($model);?>
 
-                <?= $form->field($model, 'name')->textInput(['autofocus' => true]) ?>
+                <?= $form->field($model, 'name') ?>
 
                 <?= $form->field($model, 'email') ?>
                 <?= $form->field($model, 'phone') ?>
@@ -58,15 +60,7 @@ $this->endBlock();*/
 
                 <?= $form->field($model, 'body')->textArea(['rows' => 6]) ?>
 
-                <?php
-                if(YII_ENV_PROD)
-                {
-                    ?>
-                    <?php
-                    echo $form->field($model, 'reCaptcha')->widget(ReCaptcha::className()) ?>
-                    <?php
-                }
-                ?>
+                <?php echo $form->field($model, 'reCaptcha', ['enableAjaxValidation' => false, 'enableClientValidation' => false])->widget(ReCaptcha::class) ?>
 
                 <div class="form-group">
                     <?= Html::submitButton(Yii::t('common', 'Submit'), ['class' => 'btn btn-primary', 'name' => 'contact-button']) ?>
@@ -81,3 +75,4 @@ $this->endBlock();*/
     ?>
 
 </div>
+

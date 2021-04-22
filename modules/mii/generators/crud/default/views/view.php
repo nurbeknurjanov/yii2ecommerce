@@ -21,11 +21,9 @@ $this->title = $model-><?= $generator->getNameAttribute() ?>;
 $this->params['breadcrumbs'][] = ['label' => <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>, 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-view">
+<div class="card">
 
-    <h1><?= "<?= " ?>Html::encode($this->title) ?></h1>
-
-    <p>
+    <div class="card-header">
         <?= "<?php\n\t\t" ?>if(Yii::$app->user->can('update<?=StringHelper::basename($generator->modelClass);?>', ['model' => $model]))
             <?= "echo " ?>Html::a(<?= $generator->generateString('Update') ?>, ['update', <?= $urlParams ?>], ['class' => 'btn btn-primary']);
         ?>
@@ -39,65 +37,66 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
             ]);
         ?>
-    </p>
+    </div>
 
-    <?= "<?= " ?>DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-<?php
-if (($tableSchema = $generator->getTableSchema()) === false) {
-    foreach ($generator->getColumnNames() as $name) {
-        echo "            '" . $name . "',\n";
+    <div class="card-body">
+        <?= "<?= " ?>DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+    <?php
+    if (($tableSchema = $generator->getTableSchema()) === false) {
+        foreach ($generator->getColumnNames() as $name) {
+            echo "            '" . $name . "',\n";
+        }
+    } else {
+        foreach ($generator->getTableSchema()->columns as $column) {
+            $format = $generator->generateColumnFormat($column);
+            if($column->dbType==='tinyint(1)')
+            {
+                ?>
+                [
+                    'attribute'=>'<?=$column->name;?>',
+                    //'format'=>'boolean',
+                    'value'=>$model-><?=$column->name;?>Text,
+                ],
+    <?php
+            }
+            elseif($column->dbType==='smallint(6)')
+            {
+                ?>
+                [
+                    'attribute'=>'<?=$column->name;?>',
+                    'value'=>$model-><?=$column->name;?>Text,
+                ],
+    <?php
+            }
+            elseif($column->dbType==='datetime' || $column->dbType==='date')
+            {
+                ?>
+                [
+                    'attribute'=>'<?=$column->name;?>',
+                    'format'=>'<?=$column->dbType;?>',
+                ],
+    <?php
+            }
+            elseif($column->comment)
+            {
+                $comment = explode('\\',$column->comment);
+                $comment = end($comment);
+                ?>
+                [
+                    'attribute'=>'<?=$column->name;?>',
+                    'format'=>'raw',
+                    'value'=>$model-><?=lcfirst($comment);?> ? $model-><?=lcfirst($comment);?>->title:null,
+                ],
+    <?php
+            }
+            else
+                echo "            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
+        }
     }
-} else {
-    foreach ($generator->getTableSchema()->columns as $column) {
-        $format = $generator->generateColumnFormat($column);
-        if($column->dbType==='tinyint(1)')
-        {
-            ?>
-            [
-                'attribute'=>'<?=$column->name;?>',
-                //'format'=>'boolean',
-                'value'=>$model-><?=$column->name;?>Text,
+    ?>
             ],
-<?php
-        }
-        elseif($column->dbType==='smallint(6)')
-        {
-            ?>
-            [
-                'attribute'=>'<?=$column->name;?>',
-                'value'=>$model-><?=$column->name;?>Text,
-            ],
-<?php
-        }
-        elseif($column->dbType==='datetime' || $column->dbType==='date')
-        {
-            ?>
-            [
-                'attribute'=>'<?=$column->name;?>',
-                'format'=>'<?=$column->dbType;?>',
-            ],
-<?php
-        }
-        elseif($column->comment)
-        {
-            $comment = explode('\\',$column->comment);
-            $comment = end($comment);
-            ?>
-            [
-                'attribute'=>'<?=$column->name;?>',
-                'format'=>'raw',
-                'value'=>$model-><?=strtolower($comment);?> ? $model-><?=strtolower($comment);?>->title:null,
-            ],
-<?php
-        }
-        else
-            echo "            '" . $column->name . ($format === 'text' ? "" : ":" . $format) . "',\n";
-    }
-}
-?>
-        ],
-    ]) ?>
-
+        ]) ?>
+    </div>
 </div>

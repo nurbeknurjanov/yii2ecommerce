@@ -13,6 +13,7 @@ use file\models\FileImage;
 
 if($images){
     ?>
+    <div class="clear"></div>
     <div class="file-preview form-control" style="height:auto;">
         <div class="file-drop-disabled">
             <div class="file-preview-thumbnails" >
@@ -29,7 +30,7 @@ if($images){
                     ?>
                     <div class="file-preview-frame  krajee-default  kv-preview-thumb" style="display: block; height: auto">
                         <a href="<?=$image->imageUrl;?>" data-lightbox="file-preview">
-                            <?=$image->getImg($thumbType);?>
+                            <?=$image->getThumbImg($thumbType);?>
                         </a>
                         <div class="file-thumbnail-footer">
                             <div title="<?=$image->title;?>" class="file-footer-caption"><?=$image->title;?></div>

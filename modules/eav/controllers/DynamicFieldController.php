@@ -40,7 +40,7 @@ class DynamicFieldController extends Controller
                     [
                         'actions' => ['create', 'view', 'update', 'delete', 'index'],
                         'allow' => true,
-                        'roles' => [User::ROLE_MANAGER],
+                        'roles' => [User::ROLE_ADMINISTRATOR],
                     ],
                 ],
             ],

@@ -15,6 +15,8 @@ use user\models\Token;
 use user\models\User;
 use Yii;
 use yii\base\Event;
+use yii\base\Exception;
+use yii\bootstrap\ActiveForm;
 use yii\db\ActiveRecord;
 use yii\db\AfterSaveEvent;
 use yii\filters\AccessControl;
@@ -23,6 +25,7 @@ use extended\controller\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
+use yii\web\Response;
 use yii\web\UploadedFile;
 
 
@@ -68,66 +71,57 @@ class ProfileController extends Controller
     public function actionEditProfile()
     {
         $model = Yii::$app->user->identity;
+        $model->scenario = User::SCENARIO_EDIT_PROFILE;
 
-        $this->performAjaxValidation($model);
+        $profile = $model->userProfileObject;
+        $profile->userObject = $model;
 
-        if ($model->load(Yii::$app->request->post())){
-            if($model->save()){
-                if($model->language)
-                    Yii::$app->language = $model->language;
-                Yii::$app->session->setFlash('successMessage', Yii::t('user', 'Changes successfully was saved.'));
-                if(!Yii::$app->request->isPjax)
-                {
+
+        if(Yii::$app->request->isAjax)
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+
+        if(Yii::$app->request->isPost){
+            $model->load(Yii::$app->request->post());
+            $profile->load(Yii::$app->request->post());
+
+            if(Yii::$app->request->post('ajax'))
+                return array_merge(ActiveForm::validate($model), ActiveForm::validate($profile));
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                if(!$model->save())
+                    throw new Exception(Html::errorSummary($model, ['header'=>false]));
+                if(!$profile->save())
+                    throw new Exception(Html::errorSummary($profile, ['header'=>false]));
+
+                $transaction->commit();
+
+
+                Yii::$app->session->setFlash('successMessage', 'Changes successfully was saved.');
+                return $this->refresh();
+                /*if($model->language)
+                    Yii::$app->language = $model->language;*/
+                /*if(!Yii::$app->request->isPjax){
                     if($model->language)
                         return $this->redirect(Url::to(['/user/profile/edit-profile', 'language'=>$model->language]));
                     return $this->refresh();
-                }
-            }else
-                Yii::$app->session->setFlash('error', Html::errorSummary($model, ['header'=>false,]));
+                }*/
+
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::$app->session->addFlash('error', $e->getMessage());
+            }
+
         }
+
+
         return $this->render('editProfile', [
             'model' => $model,
+            'profile' => $profile,
         ]);
     }
 
-    public function actionShare()
-    {
-        $model = Token::find()->userQuery(Yii::$app->user->identity)->runnable()->actionQuery(Token::ACTION_SHARE_LINK_TO_REGISTER)->last()->one();
-        if(!$model)
-            $model = new Token;
-
-        if (Yii::$app->request->isPost){
-            $model = TokenCreate::createIfNotExists(Token::ACTION_SHARE_LINK_TO_REGISTER, Yii::$app->user->identity);
-            Yii::$app->session->setFlash('success', Yii::t('user', 'You successfully generated new link to register.'));
-            return $this->refresh();
-        }
-        return $this->render('share', [
-            'model' => $model,
-        ]);
-    }
-
-    public function actionInvite()
-    {
-        $model = new InviteForm();
-        $this->performAjaxValidation($model);
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post()) && $model->validate())
-        {
-            $token = TokenCreate::createIfNotExists(Token::ACTION_SHARE_LINK_TO_REGISTER, Yii::$app->user->identity);
-
-            Yii::$app->mailer->compose('invite-html', ['user' => Yii::$app->user->identity, 'token'=>$token,])
-                ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
-                ->setTo($model->email)
-                ->setSubject(Yii::t('user', 'You invited user to register.'))
-                ->send();
-
-            Yii::$app->session->setFlash('success', Yii::t('user', 'You invited user to register.'));
-            return $this->refresh();
-        }
-        return $this->render('invite', [
-            'model' => $model,
-        ]);
-    }
 
 
     public function actionChangePassword()

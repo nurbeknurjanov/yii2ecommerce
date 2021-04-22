@@ -15,10 +15,10 @@ use extended\helpers\Helper;
 $this->title = Yii::t('common', 'Likes');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="like-index box">
+<div class="like-index card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Alert::widget() ?>
         <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
 

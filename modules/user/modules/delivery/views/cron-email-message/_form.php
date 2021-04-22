@@ -27,7 +27,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'body')->textarea() ?>
 
-    <?= $form->field($model, 'status')->radioList($model->statusValues, [
+    <?= $form->field($model, 'status')->radioList($model->statusOptions, [
         'itemOptions'=>[
             'disabled'=>'disabled',
         ],

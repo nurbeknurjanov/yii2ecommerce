@@ -2,6 +2,7 @@
 
 namespace setting\controllers;
 
+use setting\models\JsonRow;
 use Yii;
 use setting\models\Setting;
 use setting\models\search\SettingSearch;
@@ -13,6 +14,8 @@ use yii\base\Exception;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use extended\controller\Controller;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 
 /**
@@ -27,7 +30,7 @@ class SettingController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['create'],
+                        'actions' => ['create', 'row-tr'],
                         'allow' => true,
                         //'roles' => [User::ROLE_USER],
                         'matchCallback' => function($rule, $action){
@@ -128,6 +131,13 @@ class SettingController extends Controller
         }
     }
 
+    public function actionRowTr($index)
+    {
+        $content = $this->renderPartial('_row_tr', ['index' => $index]);
+        return $content;
+    }
+
+
     /**
      * Updates an existing Setting model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -139,9 +149,27 @@ class SettingController extends Controller
         $model = $this->findModel($id);
         if($key)
             $model->key = $key;
-        $this->performAjaxValidation($model);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if($model->key==$model::VISUAL_JSON_DATA)
+            $model->trigger($model::EVENT_FIND_JSON_ROWS);
+
+
+
+        $post = $model->load(Yii::$app->request->post());
+        if($post)
+            $model->loadRows(Yii::$app->request->post(), (new JsonRow)->formName());
+
+
+        if(Yii::$app->request->isAjax && $post){
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            $errorArray = ActiveForm::validate($model);
+            if($model->jsonRows)
+                $errorArray = array_merge($errorArray,ActiveForm::validateMultiple($model->jsonRows) );
+            Yii::$app->response->data = $errorArray;
+            Yii::$app->end();
+        }
+
+        if ($post && $model->save()) {
             return $this->redirect(['index', 'id' => $model->id]);
         } else {
             return $this->render('update', [

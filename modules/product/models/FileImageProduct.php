@@ -17,12 +17,12 @@ class FileImageProduct extends FileImage
     public $thumbXs = true;
     public $thumbSm = true;
     public $thumbMd = true;
-    public $thumbXsWidth=50;
-    public $thumbXsHeight=50;
-    public $thumbSmWidth=120;
-    public $thumbSmHeight=120;
-    public $thumbMdWidth=400;
-    public $thumbMdHeight=400;
+    public $thumbXsWidth=40;
+    public $thumbXsHeight=54;
+    public $thumbSmWidth=184;
+    public $thumbSmHeight=250;
+    public $thumbMdWidth=398;
+    public $thumbMdHeight=540;
 
     public $imageWidth=1200;
     public $imageHeight=1200;

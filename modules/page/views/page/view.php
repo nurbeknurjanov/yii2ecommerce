@@ -7,8 +7,9 @@ use yii\widgets\DetailView;
 /* @var $model page\models\Page */
 
 $this->title = $model->title;
-$this->params['page'] = $model;
+
 $this->params['breadcrumbs'][] = $this->title;
+$this->params['topTitle'] = $this->title;
 ?>
 <div class="page-view">
 

@@ -17,7 +17,7 @@ use yii\web\View;
 foreach ($fieldModels as $fieldModel){
     $valueModel = $fieldModel->getValueObject($object_id);
     echo $form->field($valueModel, "[$fieldModel->id]value",
-        ['parts'=>['{input}'=>$fieldModel->getFieldWithUnit($valueModel, "[$fieldModel->id]value") ]]);
+        ['parts'=>['{input}'=>$fieldModel->getField($valueModel, "[$fieldModel->id]value") ]]);
 }
 foreach ($form->attributes as $attribute){
     $this->registerJs( "jQuery('#$form->id').yiiActiveForm('add', ".Json::encode($attribute)." );\n ",

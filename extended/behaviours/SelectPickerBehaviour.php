@@ -18,7 +18,7 @@ use yii\base\Exception;
 use yii\data\ActiveDataProvider;
 use Yii;
 use yii\db\ActiveQuery;
-use extended\vendor\BootstrapSelectAsset;
+use common\assets\BootstrapSelectAsset;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use product\models\Product;
@@ -109,8 +109,9 @@ class SelectPickerBehaviour extends Behavior
         ], $options);
 
         $query = $this->getOrderedQuery($model->$attribute);
+
         if($addQuery && $addQuery->where)
-            $query->andFilterWhere($addQuery->where);
+            $query->andWhere($addQuery->where);
 
 
         $data = ArrayHelper::map($query->all(), 'id', $this->title);

@@ -78,7 +78,11 @@ class CompareController extends Controller
         $models = Product::find()->compare()->enabled()->with("valuesWithFields")->all();
         if(!$models)
             Yii::$app->session->setFlash('warning', Yii::t('product', 'You didn\'t select the items to compare.'));
+
+        $title = Yii::t('product', 'Compare products');
+
         return $this->render('compare', [
+            'title' => $title,
             'models' => $models,
         ]);
     }

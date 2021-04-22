@@ -44,7 +44,7 @@ $form = ActiveForm::begin([
 
     <?php
     if(YII_ENV_PROD)
-        echo $form->field($model, 'reCaptcha')->widget(ReCaptcha::className()) ?>
+        echo $form->field($model, 'reCaptcha', ['enableAjaxValidation' => false, 'enableClientValidation' => false])->widget(ReCaptcha::className()) ?>
 
     <div class="form-group">
         <div class="col-lg-offset-4 col-lg-8">

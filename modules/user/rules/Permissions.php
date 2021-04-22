@@ -47,8 +47,8 @@ class Permissions
         $auth->addChild($userRole, $createUser);
         $auth->addChild($userRole, $updateUser);
         $auth->addChild($userRole, $deleteUser);
-        $auth->addChild($userRole, $viewUser);
+        $auth->addChild($guestRole, $viewUser);
         $auth->addChild($managerRole, $indexUser);
-        $auth->addChild($managerRole, $listUser);
+        $auth->addChild($guestRole, $listUser);
     }
 }

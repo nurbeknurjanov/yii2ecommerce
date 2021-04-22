@@ -19,9 +19,9 @@ UserAsset::register($this);
 $this->title = 'Send email messages to users';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-contact box">
+<div class="site-contact card">
 
-   <div class="box-body">
+   <div class="card-body">
        <div class="row">
            <div class="col-lg-12">
                <?php $form = ActiveForm::begin([
@@ -31,23 +31,31 @@ $this->params['breadcrumbs'][] = $this->title;
                ]);
                ?>
                <?php
-               echo $form->field($model, 'role')
-                   ->checkboxList((new User())->rolesValues);
+               $roles = (new User())->rolesValues;
+               unset($roles[User::ROLE_GUEST]);
+               echo $form->field($model, 'role')->checkboxList($roles);
                ?>
+
+
+
 
                <?php
                echo $form->field($model, 'subscribe')
                    ->checkboxList((new User())->subscribeValues);
                ?>
 
-               <?= $form->field($model, 'recipients')
-                   ->dropDownList(ArrayHelper::map(User::find()->all(), function($user){
-                       return $user->email.'|'.$user->fullName;
-                   }, 'fullName'),
-                       [
-                           'multiple' => true,
-                           'size' => 20,
-                       ]); ?>
+
+               <?php
+               $query = User::find();
+               if($model->role)
+                   $query->rolesQuery($model->role);
+               $allUsers = $query->all();
+               $options = ArrayHelper::map($allUsers, function($user){
+                   return $user->email.'|'.$user->fullName;
+               }, 'fullName');
+               ?>
+               <?= $form->field($model, 'recipients')->dropDownList($options, [ 'multiple' => true, 'size' => 20 ]) ?>
+
 
 
                <?= $form->field($model, 'subject') ?>

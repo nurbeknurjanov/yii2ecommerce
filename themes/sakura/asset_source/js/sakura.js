@@ -5,20 +5,24 @@
 
 $('.nav > .dropdown > a').removeClass('dropdown-toggle');
 $('.nav > .dropdown > a').removeAttr('data-toggle');
-$('.nav > .dropdown').hover(function(){
+$('body').on({
+    mouseenter: function () {
 
-    var $this = $(this);
-    $this.addClass('open');
-    if($this.parents('.navbar-menu ').length){
-        var height = $('.nav > .open > ul').height();
-        $('#shadow').height(height+15).show();
+        var $this = $(this);
+        $this.addClass('open');
+        if($this.parents('.navbar-menu ').length){
+            var height = $('.nav > .open > ul').height();
+            $('#shadow').height(height+15).show();
+        }
+
+    },
+    mouseleave: function () {
+
+        $(this).removeClass('open');
+        $('#shadow').hide();
+
     }
-},function(){
-    $(this).removeClass('open');
-    $('#shadow').hide();
-});
-
-
+}, '.nav > .dropdown');
 
 
 
@@ -34,23 +38,3 @@ function centerItFixedWidth(target, outer)
     //if(scrollLeftValue) scrollLeftValue+=90;
     out.scrollLeft(scrollLeftValue);
 }
-
-$('#carousel-index').bind('slide.bs.carousel', function (e) {
-    var index = $(e.target).find(".active").index();
-    var $item = $("li[data-slide-to='"+index+"']");
-
-    if(!$('.wrap-indicators').is(":hover")){
-        if(index==$('.carousel-indicators li').length-1)
-            $('.wrap-indicators ol').scrollLeft(0);
-        else
-            centerItFixedWidth($item, $('.wrap-indicators ol'));
-    }
-});
-
-$(function() {
-    $('.carousel-indicators').perfectScrollbar({
-        suppressScrollY: true
-    });
-});
-
-

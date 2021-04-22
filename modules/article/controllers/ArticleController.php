@@ -30,7 +30,7 @@ class ArticleController extends Controller
     public function init()
     {
         parent::init();
-        if(Yii::$app->id=='app-frontend')
+        if(strpos(Yii::$app->id, 'app-frontend')!==false)
             $this->defaultAction = 'list';
     }
 

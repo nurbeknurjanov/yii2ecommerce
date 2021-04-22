@@ -16,8 +16,8 @@ if($model->category_id && $model->category) {
     $this->params['category'] = $category = $model->category;
     $this->params['breadcrumbs'][] = ['label' => Yii::t('product', 'Products'), 'url' => ['/product/product/list']];
     foreach ($model->category->parents()->all() as $parent)
-        $this->params['breadcrumbs'][] = ['label' => $parent->title, 'url' => ['/product/product/list', 'category_id'=>$parent->id, 'title_url'=>$parent->title_url]];
-    $this->params['breadcrumbs'][] = ['label' => $category->title, 'url' => ['/product/product/list', 'category_id'=>$category->id, 'title_url'=>$category->title_url]];
+        $this->params['breadcrumbs'][] = ['label' => $parent->title, 'url' => $parent->url];
+    $this->params['breadcrumbs'][] = ['label' => $category->title, 'url' => $category->url];
 }else {
     $this->params['breadcrumbs'][] = ['label' => Yii::t('product', 'Products'), 'url' => [$this->context->defaultAction]];
 }

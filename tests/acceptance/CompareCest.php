@@ -63,7 +63,7 @@ class CompareCest
         $I->waitForText($text);
 
         $I->amOnPage(Url::to(['/product/compare/index']));
-        $I->waitForText(Yii::t('order', 'Comparing products'), null, 'h1');
+        $I->waitForText(Yii::t('order', 'Compare products'), null, 'h1');
         $I->dontSee($product->title);
     }
     public function testRemoveCompareFromCompare(AcceptanceTester $I)

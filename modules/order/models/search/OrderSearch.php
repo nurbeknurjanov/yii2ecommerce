@@ -25,13 +25,15 @@ class OrderSearch extends Order
     public function behaviors()
     {
         return [
-            'dateSearchCreatedAt'=>[
-                'class' => DateSearchBehaviour::class,
-                'dateAttribute'=>'created_at',
-            ],
             'dateSearchUpdatedAt'=>[
                 'class' => DateSearchBehaviour::class,
                 'dateAttribute'=>'updated_at',
+                'time'=>false,
+            ],
+            'dateSearchCreatedAt'=>[
+                'class' => DateSearchBehaviour::class,
+                'dateAttribute'=>'created_at',
+                'time'=>false,
             ],
         ];
     }
@@ -48,7 +50,6 @@ class OrderSearch extends Order
             [['amount'], 'number'],
             [['status'], 'integer'],
             [['nameAttribute'], 'safe'],
-            [['coupon_id'], 'safe'],
         ];
     }
     public $nameAttribute;
@@ -94,7 +95,8 @@ class OrderSearch extends Order
             'payment_type' => $this->payment_type,
             'delivery_id' => $this->delivery_id,
             'city_id' => $this->city_id,
-
+            'region_id' => $this->region_id,
+            'country_id' => $this->country_id,
         ]);
 
         $query

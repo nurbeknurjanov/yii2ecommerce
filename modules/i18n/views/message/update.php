@@ -12,9 +12,9 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'I18n Messages'), 
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id, 'language' => $model->language]];
 $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
-<div class="i18n-message-update box">
+<div class="i18n-message-update card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

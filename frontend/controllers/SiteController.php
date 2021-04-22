@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use article\models\search\ArticleSearch;
 use comment\models\Comment;
 use file\models\File;
 use Imagine\Image\ImageInterface;
@@ -12,14 +13,16 @@ use product\models\Rating;
 use user\models\User;
 use Yii;
 use yii\base\InvalidParamException;
+use yii\base\Model;
+use yii\data\ActiveDataFilter;
+use yii\data\DataFilter;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\validators\NumberValidator;
 use yii\web\BadRequestHttpException;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use frontend\models\ContactForm;
-use yii\web\Cookie;
 use yii\web\Request;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -28,66 +31,16 @@ use Imagine\Image\Box;
 use Imagine\Image\Point;
 use yii\web\View;
 use yii\httpclient\Client;
+use yii\filters\Cors;
+use yii\rest\Controller as RestController;
+use \extended\controller\Controller;
+use yii\widgets\ActiveForm;
 
-/*
-class Bar
-{
-    public $title = 'bar';
-}
-
-class Foo
-{
-    public $bar;
-    public function __construct(Bar $bar)
-    {
-        $this->bar = $bar;
-    }
-    public function pr()
-    {
-        echo $this->bar->title;
-    }
-}
-
-
-$bar = new Bar;
-$foo = new Foo($bar);
-$foo->pr();
-
-$container = Yii::$container;
-*/
-//$container->set('foo', 'Foo');
-
-//$foo = Yii::$container->get('\frontend\controllers\Foo');
-//$foo->pr();
-
-/*$myBar = new Bar();
-$myBar->title = 'my title';*/
-//$foo = Yii::$container->get('\frontend\controllers\Foo', [$myBar]);
-/*$foo = Yii::$container->get('\frontend\controllers\Foo', [], [
-    'bar'=>$myBar,
-]);*/
-
-/*Yii::$container->set('frontend\controllers\Bar', [
-    'class'=>'\frontend\controllers\Bar',
-    'title'=>'123123123',
-]);*/
-
-/*Yii::$container->set('myFoo', [
-    'class'=>'\frontend\controllers\Foo',
-    //'bar'=>$myBar,
-], ['0'=>$myBar]);
-$foo = Yii::$container->get('myFoo');
-$foo->pr();*/
-
-
-
-/*$foo = Yii::$app->get('foo');
-$foo->pr();*/
 
 /**
  * Site controller
  */
-class SiteController extends \extended\controller\Controller
+class SiteController extends Controller
 {
     /**
      * @inheritdoc
@@ -95,15 +48,12 @@ class SiteController extends \extended\controller\Controller
     public function behaviors()
     {
         return [
-            'corsFilter' => [
-                'class' => \yii\filters\Cors::class,
-            ],
             'access' => [
                 'class' => AccessControl::className(),
                 'only' => ['test'],
                 'rules' => [
                     [
-                        'actions' => ['test', 'test-api'],
+                        'actions' => ['test', 'test2', 'test-api'],
                         'allow' => true,
                         //'roles' => ['@'],
                     ],
@@ -145,17 +95,18 @@ class SiteController extends \extended\controller\Controller
      */
     public function actionIndex()
     {
+        /*Yii::$app->session->setFlash('success', 'Nurbek');
+        return 123;*/
         /*Yii::$app->response->cookies->add(new Cookie([
             'name' => 'talafo',
             'value' => 'nurjanov',
             'expire' => time() + 3600*24*7,
         ]));
         return $this->redirect(['/site/test']);*///пашет
+
         return $this->render('index');
     }
 
-
-    //public $enableCsrfValidation = false;
     public function actionTestApi()
     {
         /*Yii::$app->response->format = Response::FORMAT_JSON;
@@ -164,9 +115,22 @@ class SiteController extends \extended\controller\Controller
             'page'=>['title'=>$page->title, 'text'=>$page->text]
         ];*/
     }
+    public function actionTest2()
+    {
+        return 'test2';
+    }
     public function actionTest()
     {
-        return 'test';
+        //header("Location: http://demo.sakura.com/site/test2");
+
+        //Yii::$app->response->getHeaders()->set('X-PJAX-Url',Url::to(['site/test2']));
+
+        //return $this->run(Url::to(['site/test2']));
+
+        //return Yii::$app->response->redirect('https://mail.ru', 301, false);//wont work, cuz mail.ru has no cors
+        return Yii::$app->response->redirect(Url::to(['site/test2']), 301, false);//works
+        return $this->renderContent('test');
+        //return 'test';
         //echo Yii::$app->request->cookies->get('malafo')->value;
         /*OrderProduct::deleteAll("1=1");
         Order::deleteAll("1=1");
@@ -183,6 +147,8 @@ class SiteController extends \extended\controller\Controller
     public function actionContact()
     {
         $model = new ContactForm();
+
+
         $this->performAjaxValidation($model);
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {

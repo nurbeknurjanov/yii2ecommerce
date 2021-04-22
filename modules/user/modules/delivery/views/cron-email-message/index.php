@@ -10,11 +10,11 @@ use yii\grid\GridView;
 $this->title = Yii::t('common', 'Report of cron email messages');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="cron-email-message-index box">
+<div class="cron-email-message-index card">
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="box-header">
+    <div class="card-header">
         <?php // Html::a(Yii::t('common', 'Create Cron Email Message'), ['create'], ['class' => 'btn btn-success']) ?>
     </div>
 
@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value'=>function($data){
                     return $data->statusText;
                 },
-                'filter'=>$searchModel->statusValues,
+                'filter'=>$searchModel->statusOptions,
             ],
              'sent_date',
 

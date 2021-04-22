@@ -11,9 +11,13 @@ use yii\bootstrap\Tabs;
 use mihaildev\ckeditor\CKEditor;
 use mihaildev\elfinder\ElFinder;
 use file\widgets\file_preview\FilePreview;
+use country\models\Country;
+use country\models\Region;
+use country\models\City;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
-/* @var $model user\models\User */
+/* @var $model \user\models\User */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
@@ -58,17 +62,15 @@ use file\widgets\file_preview\FilePreview;
     ?>
 
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'language')->dropDownList((new I18nSourceMessage())->languageValues, ['prompt' => 'Select']) ?>
-    <?= $form->field($model, 'time_zone')->dropDownList($model->getTimeZoneValues(), ['prompt' => 'Select']) ?>
 
     <?php
     $subscribeValues = $model->subscribeValues;
-    unset($subscribeValues[$model::SUBSCRIBE_NEUTRAL]);
+    unset($subscribeValues[User::SUBSCRIBE_NEUTRAL]);
     ?>
     <?= $form->field($model, 'subscribe')->radioList($subscribeValues) ?>
 
     <?php
-    if(Yii::$app->user->can(User::ROLE_MANAGER))
+    if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR))
     {
         ?>
         <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
@@ -89,12 +91,12 @@ use file\widgets\file_preview\FilePreview;
     ?>
     <?= $form->field($model, 'description')->widget(CKEditor::className(),[
         'editorOptions' => ElFinder::ckeditorOptions('elfinder',[
-                'preset' => 'basic',
-                'inline' => false,
-                'resize_enabled'=>true,
-                'height'=>400,
-                'toolbarGroups'=>[['name' => 'editing', 'groups' => [ 'tools']],]
-            ]),
+            'preset' => 'basic',
+            'inline' => false,
+            'resize_enabled'=>true,
+            'height'=>400,
+            'toolbarGroups'=>[['name' => 'editing', 'groups' => [ 'tools']],]
+        ]),
     ]); ?>
 
     <div class="form-group">
@@ -103,6 +105,68 @@ use file\widgets\file_preview\FilePreview;
     <?php
     $content2 = ob_get_contents();
     ob_end_clean();
+
+
+
+    ob_start();
+    ?>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <?=$form->field($profile, 'country_id',[
+                    'template'=>'{label}{input}{error}',
+                    'options'=>['style'=>'margin:0',],
+                    'labelOptions'=>['class'=>'control-label'],
+                    'parts'=>['{input}'=>
+                (new Country)->getWidgetSelectPicker($profile, 'country_id', null, ['class'=>'selectpicker country_id',])]]) ?>
+        </div>
+        <div class="col-lg-4">
+            <?=$form->field($profile, 'region_id',[
+                    'template'=>'{label}{input}{error}',
+                    'options'=>['style'=>'margin:0',],
+                    'labelOptions'=>['class'=>'control-label'],
+                    'parts'=>[
+                    '{input}'=>
+                (new Region)->getWidgetSelectPicker($profile, 'region_id', Region::find()->countryQuery($profile->country_id),
+                    ['class'=>'selectpicker region_id',
+                        'data-url'=>Url::to(['/country/region/select-picker', 'country_id'=>$profile->country_id])
+                    ])]]) ?>
+        </div>
+        <div class="col-lg-4">
+            <?=$form->field($profile, 'city_id',[
+                    'template'=>'{label}{input}{error}',
+                    'options'=>['style'=>'margin:0',],
+                    'labelOptions'=>['class'=>'control-label'],
+                    'parts'=>[
+                    '{input}'=>
+                (new City)->getWidgetSelectPicker($profile, 'city_id', City::find()->regionQuery($profile->region_id),
+                    ['class'=>'selectpicker city_id',
+                        'data-url'=>Url::to(['/country/region/select-picker', 'region_id'=>$profile->region_id])
+                    ])]]) ?>
+        </div>
+        <div class="col-lg-8">
+            <?=$form->field($profile, 'address', [
+                'template'=>'{label}{input}{error}',
+                'options'=>['style'=>'margin:0',],
+                'labelOptions'=>['class'=>'control-label'],
+            ]) ?>
+        </div>
+        <div class="col-lg-4">
+            <?=$form->field($profile, 'zip_code', [
+                'template'=>'{label}{input}{error}',
+                'options'=>['style'=>'margin:0',],
+                'labelOptions'=>['class'=>'control-label'],
+            ]) ?>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-12" style="text-align: right"><?= Html::submitButton(Yii::t('common', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?></div>
+    </div>
+    <?php
+    $content1 = ob_get_contents();
+    ob_end_clean();
+
 
 
     ob_start();
@@ -124,6 +188,8 @@ use file\widgets\file_preview\FilePreview;
     $content3 = ob_get_contents();
     ob_end_clean();
 
+
+
     echo Tabs::widget([
         'items' => [
             [
@@ -131,6 +197,11 @@ use file\widgets\file_preview\FilePreview;
                 'content' => '<br><br>'.$content,
                 'options' => ['tag' => 'div'],
                 'headerOptions' => ['class' => 'my-class'],
+            ],
+            [
+                'label' => $model->getAttributeLabel('Profile'),
+                'content' => '<br>'.$content1,
+                'options' => ['id' => 'my-tab1'],
             ],
             [
                 'label' => $model->getAttributeLabel('description'),

@@ -16,10 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $this->beginBlock('page');
 ?>
-    <div class="comment-index box">
+    <div class="comment-index card">
 
 
-        <div class="box-header">
+        <div class="card-header">
             <?= Alert::widget() ?>
             <?php echo $this->render('_search', ['model' => $searchModel]); ?>
             <?php

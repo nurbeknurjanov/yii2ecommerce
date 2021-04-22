@@ -59,10 +59,19 @@ $results = ArrayHelper::toArray($categories,[
             return $model->getUrl();
         },
         'linkOptions'=>function (Category $model) {
-            $linkOptions=[];
+            $linkOptions=[
+                'data-toggle'=>'',//not possible
+                'class'=> ['widget'=>''],
+            ];
             if($model->depth==1)
                 $linkOptions['class'] = ['widget'=>'bold'];
             return $linkOptions;
+        },
+        'dropDownOptions'=>function (Category $model) {
+            return [
+                //'class'=>['widget'=>''],
+                'id'=>'c'.$model->id,
+            ];
         },
         'active'=>function (Category $model) {
             return $model->id==Yii::$app->request->get('category_id');
@@ -76,13 +85,15 @@ $items=[];
 if($results)
     $items = (new MenuTree)->tree($results);
 NavBar::begin([
+    'id'=>'category-menu-widget',
     'brandLabel' => false,
     'brandUrl' => Yii::$app->homeUrl,
     'options' => [
-        'class' => 'navbar navbar-inverse navbar-menu',
+        'class' => 'navbar '.($this->theme->id=='sakura' ? 'navbar-inverse':'navbar-default').' navbar-menu',
     ],
 ]);
 echo Nav::widget([
+    'id'=>'category-menu-widget-content',
     'encodeLabels'=>false,
     'options' => ['class' => 'navbar-nav navbar-left'],
     'items' => $items,
@@ -90,7 +101,6 @@ echo Nav::widget([
 NavBar::end();
 ?>
 <div id="shadow"></div>
-
 
 
 <?php
@@ -139,7 +149,10 @@ $results = ArrayHelper::toArray($categories,[
             return ['class'=>['widget'=>'']];
         },
         'dropDownOptions'=>function (Category $model) {
-            return ['class'=>['widget'=>'']];
+            return [
+                'class'=>['widget'=>''],
+                'id'=>'cc'.$model->id,
+            ];
         },
         'isLeaf'=>function (Category $model) {
             return $model->isLeaf;
@@ -151,7 +164,7 @@ if($results)
     $items = (new MenuTree)->treeMobile($results); //создаем дерево в виде массива
 //$items = $items[0]['items']; //убираем корневой элемент
 ?>
-<nav id="category-menu" style="display: none;" >
+<nav id="category-menu-widget2" class="<?=$this->theme->id=='sakura_light' ? 'nav-gray-category':null ?>" style="display: none;"  >
     <?php
     $this->registerJs("
             var Back_to_all_categories='".Yii::t('db_category', 'Back to all categories')."';
@@ -167,6 +180,7 @@ if($results)
         ]
     ],$items);
     echo Nav::widget([
+        'id'=>'category-menu-widget2-content',
         'dropDownCaret'=>false,
         'encodeLabels'=>false,
         'options' => ['class' => ['widget'=>'',]],
@@ -174,28 +188,20 @@ if($results)
     ]);
     ?>
 </nav>
-<div class="navbar navbar-inverse navbar-menu navbar-menu-hidden">
+<div class="navbar <?=$this->theme->id=='sakura' ? 'navbar-inverse':'navbar-default'?> navbar-menu navbar-menu-hidden">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w29-collapse"><span class="sr-only">Toggle navigation</span>
+            <button type="button" class="navbar-toggle" ><span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <?php
-            if(Yii::$app->controller->route=='product/product/list'){
-                if(isset($this->params['category']))
-                    echo Html::a($this->params['category']->title, $this->params['category']->url, ['class'=>'navbar-brand']);
-                else
-                    echo Html::a(Yii::t('product', 'All products'), ['/product/product/list'], ['class'=>'navbar-brand']);
-            }
-            if(Yii::$app->controller->route=='product/product/view'){
-                if(isset($this->params['product']))
-                    echo Html::a($this->params['product']->title, $this->params['product']->url, ['class'=>'navbar-brand']);
-            }
-            ?>
+            <a href="javascript:void(0)" class="navbar-brand">
+                <?php
+                if(isset($this->params['menuTitle']))
+                    echo $this->params['menuTitle'];
+                ?>
+            </a>
         </div>
     </div>
 </div>
-
-

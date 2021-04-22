@@ -20,8 +20,10 @@ use yii\helpers\Url;
 /* @var $searchModel product\models\search\ProductSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('product', 'Comparing products');
+$this->title = $title;
 $this->params['breadcrumbs'][] = $this->title;
+
+$this->params['topTitle'] = $this->title;
 
 
 ?>
@@ -34,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Alert::widget() ?>
     </p>
 
-    <div style="width: 100%; overflow: scroll">
+    <div style="width: 100%; overflow: auto">
         <?php
         if($models){
             ?>

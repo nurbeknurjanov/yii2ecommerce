@@ -96,7 +96,7 @@ class DynamicValue extends \yii\db\ActiveRecord
                     $model = $event->sender;
                     if(is_array($model->value))
                         $model->value=implode(',',$model->value);
-                    return $this->value;
+                    return $model->value;
                 },
             ],
         ];
@@ -174,7 +174,8 @@ class DynamicValue extends \yii\db\ActiveRecord
     public $rules=[
         [['field_id', 'object_id'], 'required'],
         [['field_id', 'object_id'], 'integer'],
-        [['value'], 'string', 'max'=>1000],
+        [['value'], 'safe'],
+        //[['value'], 'string', 'max'=>1000],
     ];
     public function rules()
     {
@@ -214,4 +215,29 @@ class DynamicValue extends \yii\db\ActiveRecord
             return $this->_fieldObject;
         return $this->_fieldObject = $this->field;
     }
+
+
+    public function fields()
+    {
+        return [
+            'id',
+            'object_id',
+            'field_id',
+            'value',
+            'valueText' => function (self $model) {
+                return $model->valueText;
+            },
+        ];
+    }
+
+    public function extraFields()
+    {
+        return [
+            'field' => function (self $model) {
+                return $model->field;
+            },
+        ];
+    }
+
+
 }

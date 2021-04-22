@@ -16,7 +16,7 @@ use yii\helpers\Html;
 
 class UserCreate extends \user\models\User
 {
-    protected static function prepareUser($attributes)
+    protected static function prepareUser($attributes, $profileAttributes=[])
     {
         if(!isset($attributes['email']) && !$attributes['email'])
             throw new Exception("Email attribute is missing.");
@@ -25,49 +25,55 @@ class UserCreate extends \user\models\User
             throw new Exception("User already exists.");
 
         $user = new User($attributes);
+        $userProfile = $user->userProfileObject;
+        $userProfile->attributes = $profileAttributes;
 
         if(isset($attributes['password']) && $attributes['password']){
             $user->setPassword($attributes['password']);
             $user->generateAuthKey();
         }
 
-        if(Yii::$app->session->get('referrer_id'))
-            $user->referrer_id = Yii::$app->session->get('referrer_id');
-        $from = Yii::$app->response->cookies->get('from')?:Yii::$app->request->cookies->get('from');
-        if($from){
-            $user->from = $from;
-            if($referrer = User::findOne(['email'=>$user->from,]))
-                $user->referrer_id = $referrer->id;
-            Yii::$app->response->cookies->remove('from');
+        return [$user, $userProfile];
+    }
+    public static function create($attributes=[], $profileAttributes, $validation=true)
+    {
+        $return = self::prepareUser($attributes, $profileAttributes);
+        $user = $return[0];
+        $userProfile = $return[1];
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $user->validate();
+            if(!$user->save($validation))
+                throw new Exception(Html::errorSummary($user));
+            if($profileAttributes){
+                $userProfile->id = $user->id;
+                if(!$userProfile->save($validation))
+                    throw new Exception(Html::errorSummary($userProfile));
+            }
+            $transaction->commit();
+        } catch (Exception $e) {
+            $transaction->rollBack();
+            throw new Exception($e->getMessage());
         }
         return $user;
     }
-    public static function create($attributes=[])
-    {
-        $user = self::prepareUser($attributes);
-        if($user->save())
-            return $user;
-        else
-            throw new Exception(Html::errorSummary($user));
-    }
 
     //for sign up
-    public static function createUserInactive($attributes=[])
+    public static function createUserInactive($attributes=[], $profileAttributes = [])
     {
-        $attributes['rolesAttribute'] = User::ROLE_USER;
+        $attributes['rolesAttribute'] = [User::ROLE_USER, User::ROLE_MANAGER];
         $attributes['status'] = User::STATUS_INACTIVE;
-        return self::create($attributes);
+        return self::create($attributes,$profileAttributes);
     }
     //for social network, for order user, for invite //TODO
-    public static function createUserInactiveForce($attributes=[])
+    public static function createUserInactiveForce($attributes=[],$profileAttributes = [])
     {
-        $attributes['rolesAttribute'] = User::ROLE_USER;
+        $attributes['rolesAttribute'] = [User::ROLE_USER, User::ROLE_MANAGER];
         $attributes['status'] = User::STATUS_INACTIVE;
-        $user = self::prepareUser($attributes);
-        if($user->save(false))
-            return $user;
-        else
-            throw new Exception(Html::errorSummary($user));
+        return self::create($attributes, $profileAttributes, false);
     }
 
 }
+
+

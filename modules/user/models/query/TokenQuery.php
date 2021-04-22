@@ -56,4 +56,21 @@ class TokenQuery extends \yii\db\ActiveQuery
     }
 
 
+    /**
+     * @inheritdoc
+     * @return \user\models\Token[]|array
+     */
+    public function all($db = null)
+    {
+        return parent::all($db);
+    }
+
+    /**
+     * @inheritdoc
+     * @return \user\models\Token|array|null
+     */
+    public function one($db = null)
+    {
+        return parent::one($db);
+    }
 }

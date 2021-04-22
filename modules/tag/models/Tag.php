@@ -94,11 +94,11 @@ class Tag extends \yii\db\ActiveRecord
 
     public function getArticleTags()
     {
-        return $this->hasMany(ObjectTag::className(), ['tag_id'=>'id'])->andOnCondition(['model_name'=>Article::className()]);
+        return $this->hasMany(ObjectTag::class, ['tag_id'=>'id'])->andOnCondition(['object_tag.model_name'=>Article::className()]);
     }
     public function getArticles()
     {
-        return $this->hasMany(Tag::className(), ['id'=>'tag_id'])->via('articleTags');
+        return $this->hasMany(Tag::class, ['id'=>'tag_id'])->via('articleTags');
     }
 
 

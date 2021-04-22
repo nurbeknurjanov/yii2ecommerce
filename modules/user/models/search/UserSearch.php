@@ -28,6 +28,7 @@ class UserSearch extends User
         ];
     }
 
+    public $shopsAttribute='';
     /**
      * @inheritdoc
      */
@@ -35,8 +36,9 @@ class UserSearch extends User
     {
         return [
             [['id', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['username','name', 'email', 'referrer_id', 'from', 'subscribe'], 'safe'],
+            [['username','name', 'email', 'subscribe'], 'safe'],
             ['rolesAttribute', 'safe'],
+            ['shopsAttribute', 'safe'],
         ];
     }
 
@@ -64,6 +66,8 @@ class UserSearch extends User
             'query' => $query,
         ]);
 
+        $query->joinWith('shops');
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -73,12 +77,6 @@ class UserSearch extends User
         }
 
         $query->defaultFrom();
-        /*$query->joinWith([
-            'referrer' => function (\yii\db\ActiveQuery $query) {
-                    $query->from(['referrer'=>$this->tableName(),]);
-                },
-        ]);*/
-        $query->andFilterWhere(['like', 'referrer.name', $this->referrer_id]);
 
         $query->andFilterWhere([
             'user.id' => $this->id,
@@ -91,14 +89,9 @@ class UserSearch extends User
         $query->andFilterWhere(['like', 'user.username', $this->username])
             ->andFilterWhere(['like', 'user.email', $this->email])
             ->andFilterWhere(['like', 'user.name', $this->name])
-            ->andFilterWhere(['like', 'user.from', $this->from])
+            ->andFilterWhere(['like', 'shop.title', $this->shopsAttribute])
         ;
 
-        $query->andFilterWhere(['like', 'user.username', $this->username])
-            ->andFilterWhere(['like', 'user.email', $this->email])
-            ->andFilterWhere(['like', 'user.name', $this->name])
-            ->andFilterWhere(['like', 'user.from', $this->from])
-        ;
         if($this->rolesAttribute){
             $query->leftJoin('{{%auth_assignment}} assignment', 'user.id=assignment.user_id')
                 ->groupBy('user.id')

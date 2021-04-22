@@ -40,7 +40,9 @@ class Card extends Model
                 'value' => function ($event) {
                     /* @var self $model */
                     $model = $event->sender;
-                    return $model->digits1.$model->digits2.$model->digits3.$model->digits4;
+                    if($model->digits1 && $model->digits2 && $model->digits3 && $model->digits4)
+                        $model->number = $model->digits1.$model->digits2.$model->digits3.$model->digits4;
+                    return $model->number;
                 },
             ],
             [

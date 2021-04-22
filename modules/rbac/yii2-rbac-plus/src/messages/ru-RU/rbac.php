@@ -70,5 +70,7 @@ return [
     /* 1. Permisstion Views */      
     'User Assignment'=>'Соответсвия пользователя',
     'Assignment'=>'Соответсвия',
+
+    'Roles'=>'Роли',
 ];
 

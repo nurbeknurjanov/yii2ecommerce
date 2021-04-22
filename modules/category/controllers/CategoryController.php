@@ -8,6 +8,8 @@
 
 namespace category\controllers;
 
+use file\models\File;
+use file\models\FileImage;
 use tests\unit\fixtures\CategoryFixture;
 use Yii;
 use category\models\Category;
@@ -62,7 +64,18 @@ class CategoryController extends Controller
                         }
                     ],
                     [
-                        'actions' => ['index', 'init'],
+                        'actions' => ['delete-file'],
+                        'allow' => true,
+                        'matchCallback' => function($rule, $action){
+                            if(!isset($_GET['id']))
+                                throw new Exception("id parameter is missing");
+                            $file =File::findOne($_GET['id']);
+                            return Yii::$app->user->can('update'.$file->shortModelName, ['model' => $file->model]);
+                        }
+                    ],
+
+                    [
+                        'actions' => ['index'],
                         'allow' => true,
                         'matchCallback' => function($rule, $action){
                             return Yii::$app->user->can('indexCategory');
@@ -180,8 +193,8 @@ class CategoryController extends Controller
         } else {
             /*
             @ ищет по неймспейсу
-            // => ищщет в общем модуле /backend/views
-            /category/update => ищет в конкретном подмодуле /modules/category/views/ и update похожи
+            // => ищщет в app модуле /backend/views or frontend/view or api/views, можно так сделать Yii::$app->viewPath = '@frontend/views';
+            /category/update и update => search in controller's views
             если ничего не указано ищет сам контроллер, ищет у себя viewpath
             если не определен ищет в своем конкретном модуле viewpath
             */
@@ -200,12 +213,16 @@ class CategoryController extends Controller
     public function actionDelete($id)
     {
         try {
-            $this->findModel($id)->deleteNode();
+            $this->findModel($id)->delete();
+            Yii::$app->session->setFlash('success', 'You have successfully deleted the item.');
+            if(strpos(Yii::$app->request->referrer,'view')!==false)
+                return $this->redirect($this->defaultAction);
         } catch (Exception $e) {
             Yii::$app->session->setFlash('error', $e->getMessage());
         }
-        return $this->redirect(['index']);
+        return $this->redirect(Yii::$app->request->referrer);
     }
+
 
 
     /**
@@ -224,5 +241,10 @@ class CategoryController extends Controller
         }
     }
 
+    public function actionDeleteFile($id)
+    {
+        Event::on(FileImage::class, FileImage::EVENT_AFTER_DELETE, [Category::class, 'deleteCache']);
+        return Yii::$app->runAction('/file/file-image/delete', ['id' => $id]);
+    }
 
 }

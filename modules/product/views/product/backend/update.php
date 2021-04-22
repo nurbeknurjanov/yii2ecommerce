@@ -11,17 +11,15 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model product\models\Product */
 
-$this->title = Yii::t('product', 'Update {modelClass}: ', [
-    'modelClass' => 'Product',
-]) . ' ' . $model->title;
+$this->title = Yii::t('product', 'Update Product') . ' ' . $model->title;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('product', 'Products'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = Yii::t('product', 'Update');
+$this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
-<div class="product-update box">
+<div class="product-update card">
 
     <?php $this->beginBlock('form') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?= $this->render('_form', [
                 'model' => $model,
             ]) ?>

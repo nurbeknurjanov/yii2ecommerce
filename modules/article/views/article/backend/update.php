@@ -13,12 +13,12 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Articles'), 'url'
 $this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
-<div class="article-update box">
+<div class="article-update card">
 
 
 
     <?php $this->beginBlock('form') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?= $this->render('_form', [
                 'model' => $model,
             ]) ?>

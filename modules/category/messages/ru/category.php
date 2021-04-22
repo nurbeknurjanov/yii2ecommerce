@@ -7,5 +7,8 @@
  */
 
 return [
+    'Category'=>'Категория',
     'Categories'=>'Категории',
+    'Create Category'=>'Создать Категорию',
+    'Update Category'=>'Править Категорию',
 ];

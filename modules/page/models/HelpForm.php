@@ -108,7 +108,7 @@ class HelpForm extends Model
     public function sendEmail()
     {
         $user = $this->user_id ? Html::a($this->user->fullName,
-            Yii::$app->urlManagerBackend->createAbsoluteUrl(['/user/manage/index/view', 'id'=>$this->user_id])):null;
+            Yii::$app->urlManagerBackend->createAbsoluteUrl(['/user/manage/user/view', 'id'=>$this->user_id])):null;
         $page_url = Html::a($this->page_url, $this->page_url);
 
         Yii::$app->mailer->viewPath = '@page/mail';

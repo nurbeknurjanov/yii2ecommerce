@@ -21,6 +21,7 @@ use order\models\OrderProduct;
 use Yii;
 use order\models\Order;
 use order\models\search\OrderSearch;
+use yii\db\ActiveRecord;
 use yii\grid\GridView;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -66,6 +67,7 @@ class PaypalController extends Controller
         return $this->render('button');
     }
 
+
     public function actionCard()
     {
         $apiContext = Paypal::getApiConnection(false);
@@ -74,26 +76,73 @@ class PaypalController extends Controller
 
         try {
             $return =  $payment->create($apiContext);
-            Yii::$app->session->setFlash('success', Yii::t('order', 'Your order is paid by card and accepted.'));
             $model = new Order;
+            $model->online_payment_status = Order::ONLINE_PAYMENT_STATUS_PAID;
             $model->trigger($model::EVENT_INIT_BASKET_PRODUCTS);
             $model->attributes = Yii::$app->session->get('Order');
             $model->saveWithOrderProducts();
+            Yii::$app->session->setFlash('success', Yii::t('order', 'Your order is paid by card and accepted.'));
             Yii::$app->session->remove('Order');
             Yii::$app->session->remove('Card');
             return $this->redirect(['/order/order/view', 'id'=>$model->id]);
         }catch (\PayPal\Exception\PayPalConnectionException $ex) {
             Yii::$app->session->setFlash('error', $ex->getData());
             return $this->redirect(['/order/order/create2']);
+        }catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', $ex->getMessage());
+            return $this->redirect(['/order/order/create2']);
         }
     }
+    protected function prepareAmount(&$payer, &$payment)
+    {
+        $model = new Order;
+        $model->trigger($model::EVENT_INIT_BASKET_PRODUCTS);
 
+        $model->attributes = Yii::$app->session->get('Order');
+
+        $tax = 0;
+        $items=[];
+        foreach ($model->basketProducts as $basketProduct) {
+            $item = new Item;
+            $item->setName($basketProduct->product->title)
+                ->setCurrency(Yii::$app->formatter->currencyCode)
+                ->setDescription(StringHelper::truncate($basketProduct->product->description,20))
+                ->setQuantity($basketProduct->count)
+                ->setPrice($basketProduct->price)
+                ->setTax($tax);
+            $items[]=$item;
+        }
+
+        $itemList = new ItemList();
+        $itemList->setItems($items);
+
+        $details = new Details;
+        $details->setTax($tax);
+        $details->setShipping(0);
+        $details->setSubtotal($model->amount);
+
+        $amount = new Amount();
+        $amount->setTotal($model->amount +$tax);
+        $amount->setCurrency(Yii::$app->formatter->currencyCode);
+        $amount->setDetails($details);//
+
+        $transaction = new Transaction();
+        $transaction->setAmount($amount)
+            ->setItemList($itemList)
+            ->setDescription(StringHelper::truncate($model->description,20))
+        ;//->setInvoiceNumber(/*$model->latestID+*/1234);
+
+
+
+        $payment->setIntent('sale')
+            ->setPayer($payer)
+            ->setTransactions([$transaction]);
+    }
     protected function preparePaymentCard()
     {
         $cardModel = new Card;
         $cardModel->attributes = Yii::$app->session->get('Card');
-        $cardModel->trigger($cardModel::EVENT_BEFORE_VALIDATE);
-
+        $cardModel->trigger(ActiveRecord::EVENT_BEFORE_VALIDATE);
 
         $name = explode(' ', $cardModel->name);
         $firstName = $name[0];
@@ -126,50 +175,28 @@ class PaypalController extends Controller
         return $payment;
 
     }
-    protected function prepareAmount(&$payer, &$payment)
+
+
+    public function actionPaypal()
     {
-        $model = new Order;
-        $model->trigger($model::EVENT_INIT_BASKET_PRODUCTS);
+        $apiContext=Paypal::getApiConnection(false);
 
-        $model->attributes = Yii::$app->session->get('Order');
+        $payment = $this->preparePaymentPaypal();
 
-        $tax = 0;
-        $items=[];
-        foreach ($model->basketProducts as $basketProduct) {
-            $item = new Item;
-            $item->setName($basketProduct->product->title)
-                ->setCurrency(Yii::$app->formatter->currencyCode)
-                ->setDescription(StringHelper::truncate($basketProduct->product->description,20))
-                ->setQuantity($basketProduct->count)
-                ->setPrice($basketProduct->amount)
-                ->setTax($tax);
-            $items[]=$item;
+        try {
+            $payment->create($apiContext);//here happens redirect to paypal's site
+        }
+        catch (\PayPal\Exception\PayPalConnectionException $ex) {
+            Yii::$app->session->setFlash('error', $ex->getData());
+            return $this->redirect(['/order/order/create2']);
+        }catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', $ex->getMessage());
+            return $this->redirect(['/order/order/create2']);
         }
 
-        $itemList = new ItemList();
-        $itemList->setItems($items);
 
-        $details = new Details;
-        $details->setTax($tax);
-        $details->setShipping(0);
-        $details->setSubtotal($model->amount);
+        return $this->redirect($payment->getApprovalLink());
 
-        $amount = new Amount();
-        $amount->setTotal($model->amount +$tax);
-        $amount->setCurrency(Yii::$app->formatter->currencyCode);
-        $amount->setDetails($details);//
-
-        $transaction = new Transaction();
-        $transaction->setAmount($amount)
-            ->setItemList($itemList)
-            ->setDescription(StringHelper::truncate($model->description,20))
-            ;//->setInvoiceNumber(/*$model->latestID+*/1234);
-
-
-
-        $payment->setIntent('sale')
-            ->setPayer($payer)
-            ->setTransactions([$transaction]);
     }
     protected function preparePaymentPaypal()
     {
@@ -197,35 +224,22 @@ class PaypalController extends Controller
 
         try {
             $result = $payment->execute($exec, $apiContext);
-            Yii::$app->session->setFlash('success', Yii::t('order', 'Your order is paid by paypal and accepted.'));
             $model = new Order;
+            $model->online_payment_status = Order::ONLINE_PAYMENT_STATUS_PAID;
             $model->trigger($model::EVENT_INIT_BASKET_PRODUCTS);
             $model->attributes = Yii::$app->session->get('Order');
             $model->saveWithOrderProducts();
+            Yii::$app->session->setFlash('success', Yii::t('order', 'Your order is paid by paypal and accepted.'));
             Yii::$app->session->remove('Order');
             Yii::$app->session->remove('Card');
             return $this->redirect(['/order/order/view', 'id'=>$model->id]);
         } catch (\PayPal\Exception\PayPalConnectionException $ex) {
             Yii::$app->session->setFlash('error', $ex->getData());
             return $this->redirect(['/order/order/create2']);
-        }
-    }
-    public function actionPaypal()
-    {
-        $apiContext=Paypal::getApiConnection(false);
-
-        $payment = $this->preparePaymentPaypal();
-
-        try {
-            $payment->create($apiContext);
-        }
-        catch (\PayPal\Exception\PayPalConnectionException $ex) {
-            Yii::$app->session->setFlash('error', $ex->getData());
+        }catch (\Exception $ex) {
+            Yii::$app->session->setFlash('error', $ex->getMessage());
             return $this->redirect(['/order/order/create2']);
         }
-
-
-        return $this->redirect($payment->getApprovalLink());
-
     }
+
 }

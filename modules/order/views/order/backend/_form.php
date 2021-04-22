@@ -13,6 +13,7 @@ use user\models\User;
 use country\models\Country;
 use country\models\Region;
 use country\models\City;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $model order\models\Order */
@@ -50,10 +51,14 @@ use country\models\City;
         (new Country)->getWidgetSelectPicker($model, 'country_id', null, ['class'=>'selectpicker country_id', 'disabled'=>true])]]) ?>
     <?=$form->field($model, 'region_id',['parts'=>['{input}'=>
         (new Region)->getWidgetSelectPicker($model, 'region_id', Region::find()->countryQuery($model->country_id),
-            ['class'=>'selectpicker region_id', 'disabled'=>true])]]) ?>
+            ['class'=>'selectpicker region_id',
+                'data-url'=>Url::to(['/country/region/select-picker', 'country_id'=>$model->country_id]),
+                'disabled'=>true])]]) ?>
     <?=$form->field($model, 'city_id',['parts'=>['{input}'=>
         (new City)->getWidgetSelectPicker($model, 'city_id', City::find()->regionQuery($model->region_id),
-            ['class'=>'selectpicker city_id', 'disabled'=>true])]]) ?>
+            ['class'=>'selectpicker city_id',
+                'data-url'=>Url::to(['/country/city/select-picker', 'region_id'=>$model->region_id]),
+                'disabled'=>true])]]) ?>
 
 
     <?= $form->field($model, 'address')->textInput(['readonly'=>true]) ?>
@@ -62,12 +67,20 @@ use country\models\City;
 
     <?= $form->field($model, 'delivery_id')->dropDownList($model->deliveryValues, ['prompt'=>'Выбрать', 'disabled'=>true]) ?>
 
-    <?= $form->field($model, 'payment_type')->dropDownList($model->paymentTypeValues, ['prompt'=>Yii::t('common', 'Select'), 'disabled'=>true]) ?>
+    <?php
+    if($model->isPaymentOnline){
+        ?>
+        <?= $form->field($model, 'payment_type')->dropDownList($model->paymentTypeValues, ['prompt'=>Yii::t('common', 'Select'), 'disabled'=>true]) ?>
+        <?= $form->field($model, 'online_payment_type')->dropDownList($model->onlinePaymentTypeValues, ['prompt'=>Yii::t('common', 'Select'), 'disabled'=>true]) ?>
+
+        <?php
+    }
+    ?>
 
     <?php
     if(!$model->isNewRecord && Yii::$app->user->can('updateOrder')){
         ?>
-        <?= $form->field($model, 'status')->radioList($model->statusValues); ?>
+        <?= $form->field($model, 'status')->radioList($model->statusValues, ['separator'=>'<br>',]); ?>
         <?php
     }
     ?>

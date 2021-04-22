@@ -51,7 +51,9 @@ class Bootstrap implements BootstrapInterface {
         }
 
         $view = $app->view;
-        //$view->registerAssetBundle(ProductAsset::class);
-        ProductAsset::register($view);
+        if($app->view->bootstrapAssetBundles)
+        {
+            ProductAsset::register($view);
+        }
     }
 }

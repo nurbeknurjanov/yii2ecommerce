@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Url;
-use tests\unit\fixtures\UserFixture;
 use user\models\Token;
 use yii\test\ActiveFixture;
 use user\models\LoginForm;
@@ -38,6 +37,6 @@ class PageCest
         $I->click($page->title);
         //parse url
         $I->waitForText($page->title);
-        $I->seeInCurrentUrl($page->url);
+        $I->seeInCurrentUrl($page->title_url);
     }
 }

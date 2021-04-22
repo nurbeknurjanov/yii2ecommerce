@@ -11,18 +11,18 @@ use extended\helpers\StringHelper;
 /* @var $searchModel page\models\search\PageSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('common', 'Pages');
+$this->title = Yii::t('page', 'Pages');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="page-index box">
+<div class="page-index card">
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php // $this->render('_search', ['model' => $searchModel]); ?>
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Alert::widget() ?>
         <?php
 		if(Yii::$app->user->can('createPage'))
-            echo Html::a(Yii::t('common', 'Create Page'), ['create'], ['class' => 'btn btn-success']);
+            echo Html::a(Yii::t('page', 'Create Page'), ['create'], ['class' => 'btn btn-success']);
         ?>
     </div>
 
@@ -30,15 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-
-            //'id',
             [
-                'attribute'=>'url',
+                'attribute'=>'title_url',
                 //'format'=>'url',
                 'format'=>'raw',
                 'value'=>function($data){
-                    return Html::a($data->url, Url::to(['/'.$data->url]));
+                    return Html::a($data->title_url, Yii::$app->urlManagerFrontend->createAbsoluteUrl(Url::to($data->url)));
                 },
             ],
             'title',
@@ -49,7 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     return StringHelper::truncate($data->text, 50);
                 },
             ],
-
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template'=>'{view} {update} {delete}',

@@ -17,6 +17,7 @@ $('form#formId').on('afterValidate', function (event, messages) {
 $('#gridView').on('beforeFilter', function (event) {
 });
 
+
 $('[name="Order[payment_type]"]').change(function(){
     if(isPaymentOnline())
         $('.field-order-online_payment_type').show();

@@ -9,10 +9,13 @@ return [
     'Product'=>'Товар',
     'Products'=>'Товары',
 
+    'Create Product'=>'Создать товар',
+    'Update Product'=>'Править товар',
+
     'SKU'=>'Артикул',
     'Price'=>'Цена',
 
-    'Comparing products'=>'Сравнение товаров',
+    'Compare products'=>'Сравнение товаров',
     'You successfully added the item into compare.'=>'Вы успешно добавили товар на сравнение.',
     'You successfully removed the item from compare.'=>'Вы успешно убрали товар из сравнения.',
     'Do you want to remove the item from compare ?'=>'Вы хотите убрать товар из сравнения ?',
@@ -43,9 +46,14 @@ return [
     'Characteristics'=>'Характеристики',
     'Reviews'=>'Отзывы',
 
-    'For query "{q}" - {sub_text}'=>'По запросу "{q}" - {sub_text}',
+    'For query "{q}" - {nProducts}'=>'По запросу "{q}" - {nProducts}',
     '{n, plural, =0{no products} =1{# product} other{# products}} found.'=>'{n, plural, =0{ни один товар не найден} =1{найден # товар} one{найден # товар} few{найдено # товара} many{найдено # товаров} other{найдено # товара}}',
 
     'Buy with this product'=>'С этим товаром покупают',
     'All products'=>'Все товары',
+
+    'Discount'=>'Скидка',
+    'Buy with this'=>'С этим покупают',
+    'Grouped Products'=>'Группированные товары',
+    'Update all'=>'Сохранить все',
 ];

@@ -32,7 +32,8 @@ use country\models\City;
         <div class="col-lg-4">
             <?= $form->field($model, 'email') ?>
             <?= $form->field($model, 'phone') ?>
-            <?php echo $form->field($model, 'delivery_id')->radioList($model->deliveryValues, ['prompt'=>'Select',]) ?>
+            <?php echo $form->field($model, 'delivery_id')->radioList($model->deliveryValues,
+                ['prompt'=>'Select', 'separator'=>'<br>',]) ?>
             <?php echo $form->field($model, 'description') ?>
         </div>
         <div class="col-lg-4">
@@ -40,10 +41,13 @@ use country\models\City;
                 (new Country)->getWidgetSelectPicker($model, 'country_id', null, ['class'=>'selectpicker country_id',])]]) ?>
             <?=$form->field($model, 'region_id',['parts'=>['{input}'=>
                 (new Region)->getWidgetSelectPicker($model, 'region_id', Region::find()->countryQuery($model->country_id),
-                    ['class'=>'selectpicker region_id',])]]) ?>
+                    ['class'=>'selectpicker region_id',
+                        'data-url'=>Url::to(['/country/region/select-picker', 'country_id'=>$model->country_id])])]]) ?>
             <?=$form->field($model, 'city_id',['parts'=>['{input}'=>
                 (new City)->getWidgetSelectPicker($model, 'city_id', City::find()->regionQuery($model->region_id),
-                    ['class'=>'selectpicker city_id',])]]) ?>
+                    ['class'=>'selectpicker city_id',
+                        'data-url'=>Url::to(['/country/city/select-picker', 'region_id'=>$model->region_id])
+                        /*'multiple'=>true,*/])]]) ?>
             <?php echo $form->field($model, 'address') ?>
         </div>
         <div class="col-lg-4">

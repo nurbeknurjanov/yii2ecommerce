@@ -15,10 +15,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $this->beginBlock('page');
 ?>
-<div class="comment-view box">
+<div class="comment-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?php
 		if(Yii::$app->user->can('updateComment', ['model' => $model]))
             echo Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
@@ -90,7 +90,7 @@ $this->beginBlock('page');
     ?>
 
     <?php $this->beginBlock('detailView') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?=$widget->run() ?>
         </div>
     <?php $this->endBlock() ?>

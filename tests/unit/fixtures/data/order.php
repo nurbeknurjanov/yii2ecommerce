@@ -28,7 +28,6 @@ return [
         'amount' => 1500,
         'payment_type' => Order::PAYMENT_TYPE_CASH,
         'status' => Order::STATUS_APPROVED,
-        'coupon_id' => NULL
     ],
     [
         'id' => '2',
@@ -48,7 +47,6 @@ return [
         'amount' => 250,
         'payment_type' => Order::PAYMENT_TYPE_CASH,
         'status' => Order::STATUS_APPROVED,
-        'coupon_id' => NULL
     ],
     [
         'id' => '3',
@@ -68,6 +66,5 @@ return [
         'amount' => 725,
         'payment_type' => Order::PAYMENT_TYPE_CASH,
         'status' => Order::STATUS_NEW,
-        'coupon_id' => NULL
     ],
 ];

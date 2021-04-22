@@ -9,6 +9,7 @@
 namespace extended\behaviours;
 
 
+use kartik\date\DatePicker;
 use kartik\datetime\DateTimePicker;
 use yii\base\Behavior;
 use yii\base\Exception;
@@ -21,6 +22,7 @@ class DateSearchBehaviour extends Behavior
     public $dateFrom;
     public $dateTo;
     public $dateAttribute;
+    public $time=false;
 
     public function init()
     {
@@ -38,10 +40,18 @@ class DateSearchBehaviour extends Behavior
         $query->defaultFrom();
         $from = key($query->from);
 
-        if(isset($_GET[$this->dateFrom]))
-            $query->andWhere("$from.$this->dateAttribute>=STR_TO_DATE('{$_GET[$this->dateFrom]}', '%Y-%m-%d %H:%i:%s')");
-        if(isset($_GET[$this->dateTo]))
-            $query->andWhere("$from.$this->dateAttribute<=STR_TO_DATE('{$_GET[$this->dateTo]}', '%Y-%m-%d %H:%i:%s')");
+        if($this->time){
+            if(isset($_GET[$this->dateFrom]))
+                $query->andWhere("$from.$this->dateAttribute>=STR_TO_DATE('{$_GET[$this->dateFrom]}', '%Y-%m-%d %H:%i:%s')");
+            if(isset($_GET[$this->dateTo]))
+                $query->andWhere("$from.$this->dateAttribute<=STR_TO_DATE('{$_GET[$this->dateTo]}', '%Y-%m-%d %H:%i:%s')");
+
+        }else{
+            if(isset($_GET[$this->dateFrom]))
+                $query->andWhere("$from.$this->dateAttribute>=STR_TO_DATE('{$_GET[$this->dateFrom]} 00:00:00', '%Y-%m-%d %H:%i:%s')");
+            if(isset($_GET[$this->dateTo]))
+                $query->andWhere("$from.$this->dateAttribute<=STR_TO_DATE('{$_GET[$this->dateTo]} 23:59:59', '%Y-%m-%d %H:%i:%s')");
+        }
 
         /*
          *   $dateTimeValidator = new DateValidator();
@@ -56,42 +66,85 @@ class DateSearchBehaviour extends Behavior
 
     public function getWidgetFilter($horizontal=false)
     {
-        $dateFrom = DateTimePicker::widget([
-            'name' => $this->dateFrom,
-            'value'=>Yii::$app->request->get($this->dateFrom),
-            //'model' => $searchModel,
-            //'attribute' => 'created_at',
-            'options' => ['placeholder' => 'Select time'],
-            'convertFormat' => true,
-            'pluginOptions' => [
-                'format' => 'yyyy-MM-dd H:i',
-                'todayHighlight' => true
-            ]
-        ]);
-        $dateTo = DateTimePicker::widget([
-            'name' => $this->dateTo,
-            'value'=>Yii::$app->request->get($this->dateTo),
-            //'model' => $searchModel,
-            //'attribute' => 'created_at',
-            'options' => ['placeholder' => 'Select time'],
-            'convertFormat' => true,
-            'pluginOptions' => [
-                'format' => 'yyyy-MM-dd H:i',
-                'todayHighlight' => true
-            ]
-        ]);
+        if($this->time){
+            $dateFrom = DateTimePicker::widget([
+                'name' => $this->dateFrom,
+                'value'=>Yii::$app->request->get($this->dateFrom),
+                //'model' => $searchModel,
+                //'attribute' => 'created_at',
+                'options' => ['placeholder' => 'From time'],
+                'convertFormat' => true,
+                'pluginOptions' => [
+                    'format' => 'yyyy-MM-dd H:i',
+                    'todayHighlight' => true,
+                    'autoclose' => true,
+                ]
+            ]);
+            $dateTo = DateTimePicker::widget([
+                'name' => $this->dateTo,
+                'value'=>Yii::$app->request->get($this->dateTo),
+                //'model' => $searchModel,
+                //'attribute' => 'created_at',
+                'options' => ['placeholder' => 'To time'],
+                'convertFormat' => true,
+                'pluginOptions' => [
+                    'format' => 'yyyy-MM-dd H:i',
+                    'todayHighlight' => true,
+                    'autoclose' => true,
+                ]
+            ]);
+        }
+        else{
+            $dateFrom = DatePicker::widget([
+                'name' => $this->dateFrom,
+                'value'=>Yii::$app->request->get($this->dateFrom),
+                //'model' => $searchModel,
+                //'attribute' => 'created_at',
+                'options' => ['placeholder' => 'From date'],
+                'convertFormat' => true,
+                'pluginOptions' => [
+                    'format' => 'yyyy-MM-dd',
+                    'todayHighlight' => true,
+                    'autoclose' => true,
+                ]
+            ]);
+            $dateTo = DatePicker::widget([
+                'name' => $this->dateTo,
+                'value'=>Yii::$app->request->get($this->dateTo),
+                //'model' => $searchModel,
+                //'attribute' => 'created_at',
+                'options' => ['placeholder' => 'To date'],
+                'convertFormat' => true,
+                'pluginOptions' => [
+                    'format' => 'yyyy-MM-dd',
+                    'todayHighlight' => true,
+                    'autoclose' => true,
+                ]
+            ]);
+        }
+
+
+
         if($horizontal){
             ob_start();
             ?>
             <div class='row'>
-                <div class='col-lg-12' ><?=$dateFrom?></div>
-                <div class='col-lg-12' ><?=$dateTo?></div>
+                <div class='col-lg-6' ><?=$dateFrom?></div>
+                <div class='col-lg-6' ><?=$dateTo?></div>
             </div>
             <?php
             $content = ob_get_clean();
             return $content;
         }
-        return $dateFrom.' '.$dateTo;
+
+        ob_start();
+        ?>
+        <div>
+            <?=$dateFrom.' '.$dateTo?>
+        </div>
+        <?php
+        $content = ob_get_clean();
+        return $content;
 
         /*
          *

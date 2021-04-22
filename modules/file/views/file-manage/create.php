@@ -16,9 +16,9 @@ $this->title = Yii::t('common', 'Create File');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Files'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="file-create box">
+<div class="file-create card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

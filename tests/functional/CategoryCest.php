@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Url;
-use tests\unit\fixtures\UserFixture;
 use user\models\Token;
 use yii\test\ActiveFixture;
 use user\models\LoginForm;

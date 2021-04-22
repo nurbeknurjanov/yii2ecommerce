@@ -37,7 +37,8 @@ class User extends \user\models\User
                 {
                     $location=explode(', ', $attributes['location']['name']);
                     $attributes['city']=$location[0];
-                    $attributes['country']=$location[1];
+                    if(isset($location[1]))
+                        $attributes['country']=$location[1];
                     unset($attributes['location']);
                 }
                 if(isset($attributes['picture'], $attributes['picture']['data'],$attributes['picture']['data']['url']))

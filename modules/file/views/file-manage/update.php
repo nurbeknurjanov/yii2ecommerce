@@ -18,9 +18,9 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Files'), 'url' =>
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
-<div class="file-update box">
+<div class="file-update card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

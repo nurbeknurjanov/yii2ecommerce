@@ -7,13 +7,13 @@ use yii\widgets\DetailView;
 /* @var $model country\models\Region */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Regions'), 'url' => [Yii::$app->controller->defaultAction]];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('country', 'States/Provinces'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="region-view box">
+<div class="region-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?php
 		if(Yii::$app->user->can('updateRegion', ['model' => $model]))
             echo Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']);
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </div>
 
-    <div class="box-body">
+    <div class="card-body">
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [

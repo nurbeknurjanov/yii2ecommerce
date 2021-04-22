@@ -9,8 +9,6 @@
 namespace product\models;
 
 use Yii;
-use yii\web\Cookie;
-
 
 class Compare
 {
@@ -29,22 +27,14 @@ class Compare
     {
         $compareProducts = self::findAll();
         unset($compareProducts[$model_id]);
-        Yii::$app->response->cookies->add(new Cookie([
-            'name' => 'compareProducts',
-            'value' => $compareProducts,
-            'expire' => time() + 3600*24*7,
-        ]));
+        Yii::$app->response->cookies->add(Yii::$container->get('cookie', [],  ['name'=>'compareProducts', 'value'=>$compareProducts]));
     }
 
     public static function create(Product $model)
     {
         $compareProducts = self::findAll();
         $compareProducts[$model->id]=$model->id;
-        Yii::$app->response->cookies->add(new Cookie([
-            'name' => 'compareProducts',
-            'value' => $compareProducts,
-            'expire' => time() + 3600*24*7,
-        ]));
+        Yii::$app->response->cookies->add(Yii::$container->get('cookie', [],  ['name'=>'compareProducts', 'value'=>$compareProducts]));
     }
 
 

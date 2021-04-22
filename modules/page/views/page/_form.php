@@ -31,7 +31,7 @@ use file\widgets\file_preview\FilePreview;
 
     <?=$form->errorSummary($model);?>
 
-    <?= $form->field($model, 'url')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'title_url')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 

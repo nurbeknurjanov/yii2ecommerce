@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         if($video = $model->video){
             ?>
-            <?=$model->video->getImg();?>
+            <?=$model->video->img?>
             <?php
         }
         ?>

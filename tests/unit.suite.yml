@@ -8,5 +8,28 @@ modules:
         - Asserts
         - \Helper\Unit
         - Yii2:
+                 part: [orm, email, fixtures, init]
                  cleanup: true
+        #- Db:
+        #        dsn: 'mysql:host=localhost;dbname=sakura_test'
+        #        user: 'root'
+        #        password: 'root'
+        #        dump: tests/_data/your-dump-name.sql
 
+#env:
+#  dev:
+#    modules:
+#      enabled:
+#      - Db:
+#          dsn: 'mysql:host=localhost;dbname=sakura_test'
+#          user: 'root'
+#          password: 'root'
+#  prod:
+#    modules:
+#      enabled:
+#      - Db:
+#          dsn: 'mysql:host=localhost;dbname=sakura_sakura_test'
+#          user: 'sakura'
+#          password: '123123'
+
+#./vendor/bin/codecept run unit --env=dev

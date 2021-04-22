@@ -12,6 +12,7 @@ use category\models\Category;
 use category\models\query\CategoryQuery;
 use product\models\ProductCategory;
 use product\models\query\ProductQuery;
+use shop\models\query\ShopQuery;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -59,14 +60,23 @@ class ProductSearchBackend extends ProductSearch
         if(!$dataProvider->sort->attributeOrders)
             $query->addOrderByGroupBackend();
 
-        $this->eavSearch($dataProvider);
+        $this->eavSearch($dataProvider, 'valuesWithFields');
 
-        if($this->dynamicValuesAttribute!==null){
-            if($this->dynamicValuesAttribute)
-                $query->andWhere("dynamic_value.id IS NOT NULL");
-            else
-                $query->andWhere("dynamic_value.id IS NULL");
-        }
+        $query->andFilterWhere(['like', 'dynamic_value.value', $this->dynamicValuesAttribute]);
+
+        $model = $this;
+        $query->innerJoinWith(['shop'=>function(ShopQuery $shopQuery) use ($model) {
+            $shopQuery->andFilterWhere(['like','shop.title', $model->shop_id]);
+        }]);
+
         return $dataProvider;
+    }
+
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(),[
+            'dynamicValuesAttribute'=>Yii::t('product', 'Characteristics'),
+        ]);
+
     }
 }

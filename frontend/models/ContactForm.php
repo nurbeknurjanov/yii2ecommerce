@@ -31,14 +31,16 @@ class ContactForm extends Model
             [['name', 'email', 'body'], 'required'],
             // email has to be a valid email address
             ['email', 'email'],
-            [['reCaptcha'], ReCaptchaValidator::className(),
+            ['reCaptcha', ReCaptchaValidator::class,
                 'when'=>function($model){
-                    return YII_ENV_PROD;
-                },
-                'whenClient'=>new JsExpression("function (attribute, value) {
-                                        return ".(YII_ENV_PROD).";
-                                    }"),
-            ]
+                    if(Yii::$app->request->isAjax)
+                        return false;
+                    if(Yii::$app->request->post('ajax')=='contact-form')
+                        return false;
+                    if(YII_ENV_TEST)
+                        return false;
+                    return true ;
+                }],
         ];
     }
 
@@ -53,6 +55,7 @@ class ContactForm extends Model
             'phone'=>Yii::t('common', 'Phone'),
             'subject'=>Yii::t('db_frontend', 'Subject'),
             'body'=>Yii::t('common', 'Text'),
+            'reCaptcha'=>Yii::t('common', 'I\'m not a robot'),
         ];
     }
 
@@ -73,7 +76,7 @@ class ContactForm extends Model
             ->send();
 
         return Yii::$app->mailer->compose()
-            ->setTo(Yii::$app->params['adminEmail'])
+            ->setTo(Yii::$app->params['supportEmail'])
             ->setFrom([$this->email => $this->name])
             ->setSubject($this->subject)
             ->setHtmlBody("

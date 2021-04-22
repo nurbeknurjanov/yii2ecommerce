@@ -10,10 +10,10 @@ $this->title = Yii::t('common', 'Create like');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Likes'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="like-create box">
+<div class="like-create card">
 
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

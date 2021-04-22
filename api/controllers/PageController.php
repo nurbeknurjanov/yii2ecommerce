@@ -34,7 +34,12 @@ class PageController extends ActiveController
             ],
         ];
     }
+    public function actions()
+    {
+        $actions = parent::actions();
 
+        return $actions;
+    }
     public $modelClass = Page::class;
 
     /**
@@ -52,22 +57,5 @@ class PageController extends ActiveController
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-
-    public function actions()
-    {
-        $actions = parent::actions();
-
-        return $actions;
-    }
-
-    public function actionViewUrl($url)
-    {
-        if (($model = Page::findOne(['url'=>$url])) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
-
 
 } 

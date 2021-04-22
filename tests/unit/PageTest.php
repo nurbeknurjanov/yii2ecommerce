@@ -37,7 +37,10 @@ class PageTest extends \Codeception\Test\Unit
         $page = $this->tester->grabFixture('pages', 0);
 
         Yii::$app->urlManager->showScriptName=false;
-        $this->tester->assertEquals(Url::to(['/page/page/view', 'url'=>$page->url]), '/'.$page->url);
+
+        $url = Url::to(['/page/page/view', 'page_title_url'=>'about_us']);
+        //\Codeception\Util\Debug::debug($url);
+        $this->tester->assertEquals($url, '/'.$page->title_url);
     }
     public function testParseUrl()
     {
@@ -45,7 +48,7 @@ class PageTest extends \Codeception\Test\Unit
 
 
         $request = Yii::$app->request;
-        $request->setPathInfo($page->url);
+        $request->setPathInfo($page->title_url);
         $request->resolve();
 
         $this->tester->assertNotNull($request->get('id'));

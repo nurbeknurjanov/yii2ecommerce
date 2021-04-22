@@ -16,17 +16,17 @@ use eav\models\DynamicField;
 /* @var $searchModel eav\models\search\DynamicFieldSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('common', 'Dynamic fields');
+$this->title = Yii::t('eav', 'Dynamic fields');
 $this->params['breadcrumbs'][] = $this->title;
 
 
 ?>
-<div class="dynamic-field-index box">
+<div class="dynamic-field-index card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
-        <?= Html::a('Create dynamic field', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('eav', 'Create dynamic field'), ['create'], ['class' => 'btn btn-success']) ?>
     </div>
 
     <?= GridView::widget([
@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter'=>Html::activeDropDownList($searchModel, 'category_id', ArrayHelper::map(
                         Category::find()
                             ->defaultFrom()->defaultOrder()
-                            ->selectTitle()->enabled()->all(), 'id', 'title'), ['prompt'=>'Select', 'encode'=>false, 'class'=>'form-control',]),
+                            ->selectTitle()->enabled()->all(), 'id', 'title'), ['prompt'=>'', 'encode'=>false, 'class'=>'form-control',]),
             ],
             'label',
             [

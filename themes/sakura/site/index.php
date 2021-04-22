@@ -11,8 +11,8 @@ use extended\helpers\Html;
 use article\models\Article;
 use yii\helpers\Url;
 use extended\vendor\Carousel;
+use shop\models\Shop;
 
-$this->title=Yii::$app->name.' - '.Yii::t('common', 'ecommerce platform based on Yii2 PHP Framework');
 /* @var Product[] $models */
 ?>
 
@@ -42,8 +42,27 @@ if($models = Product::find()->defaultFrom()->enabled()->promote()->with('mainIma
         'options' => [
             'data-$indicators' => "$('.carousel-indicators div')",
             'class' => 'carousel slide',
-            'data-interval' => '3000'],
+            'data-interval' => '9000'],
     ])?>
+    <div class="clear"></div>
+    <br/>
+    <?php
+}
+?>
+
+<?php
+if($models = Shop::find()->with('mainImage')->limit(12)->all()){
+    ?>
+    <h1><?=Yii::t('product', 'Shops');?></h1>
+    <div class="populars">
+        <?php
+        foreach ($models as $model) {
+            ?>
+            <?=$this->render("@shop/views/shop/_list", ['model'=>$model]);?>
+            <?php
+        }
+        ?>
+    </div>
     <div class="clear"></div>
     <br/>
     <?php
@@ -54,7 +73,7 @@ if($models = Product::find()->defaultFrom()->enabled()->promote()->with('mainIma
 if($models = Product::find()->defaultFrom()->enabled()->popular()->with('mainImage')->limit(12)->all()){
     ?>
     <h1><?=Yii::t('product', 'Popular');?></h1>
-    <div class="index-product-list">
+    <div class="populars">
         <?php
         foreach ($models as $model) {
             ?>
@@ -73,7 +92,7 @@ if($models = Product::find()->defaultFrom()->enabled()->popular()->with('mainIma
 if($models = Product::find()->defaultFrom()->enabled()->novelty()->with('mainImage')->limit(12)->all()){
     ?>
     <h1><?=Yii::t('product', 'Novelties');?></h1>
-    <div class="index-product-list">
+    <div class="novelties">
         <?php
         foreach ($models as $model) {
             ?>

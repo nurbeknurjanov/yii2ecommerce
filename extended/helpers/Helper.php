@@ -124,12 +124,12 @@ class Helper
     {
         $q = trim($q);
         $q = strtolower($q);
-        $q = substr($q, 0, 64);
+        /*$q = substr($q, 0, 64);
         $q = preg_replace("/[^\w\x7F-\xFF\s]/", " ", $q);
         $q = preg_replace('/ {2,}/',' ',$q);
         $q = str_replace(' ','* ',$q);
         if($q)
-            $q.="*";
+            $q.="*";*/
         return $q;
     }
 }

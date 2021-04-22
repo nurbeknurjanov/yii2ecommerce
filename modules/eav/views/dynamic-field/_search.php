@@ -27,13 +27,14 @@ use yii\helpers\Url;
         <?= $form->field($model, 'enabled')->radioList($model->booleanValues) ?>
     </div>
     <div class="col-lg-4">
-        <?= $form->field($model, 'rule')->radioList($model->ruleValues, ['item' => function($index, $label, $name, $checked, $value) {
+        <?= $form->field($model, 'rule')->radioList($model->ruleValues, [
+                'item' => function($index, $label, $name, $checked, $value) {
             $return = '<label>';
             $return .= Html::radio($name, $checked, ['value'=>$value,]);
             $return .= ' '.$label;
             $return .= '</label>';
             return $return;
-        }]) ?>
+        }, 'separator'=>'<br>',]) ?>
     </div>
     <div class="col-lg-4">
         <?= $form->field($model, 'default_value') ?>

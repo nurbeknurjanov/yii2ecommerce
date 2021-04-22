@@ -20,7 +20,7 @@ class Permissions
         $auth = Yii::$app->authManager;
         $guest = $auth->getRole(User::ROLE_GUEST);
         $user = $auth->getRole(User::ROLE_USER);
-        $manager = $auth->getRole(User::ROLE_MANAGER);
+        $manager = $auth->getRole(User::ROLE_ADMINISTRATOR);
 
 
         $rule = new Rule;

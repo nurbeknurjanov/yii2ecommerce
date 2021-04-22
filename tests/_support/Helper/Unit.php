@@ -17,7 +17,7 @@ class Unit extends \Codeception\Module
             'class' => 'yii\web\UrlManager',
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'hostInfo' => YII_ENV_TEST_PROD ? 'https://img.sakuracommerce.com':'http://img.sakura',//nurbek
+            'hostInfo' => YII_ENV_TEST_PROD ? 'https://img.sakuracommerce.com':'http://img.yourdomain.com',
         ]);
     }
     public function mockUser()

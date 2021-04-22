@@ -10,9 +10,9 @@ $this->title = Yii::t('common', 'Create I18n Message');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'I18n Messages'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="i18n-message-create box">
+<div class="i18n-message-create card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

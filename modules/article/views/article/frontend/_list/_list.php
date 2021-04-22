@@ -13,7 +13,7 @@ use extended\helpers\StringHelper;
     }elseif($model->mainImage){
         ?>
         <div class="article-image" >
-            <?=$model->mainImage->img;?>
+            <?=$model->mainImage->getThumbImg('sm');?>
         </div>
         <?php
     }

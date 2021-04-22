@@ -2,12 +2,20 @@
 
 namespace user\models;
 
+use extended\behaviours\ManyToManyBehaviour;
 use extended\helpers\Html;
 use file\models\File;
 use file\models\FileImage;
 use file\models\behaviours\FileImageBehavior;
 use i18n\models\I18nSourceMessage;
+use order\models\query\OrderQuery;
+use product\models\Product;
+use product\models\query\ProductQuery;
+use shop\models\query\ShopQuery;
+use shop\models\Shop;
+use shop\models\UserShop;
 use user\models\create\TokenCreate;
+use user\models\query\UserProfileQuery;
 use Yii;
 use yii\base\Event;
 use yii\base\Exception;
@@ -21,6 +29,8 @@ use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
 use yii\web\UploadedFile;
 use order\models\Order;
+use yii\helpers\Inflector;
+use yii\helpers\StringHelper;
 
 /**
  * User model
@@ -30,6 +40,7 @@ use order\models\Order;
  * @property string $name
  * @property string $fullName
  * @property string $email
+ * @property string $phone
  * @property string $auth_key
  * @property string $password_hash
  * @property string $password write-only password
@@ -43,15 +54,19 @@ use order\models\Order;
  * @property integer $updated_at
  * @property \file\models\FileImage $image
  * @property array $images
- * @property integer $referrer_id
- * @property User $referrer
  * @property string $description
- * @property string $language
- * @property string $time_zone
- * @property string $from
  * @property integer $subscribe
  * @property string $subscribeText
  * @property array $subscribeValues
+ * @property bool $isActive
+ * @property bool $isNotActive
+ * @property array $statusOptions
+ * @property UserShop[] $userShops
+ * @property Shop[] $shops
+ * @property string $link
+ * @property [] $url
+ * @property UserProfile $userProfile
+ * @property UserProfile $userProfileObject
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -81,23 +96,13 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_BLOCKED = 20;
     const STATUS_DELETED = 21;
 
-    public $statusValues = [
-        self::STATUS_ACTIVE=>'Active',
-        self::STATUS_INACTIVE=>'Inactive',
-        self::STATUS_DELETED=>'Deleted',
-        self::STATUS_BLOCKED=>'Blocked',
-    ];
+    public $statusOptions;
 
 
 
     public function getStatusText()
     {
-        return isset($this->statusValues[$this->status]) ? $this->statusValues[$this->status]:null;
-    }
-    public function getLanguageText()
-    {
-        $languageValues = (new I18nSourceMessage)->languageValues;
-        return isset($languageValues[$this->language]) ? $languageValues[$this->language]:null;
+        return isset($this->statusOptions[$this->status]) ? $this->statusOptions[$this->status]:null;
     }
 
     public function getFullName()
@@ -150,7 +155,9 @@ class User extends ActiveRecord implements IdentityInterface
     }
     public function getRolesValues()
     {
-        return ArrayHelper::map(Yii::$app->authManager->getRoles(), 'name', 'description');
+        return ArrayHelper::map(Yii::$app->authManager->getRoles(), 'name', function($value){
+            return Yii::t('user', $value->description);
+        });
     }
     public function getRolesText()
     {
@@ -171,6 +178,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $attributes = parent::attributes();
         $attributes[] = 'rolesAttribute';
+        $attributes[] = 'shopsAttribute';
         return $attributes;
     }
     public function saveRoles()
@@ -203,7 +211,40 @@ class User extends ActiveRecord implements IdentityInterface
             }
         });
 
+        $this->on(self::EVENT_BEFORE_DELETE, function(Event $event){
+            /* @var $model self */
+            $model = $event->sender;
+            if($model->getProducts()->exists())
+                throw new Exception("Sorry. You must first detach "
+                    .Inflector::titleize(Inflector::pluralize(StringHelper::basename(Product::class)), true)." from the "
+                    .Inflector::titleize(StringHelper::basename(self::class), true).' '.$model->fullName, 400);
+        });
+
+        $this->statusOptions = [
+            self::STATUS_ACTIVE=>Yii::t('common', 'Active'),
+            self::STATUS_INACTIVE=>Yii::t('common', 'Inactive'),
+            self::STATUS_DELETED=>Yii::t('common', 'Deleted'),
+            self::STATUS_BLOCKED=>Yii::t('user', 'Blocked'),
+        ];
+
+        $this->on(self::EVENT_AFTER_DELETE, function(Event $event){
+            /* @var $model self */
+            $model = $event->sender;
+            $userShops = $model->userShops;
+            foreach ($userShops as $userShop)
+                $userShop->delete();
+        });
+
+        $this->on(self::EVENT_BEFORE_DELETE, function(Event $event){
+            /* @var $model self */
+            $model = $event->sender;
+            if($model->userProfile)
+                $model->userProfile->delete();
+        });
     }
+
+    public $shopsAttribute=[];
+
 
     public function activateStatus()
     {
@@ -225,6 +266,8 @@ class User extends ActiveRecord implements IdentityInterface
         return '{{%user}}';
     }
 
+    const EVENT_INIT_FIELDS_OF_MANY_TO_MANY='EVENT_INIT_FIELDS_OF_MANY_TO_MANY';
+
     /**
      * @inheritdoc
      */
@@ -240,6 +283,24 @@ class User extends ActiveRecord implements IdentityInterface
                 'class' => FileImageBehavior::class,
                 'className'=>self::class,
                 'fileAttributes'=>['imageAttribute', 'imagesAttribute'],
+            ],
+            [
+                'class' => AttributeBehavior::class,
+                'attributes' => [
+                    self::EVENT_INIT_FIELDS_OF_MANY_TO_MANY => 'shopsAttribute',
+                ],
+                'value' => function ($event) {
+                    /* @var self $model */
+                    $model = $event->sender;
+                    $model->shopsAttribute = ArrayHelper::map($model->shops, 'id', 'id');
+                    $model->attachBehavior('shopsAttributeBehavior', [
+                        'class' => ManyToManyBehaviour::class,
+                        'manyAttribute'=>'shopsAttribute',
+                        'manyAttributeOldValue'=>$model->shopsAttribute,
+                        'saveFunction'=>'saveUserShops',
+                    ]);
+                    return $model->shopsAttribute;
+                },
             ],
         ];
     }
@@ -281,7 +342,7 @@ class User extends ActiveRecord implements IdentityInterface
             ],
 
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
-            ['status', 'in', 'range' => array_keys($this->statusValues)],
+            ['status', 'in', 'range' => array_keys($this->statusOptions)],
             ['status', 'required'],
             ['status', 'filter', 'filter' => 'intval'],
 
@@ -295,6 +356,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['email'], 'required'],
             [['email', 'username'], 'unique'],
             [['email'], 'email'],
+            [['phone'], 'safe'],
 
             [['password', 'password_new', 'password_new_repeat'], 'required', 'on'=>'changePassword'],
             ['password', 'validateCurrentPassword', 'on'=>'changePassword'],
@@ -313,20 +375,22 @@ class User extends ActiveRecord implements IdentityInterface
             [['password_new', 'password_new_repeat'], 'required', 'on'=>'resetByAdministrator'],
             ['password_new_repeat', 'compare', 'compareAttribute'=>'password_new','on'=>'resetByAdministrator'],
 
-            ['rolesAttribute', 'each', 'rule' =>   ['in', 'range' => array_keys($this->rolesValues)], 'when'=>function(self $model){
+            /*['rolesAttribute', 'each', 'rule' =>   ['in', 'range' => array_keys($this->rolesValues)], 'when'=>function(self $model){
                 return is_array($model->rolesAttribute);
             }],
             ['rolesAttribute', 'in', 'range' => array_keys($this->rolesValues), 'when'=>function(self $model){
                 return !is_array($model->rolesAttribute);
-            }],
+            }],*/
             
-            [['language'], 'in', 'range' => array_keys((new I18nSourceMessage())->languageValues)],
-
-            [['time_zone'], 'in', 'range' => array_keys($this->getTimeZoneValues())],
+            ['rolesAttribute', 'safe'],
             ['description', 'safe'],
             [['subscribe'], 'default', 'value'=>0],
+
+            ['!email', 'safe', 'on'=>self::SCENARIO_EDIT_PROFILE],
+            [['shopsAttribute'], 'safe'],
         ];
     }
+    const SCENARIO_EDIT_PROFILE='editProfile';
     public function uniqueValidate($attribute, $params)
     {
         if(self::find()->where(['email'=>$this->$attribute,])->exists())
@@ -340,6 +404,37 @@ class User extends ActiveRecord implements IdentityInterface
         }
     }
 
+    public function saveUserShops()
+    {
+        $elementsToDelete = array_diff((array) $this->getOldAttribute('shopsAttribute'), (array) $this->shopsAttribute);
+        if($elementsToDelete){
+            UserShop::deleteAll(['user_id'=>$this->id,'shop_id'=>$elementsToDelete]);
+        }
+
+        if($this->shopsAttribute){
+            if(is_array($this->shopsAttribute)){
+                foreach ($this->shopsAttribute as $shop_id)
+                    UserShop::createIfNotExists($this->id, $shop_id);
+            }
+            else
+                UserShop::createIfNotExists($this->id, $this->shopsAttribute);
+        }
+    }
+    public function getUserShops()
+    {
+        return $this->hasMany(UserShop::class, ['user_id'=>'id']);
+    }
+
+    /**
+     * @return ShopQuery
+     */
+    public function getShops()
+    {
+        return $this->hasMany(Shop::class, ['id'=>'shop_id'])->via('userShops');
+    }
+
+
+
     public $_fields=[];
     public function fields()
     {
@@ -348,14 +443,17 @@ class User extends ActiveRecord implements IdentityInterface
             'username',
             'name',
             'email',
+            'phone',
             'status',
-            'language',
-            'time_zone',
             'description',
             'roles',
             'image'=>function($model){
                     return $model->image;
                 },
+            'hasPassword'=>function($model){
+                return (bool) $model->password_hash;
+            },
+            'userProfile'
         ], $this->_fields);
     }
     public function extraFields()
@@ -370,26 +468,25 @@ class User extends ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
+            'id'=>'ID',
             'password'=>Yii::t('user', 'Current password'),
             'password_new'=>Yii::t('user', 'New password'),
             'password_new_repeat'=>Yii::t('user', 'Repeat new password'),
             'password_set'=>Yii::t('user', 'Password'),
             'password_set_repeat'=>Yii::t('user', 'Repeat password'),
             'email_new'=>Yii::t('user', 'New email'),
-            'imageAttribute'=>Yii::t('user', 'Avatar'),
+            'imageAttribute'=>Yii::t('common', 'Image'),
             'imagesAttribute'=>Yii::t('common', 'Images'),
-            'referrer_id'=>Yii::t('user', 'Referrer'),
             'name'=>Yii::t('user', 'Name'),
             'username'=>Yii::t('user', 'User name'),
             'email'=>Yii::t('common', 'Email'),
             'rolesAttribute'=>Yii::t('common', 'Roles'),
             'status'=>Yii::t('common', 'Status'),
             'description'=>Yii::t('common', 'Description'),
-            'language'=>Yii::t('common', 'Language'),
-            'time_zone'=>Yii::t('user', 'Time zone'),
             'subscribe'=>Yii::t('user', 'Subscribe'),
             'created_at'=>Yii::t('common', 'Create date'),
             'updated_at'=>Yii::t('common', 'Update date'),
+            'shopsAttribute' => Yii::t('common', 'Shops'),
         ];
     }
 
@@ -434,14 +531,16 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findByUsernameOrEmail($username)
     {
         return static::find()->where( ['OR', ['username' => $username], ['email' => $username]])->one();
-        /*return static::find()->where(
+    }
+    public static function findActiveUserByUsernameOrEmail($username)
+    {
+        return static::find()->where(
             [
                 'AND',
                 ['OR', ['username' => $username], ['email' => $username]],
                 ['status' => self::STATUS_ACTIVE]
             ]
-        )->one();*/
-        //return static::findOne([  'username' => $username, 'status' => self::STATUS_ACTIVE]);
+        )->one();
     }
 
 
@@ -519,24 +618,6 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getReferrer()
-    {
-        return $this->hasOne(User::className(), ['id' => 'referrer_id'])->from(['referrer'=>$this->tableName(),]);
-    }
-
-    const TIME_ZONE_LIST_JSON = '{"Pacific\/Midway":"(GMT-11:00) Midway Island","US\/Samoa":"(GMT-11:00) Samoa","US\/Hawaii":"(GMT-10:00) Hawaii","US\/Alaska":"(GMT-09:00) Alaska","US\/Pacific":"(GMT-08:00) Pacific Time (US & Canada)","America\/Tijuana":"(GMT-08:00) Tijuana","US\/Arizona":"(GMT-07:00) Arizona","US\/Mountain":"(GMT-07:00) Mountain Time (US & Canada)","America\/Chihuahua":"(GMT-07:00) Chihuahua","America\/Mazatlan":"(GMT-07:00) Mazatlan","America\/Mexico_City":"(GMT-06:00) Mexico City","America\/Monterrey":"(GMT-06:00) Monterrey","Canada\/Saskatchewan":"(GMT-06:00) Saskatchewan","US\/Central":"(GMT-06:00) Central Time (US & Canada)","US\/Eastern":"(GMT-05:00) Eastern Time (US & Canada)","US\/East-Indiana":"(GMT-05:00) Indiana (East)","America\/Bogota":"(GMT-05:00) Bogota","America\/Lima":"(GMT-05:00) Lima","America\/Caracas":"(GMT-04:30) Caracas","Canada\/Atlantic":"(GMT-04:00) Atlantic Time (Canada)","America\/La_Paz":"(GMT-04:00) La Paz","America\/Santiago":"(GMT-04:00) Santiago","Canada\/Newfoundland":"(GMT-03:30) Newfoundland","America\/Buenos_Aires":"(GMT-03:00) Buenos Aires","Greenland":"(GMT-03:00) Greenland","Atlantic\/Stanley":"(GMT-02:00) Stanley","Atlantic\/Azores":"(GMT-01:00) Azores","Atlantic\/Cape_Verde":"(GMT-01:00) Cape Verde Is.","Africa\/Casablanca":"(GMT) Casablanca","Europe\/Dublin":"(GMT) Dublin","Europe\/Lisbon":"(GMT) Lisbon","Europe\/London":"(GMT) London","Africa\/Monrovia":"(GMT) Monrovia","Europe\/Amsterdam":"(GMT+01:00) Amsterdam","Europe\/Belgrade":"(GMT+01:00) Belgrade","Europe\/Berlin":"(GMT+01:00) Berlin","Europe\/Bratislava":"(GMT+01:00) Bratislava","Europe\/Brussels":"(GMT+01:00) Brussels","Europe\/Budapest":"(GMT+01:00) Budapest","Europe\/Copenhagen":"(GMT+01:00) Copenhagen","Europe\/Ljubljana":"(GMT+01:00) Ljubljana","Europe\/Madrid":"(GMT+01:00) Madrid","Europe\/Paris":"(GMT+01:00) Paris","Europe\/Prague":"(GMT+01:00) Prague","Europe\/Rome":"(GMT+01:00) Rome","Europe\/Sarajevo":"(GMT+01:00) Sarajevo","Europe\/Skopje":"(GMT+01:00) Skopje","Europe\/Stockholm":"(GMT+01:00) Stockholm","Europe\/Vienna":"(GMT+01:00) Vienna","Europe\/Warsaw":"(GMT+01:00) Warsaw","Europe\/Zagreb":"(GMT+01:00) Zagreb","Europe\/Athens":"(GMT+02:00) Athens","Europe\/Bucharest":"(GMT+02:00) Bucharest","Africa\/Cairo":"(GMT+02:00) Cairo","Africa\/Harare":"(GMT+02:00) Harare","Europe\/Helsinki":"(GMT+02:00) Helsinki","Europe\/Istanbul":"(GMT+02:00) Istanbul","Asia\/Jerusalem":"(GMT+02:00) Jerusalem","Europe\/Kiev":"(GMT+02:00) Kyiv","Europe\/Minsk":"(GMT+02:00) Minsk","Europe\/Riga":"(GMT+02:00) Riga","Europe\/Sofia":"(GMT+02:00) Sofia","Europe\/Tallinn":"(GMT+02:00) Tallinn","Europe\/Vilnius":"(GMT+02:00) Vilnius","Asia\/Baghdad":"(GMT+03:00) Baghdad","Asia\/Kuwait":"(GMT+03:00) Kuwait","Africa\/Nairobi":"(GMT+03:00) Nairobi","Asia\/Riyadh":"(GMT+03:00) Riyadh","Europe\/Moscow":"(GMT+03:00) Moscow","Asia\/Tehran":"(GMT+03:30) Tehran","Asia\/Baku":"(GMT+04:00) Baku","Europe\/Volgograd":"(GMT+04:00) Volgograd","Asia\/Muscat":"(GMT+04:00) Muscat","Asia\/Tbilisi":"(GMT+04:00) Tbilisi","Asia\/Yerevan":"(GMT+04:00) Yerevan","Asia\/Kabul":"(GMT+04:30) Kabul","Asia\/Karachi":"(GMT+05:00) Karachi","Asia\/Tashkent":"(GMT+05:00) Tashkent","Asia\/Kolkata":"(GMT+05:30) Kolkata","Asia\/Kathmandu":"(GMT+05:45) Kathmandu","Asia\/Yekaterinburg":"(GMT+06:00) Ekaterinburg","Asia\/Almaty":"(GMT+06:00) Almaty","Asia\/Dhaka":"(GMT+06:00) Dhaka","Asia\/Novosibirsk":"(GMT+07:00) Novosibirsk","Asia\/Bangkok":"(GMT+07:00) Bangkok","Asia\/Jakarta":"(GMT+07:00) Jakarta","Asia\/Krasnoyarsk":"(GMT+08:00) Krasnoyarsk","Asia\/Chongqing":"(GMT+08:00) Chongqing","Asia\/Hong_Kong":"(GMT+08:00) Hong Kong","Asia\/Kuala_Lumpur":"(GMT+08:00) Kuala Lumpur","Australia\/Perth":"(GMT+08:00) Perth","Asia\/Singapore":"(GMT+08:00) Singapore","Asia\/Taipei":"(GMT+08:00) Taipei","Asia\/Ulaanbaatar":"(GMT+08:00) Ulaan Bataar","Asia\/Urumqi":"(GMT+08:00) Urumqi","Asia\/Irkutsk":"(GMT+09:00) Irkutsk","Asia\/Seoul":"(GMT+09:00) Seoul","Asia\/Tokyo":"(GMT+09:00) Tokyo","Australia\/Adelaide":"(GMT+09:30) Adelaide","Australia\/Darwin":"(GMT+09:30) Darwin","Asia\/Yakutsk":"(GMT+10:00) Yakutsk","Australia\/Brisbane":"(GMT+10:00) Brisbane","Australia\/Canberra":"(GMT+10:00) Canberra","Pacific\/Guam":"(GMT+10:00) Guam","Australia\/Hobart":"(GMT+10:00) Hobart","Australia\/Melbourne":"(GMT+10:00) Melbourne","Pacific\/Port_Moresby":"(GMT+10:00) Port Moresby","Australia\/Sydney":"(GMT+10:00) Sydney","Asia\/Vladivostok":"(GMT+11:00) Vladivostok","Asia\/Magadan":"(GMT+12:00) Magadan","Pacific\/Auckland":"(GMT+12:00) Auckland","Pacific\/Fiji":"(GMT+12:00) Fiji"}';
-    public function getTimeZoneText()
-    {
-        if($this->time_zone)
-            return json_decode(self::TIME_ZONE_LIST_JSON, JSON_FORCE_OBJECT)[$this->time_zone];
-    }
-    public function getTimeZoneValues()
-    {
-        return json_decode(self::TIME_ZONE_LIST_JSON, JSON_FORCE_OBJECT);
-    }
 
 
     const SUBSCRIBE_YES=1;
@@ -567,13 +648,87 @@ class User extends ActiveRecord implements IdentityInterface
             ->send();
     }
 
-    public function getImg($options=[], $size=160)
+    public function getThumbImg(string $thumbType, $options=[], $width=null, $height=null)
     {
-        if(!isset($options['class']))
-            $options['class']='img-circle';
-        $options['alt']='User Image';
+        if(!isset($options['alt']))
+            $options['alt']=$this->fullName;
+
+        if(!$height)
+            $height = $width;
+        if(!$width){
+            $widthAttribute = 'thumb'.ucfirst($thumbType).'Width';
+            $width = (new FileImage)->$widthAttribute;
+        }
+        if(!$height){
+            $heightAttribute = 'thumb'.ucfirst($thumbType).'Height';
+            $height = (new FileImage)->$heightAttribute;
+        }
+        if($width && $height){
+            $cssSize = "width:{$width}px;height:{$height}px;";
+            if(isset($options['style']))
+                $options['style'].=$cssSize;
+            else
+                $options['style']=$cssSize;
+        }
+
         if($this->image)
-            return $this->image->getImg('sm', $options);
-        return Html::noImg($size, $size, $options);
+            return $this->image->getThumbImg($thumbType, $options);
+        return Html::noImg($width, $height, $options);
     }
+
+    /**
+     * @return OrderQuery
+     */
+    public function getOrders()
+    {
+        return $this->hasMany(Order::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @return ProductQuery
+     */
+    public function getProducts()
+    {
+        return $this->hasMany(Product::class, ['user_id' => 'id']);
+    }
+
+    public function getIsActive()
+    {
+        return in_array($this->status, [self::STATUS_ACTIVE]);
+    }
+    public function getIsNotActive()
+    {
+        return !$this->isActive;
+    }
+
+
+    public function getUrl()
+    {
+        return ['/user/manage/user/view', 'id'=>$this->id];
+    }
+    public function getLink()
+    {
+        return Html::a($this->fullName, $this->url);
+    }
+
+
+
+    /**
+     * @return UserProfileQuery
+     */
+    public function getUserProfile()
+    {
+        return $this->hasOne(UserProfile::class, ['id' => 'id']);
+    }
+
+    private $_userProfile;
+    public function getUserProfileObject()
+    {
+        if($this->_userProfile)
+            return $this->_userProfile;
+        if($this->userProfile)
+            return $this->_userProfile = $this->userProfile;
+        return $this->_userProfile = new UserProfile(['id'=>$this->id]);
+    }
+
 }

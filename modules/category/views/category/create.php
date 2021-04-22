@@ -10,11 +10,11 @@ $this->title = Yii::t('common', 'Create Category');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Categories'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="category-create box">
+<div class="category-create card">
 
 
     <?php $this->beginBlock('form') ?>
-        <div class="box-body">
+        <div class="card-body">
             <?= $this->render('_form', [
                 'model' => $model,
             ]) ?>

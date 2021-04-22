@@ -16,10 +16,10 @@ $this->title = $model->label;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Dynamic fields'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="dynamic-field-view box">
+<div class="dynamic-field-view card">
 
 
-    <div class="box-header">
+    <div class="card-header">
         <?= Html::a(Yii::t('common', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a(Yii::t('common', 'Delete'), ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </div>
 
-    <div class="box-body">
+    <div class="card-body">
         <?php
         echo DetailView::widget([
             'model' => $model,

@@ -1,3 +1,7 @@
+.fullPageSearchTitle{
+    display: none;
+}
+
 /* first resizing*/
 @media screen and (max-width: 990px) {
     .left-block {
@@ -78,8 +82,11 @@
     .footer .row > div:nth-child(1){
         width: 100%;
     }
-    .categoryTitle, h1.title{
+    .fullPageCategoryTitle, h1.title{
         display: none;
+    }
+    .fullPageSearchTitle{
+        display: block;
     }
     .card{
         width: 95%;

@@ -11,11 +11,11 @@ use file\widgets\file_preview\FilePreview;
 /* @var $model user\models\User */
 
 $this->title = Yii::t('user', 'My profile');
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-view">
 
-    <h1><?= $this->title ?></h1>
 
     <?php $detailView =  DetailView::widget([
         'model' => $model,
@@ -38,16 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'description:raw',
             [
-                'attribute'=>'language',
-                'format'=>'raw',
-                'value'=>$model->languageText,
-            ],
-            [
-                'attribute'=>'time_zone',
-                'format'=>'raw',
-                'value'=>$model->timeZoneText,
-            ],
-            [
                 'attribute'=>'subscribe',
                 'format'=>'raw',
                 'value'=>$model->subscribeText,
@@ -57,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute'=>'imageAttribute',
                 'format'=>'raw',
-                'value'=>$model->image ? $model->image->img : null,
+                'value'=>$model->image ? $model->image->getThumbImg('sm') : null,
             ],
         ],
     ]);

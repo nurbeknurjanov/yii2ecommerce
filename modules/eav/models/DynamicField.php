@@ -256,13 +256,7 @@ class DynamicField extends \yii\db\ActiveRecord
     {
         return $this->getField($this, 'result', $options);
     }
-    public function getFieldWithUnit($model, $attribute, $options=['class'=>'form-control'])
-    {
-        $field = $this->getField($model, $attribute, $options);
-        if($this->unit)
-            $field = Html::inputWithSymbol($model, $attribute,$this->unit );
-        return $field;
-    }
+
     public function getField($model, $attribute, $options=['class'=>'form-control'])
     {
         if(!isset($options['class']))
@@ -286,6 +280,8 @@ class DynamicField extends \yii\db\ActiveRecord
         switch($this->type)
         {
             case self::TYPE_INPUT: {
+                if($this->unit)
+                    return Html::inputWithSymbol($model, $attribute, [], $this->unit );
                 return Html::activeTextInput($model, $attribute, $options);
                 break;
             }
@@ -294,7 +290,8 @@ class DynamicField extends \yii\db\ActiveRecord
                 break;
             }
             case self::TYPE_DROP_DOWN_LIST: {
-                return Html::activeDropDownList($model, $attribute, Helper::jsonToArray($this->json_values) ,  array_merge($options, ['prompt'=>'Select']));
+                return Html::activeDropDownList($model, $attribute, Helper::jsonToArray($this->json_values) ,
+                    array_merge($options, ['prompt'=>Yii::t('common', 'Select')]));
                 break;
             }
             case self::TYPE_DROP_DOWN_LIST_MULTIPLE: {
@@ -302,7 +299,8 @@ class DynamicField extends \yii\db\ActiveRecord
                     if($model->$attributeName &&  !is_array($model->$attributeName))
                         $model->$attributeName=explode(',',$model->$attributeName);
                 }
-                return Html::activeDropDownList($model, $attribute, Helper::jsonToArray($this->json_values) , array_merge($options, ['multiple'=>'multiple']));
+                return Html::activeDropDownList($model, $attribute, Helper::jsonToArray($this->json_values) ,
+                    array_merge($options, ['multiple'=>'multiple']));
                 break;
             }
             case self::TYPE_RADIO_LIST: {
@@ -310,6 +308,7 @@ class DynamicField extends \yii\db\ActiveRecord
                     $options['class'] = str_replace('form-control', '', $options['class']);
                 return Html::activeRadioList($model, $attribute, Helper::jsonToArray($this->json_values) ,array_merge($options, [
                     'class' => 'form-control',
+                    'separator'=>'<br>',
                     //'class' => 'form-control btn-group',
                     //'data-toggle' => 'buttons',
                     //'unselect' => null, // remove hidden field
@@ -418,16 +417,20 @@ class DynamicField extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('common', 'ID'),
-            'label' => Yii::t('common', 'Label'),
-            'key' => Yii::t('common', 'Field name'),
-            'default_value' => Yii::t('common', 'Default value'),
+            'label' => Yii::t('eav', 'Label'),
+            'key' => Yii::t('eav', 'Field name'),
+            'default_value' => Yii::t('eav', 'Default value'),
             'type' => Yii::t('common', 'Type'),
             'enabled' => Yii::t('common', 'Enabled'),
-            'json_values' => Yii::t('common', 'Values'),
+            'json_values' => Yii::t('eav', 'Values'),
 
-            'category_id' => Yii::t('common', 'Category'),
-            'rule' => Yii::t('common', 'Rule'),
-            'result' => Yii::t('common', 'Result'),
+            'category_id' => Yii::t('category', 'Category'),
+            'rule' => Yii::t('eav', 'Rule'),
+            'result' => Yii::t('eav', 'Result'),
+            'position' => Yii::t('eav', 'Position'),
+            'unit' => Yii::t('eav', 'Unit'),
+            'section' => Yii::t('eav', 'Section'),
+            'with_label' => Yii::t('eav', 'With label'),
         ];
     }
 
@@ -448,7 +451,7 @@ class DynamicField extends \yii\db\ActiveRecord
         if($object_id){
             $this->_valueModel = $this->getValue($object_id)->one();
             if(!$this->_valueModel)
-                $this->_valueModel = new DynamicValue;
+                $this->_valueModel = new DynamicValue(['object_id'=>$object_id]);
         }
         else
             $this->_valueModel = new DynamicValue;
@@ -468,5 +471,20 @@ class DynamicField extends \yii\db\ActiveRecord
         return $this->hasOne(DynamicValue::class, ['field_id'=>'id'])
             ->andOnCondition(['object_id'=>$object_id])
             ->inverseOf('field');
+    }
+
+
+    public function fields()
+    {
+        return [
+            'id',
+            'label',
+            'clickable',
+            'category_id',
+            'key',
+            'options'=>function(self $model){
+                return Helper::jsonToArray($model->json_values, [], false);
+            },
+        ];
     }
 }

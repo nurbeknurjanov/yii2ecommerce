@@ -34,6 +34,8 @@ class UserController extends Controller
                         'actions' => ['view'],
                         'allow' => true,
                         'matchCallback' => function($rule, $action){
+                            if(Yii::$app->id=='app-frontend')
+                                return true;
                             if(!isset($_GET['id']))
                                 throw new Exception("id parameter is missing");
                             return Yii::$app->user->can('viewUser', ['model' => $this->findModel($_GET['id'])]);

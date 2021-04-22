@@ -4,7 +4,7 @@ modules:
         #- PhpBrowser:
             #url: http://egrade/frontend/web/index-test.php
         - WebDriver:
-            url: http://sakura/frontend/web/
+            url: http://yourdomain.com
             browser: chrome
             depends: Yii2
         - \Helper\Acceptance
@@ -13,11 +13,11 @@ modules:
             #transaction: false # don't wrap test in transaction
             #cleanup: false # don't cleanup the fixtures
             entryScript: index-test.php
-            entryUrl: http://sakura/frontend/web/
+            entryUrl: http://yourdomain.com
             cleanup: true
         - Asserts
         - Db:
-              dsn: 'mysql:host=localhost;dbname=sakura_test_db'
-              user: ''
-              password: ''
+              dsn: 'mysql:host=localhost;dbname=your_local_db_test'
+              user: 'root'
+              password: 'root1'
               cleanup: true

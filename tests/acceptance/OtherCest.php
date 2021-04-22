@@ -2,6 +2,7 @@
 
 use yii\helpers\Url;
 use tests\unit\fixtures\UserFixture;
+use tests\unit\fixtures\UserProfileFixture;
 use user\models\Token;
 use yii\test\ActiveFixture;
 use user\models\LoginForm;
@@ -34,6 +35,11 @@ class OtherCest
                     'forceUpdateRBAC'=>true,
                     'depends'=>[],
                 ],
+                'user_profiles' => [
+                    'class' => UserProfileFixture::class,
+                    'depends'=>[],
+                    'dataFile'=>null,
+                ],
             ]);
     }
 
@@ -41,7 +47,7 @@ class OtherCest
     {
     }
 
-    public function checkLanguageOfUser(AcceptanceTester $I)
+    /* public function checkLanguageOfUser(AcceptanceTester $I)
     {
         $I->updateInDatabase('user', ['language'=>'ru']);
         $I->amOnPage(Url::to(['/user/user/list']));
@@ -60,7 +66,7 @@ class OtherCest
         Yii::$app->language='en-US';
         $I->waitForText('Users', null, 'h1');
         $I->logout($I);
-    }
+    } */
 
 
     private function editProfileLanguage(AcceptanceTester $I, \Helper\Acceptance $helper)
@@ -120,9 +126,10 @@ class OtherCest
         $I->click('Bootstrap');
         $this->checkPageIsTheSame($I);
 
-        $I->clickWithLeftButton( '.navbar-fixed-top .navbar-right > li:last-child > a' );
+        $I->moveMouseOver( '.navbar-fixed-top .navbar-right > li:last-child > a' );
+        //$I->clickWithLeftButton( '.navbar-fixed-top .navbar-right > li:last-child > a' );
         $I->click('Sakura');
-        $this->checkPageIsTheSame($I);
+        //$this->checkPageIsTheSame($I);
     }
 
     protected function checkPageIsTheSame(AcceptanceTester $I)

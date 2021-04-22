@@ -148,6 +148,8 @@ class MenuTree extends Tree
                         ],
                     ]
                 );
+                /*if(!$node['isLeaf'])
+                    $item['dropDownOptions'] = ['id'=>rand(1,100000)];*/
 
                 // Количество элементов узла
                 $l = count($stack);

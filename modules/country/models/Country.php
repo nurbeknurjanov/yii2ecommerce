@@ -53,7 +53,8 @@ class Country extends \yii\db\ActiveRecord
         return [
             [[ 'name', 'short_name'], 'required'],
             [['name'], 'default', 'value'=>''],
-            [['name'], 'string', 'max' => 150]
+            [['name'], 'string', 'max' => 150],
+            [['name', 'short_name'], 'unique'],
         ];
     }
 
@@ -64,7 +65,8 @@ class Country extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('common', 'ID'),
-            'name' => Yii::t('common', 'Country name'),
+            'short_name' => Yii::t('country', 'Code ISO'),
+            'name' => Yii::t('country', 'Country name'),
         ];
     }
 
@@ -99,5 +101,12 @@ class Country extends \yii\db\ActiveRecord
     {
         return Yii::$app->dbCountries;
     }
+
+    const COUNTRY_USA=231;
+    const COUNTRY_CANADA=38;
+
+    const BIG_VALUES=[
+        self::COUNTRY_USA,self::COUNTRY_CANADA
+    ];
 
 }

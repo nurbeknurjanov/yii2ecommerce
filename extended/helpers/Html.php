@@ -13,7 +13,9 @@ class Html extends \yii\helpers\Html
 {
     public static function noImgUrl($width=120, $height=120)
     {
-        return "https://placehold.it/{$width}x{$height}";
+        $width = str_replace('px','',$width);
+        $height = str_replace('px','',$height);
+        return "https://fakeimg.pl/{$width}x{$height}";
     }
     public static function noImg($width=120, $height=120, $options=[])
     {
@@ -24,12 +26,17 @@ class Html extends \yii\helpers\Html
         return self::tag('i', '', $options);
     }
 
-    public static function inputWithSymbol($model, $attribute, $symbol)
+    public static function inputWithSymbol($model, $attribute, $options = [], $symbol)
     {
-        return Html::tag("div",
-            Html::activeTextInput($model, $attribute, ['class'=>'form-control']).
-            Html::tag("span", Html::tag("button", $symbol, ['class'=>'btn btn-default']),['class'=>'input-group-btn']),
-            ['class'=>'input-group']);
+        if(!isset($options['inputOptions']['class']))
+            $options['inputOptions']['class'] = 'form-control';
+        if(!isset($options['containerOptions']['class']))
+            $options['containerOptions']['class'] = 'input-group';
+
+        $button = Html::tag("button", $symbol, ['class'=>'btn btn-default']);
+        $span = Html::tag("span", $button,['class'=>'input-group-btn']);
+        $input = Html::activeTextInput($model, $attribute, $options['inputOptions']);
+        return Html::tag("div", $input.$span, $options['containerOptions']);
     }
 
 }

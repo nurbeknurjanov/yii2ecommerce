@@ -18,10 +18,10 @@ return [
         'db' =>
             YII_ENV_TEST_PROD ?
                 [
-                    'dsn' => 'mysql:host=localhost;dbname=sakura_db_test',
+                    'dsn' => 'mysql:host=localhost;dbname=your_server_test_db',
                 ]:
                 [
-                    'dsn' => 'mysql:host=localhost;dbname=sakura_test',
+                    'dsn' => 'mysql:host=localhost;dbname=your_local_db_test',
                 ],
     ],
     'on '.\yii\base\Module::EVENT_BEFORE_ACTION=>function(Event $event){

@@ -29,16 +29,16 @@ class RbacInitController extends Controller
 
 
         $guestRole = $auth->createRole(User::ROLE_GUEST);
-        $guestRole->description = 'Guest role';
+        $guestRole->description = 'Guest';
         $auth->add($guestRole);
         $userRole = $auth->createRole(User::ROLE_USER);
-        $userRole->description = 'User';
+        $userRole->description = 'Buyer';
         $auth->add($userRole);
-        $managerRole = $auth->createRole(User::ROLE_MANAGER, 'Manager');
-        $managerRole->description = 'Manager';
+        $managerRole = $auth->createRole(User::ROLE_MANAGER);
+        $managerRole->description = 'Seller';
         $auth->add($managerRole);
         $administratorRole = $auth->createRole(User::ROLE_ADMINISTRATOR);
-        $administratorRole->description = 'Administrator role';
+        $administratorRole->description = 'Administrator';
         $auth->add($administratorRole);
 
 
@@ -49,7 +49,11 @@ class RbacInitController extends Controller
 
 
         foreach (User::find()->all() as $user){
-            $user->rolesAttribute = User::ROLE_ADMINISTRATOR;
+            if($user->username=='admin')
+                $user->rolesAttribute = User::ROLE_ADMINISTRATOR;
+            else
+                $user->rolesAttribute = [User::ROLE_MANAGER, User::ROLE_USER];
+
             $user->saveRoles();
         }
 
@@ -66,6 +70,7 @@ class RbacInitController extends Controller
         \comment\rules\Permissions::run();
         \like\rules\Permissions::run();
         \country\rules\Permissions::run();
+        \shop\rules\Permissions::run();
 
 
         $this->stdout("RBAC successfully initialized\n", Console::FG_GREEN, Console::UNDERLINE);

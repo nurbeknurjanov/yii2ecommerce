@@ -46,7 +46,7 @@ class MissingTranslationEventHandler extends Component
         }
         if($this->sendEmail)
             Yii::$app->mailer->compose()
-                ->setTo([Yii::$app->params['adminEmail'] => Yii::$app->name])
+                ->setTo([Yii::$app->params['supportEmail'] => Yii::$app->name])
                 ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                 ->setSubject("Missing translation found.")
                 ->setHtmlBody("Missing translation found.<br>

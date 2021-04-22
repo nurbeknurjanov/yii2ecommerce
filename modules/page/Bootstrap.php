@@ -23,8 +23,8 @@ use yii\web\View;
  * @license http://sakuracommerce.com/license/
  
  */
-class Bootstrap implements BootstrapInterface {
-
+class Bootstrap implements BootstrapInterface
+{
     /**
      * Initial application compoments and modules need for extension
      * @param \yii\base\Application $app The application currently running
@@ -50,8 +50,7 @@ class Bootstrap implements BootstrapInterface {
 
         $view = $app->view;
 
-        if(!$app->request->isConsoleRequest && $app->id!='app-backend' &&
-            !$app->request->isAjax )
+        if($view->bootstrapAssetBundles && !in_array($app->id, ['app-backend', 'app-frontend-app']))
             $view->on(View::EVENT_END_BODY, function () use ($view) {
                 echo $view->render('@page/views/help/_fixed_help');
             });

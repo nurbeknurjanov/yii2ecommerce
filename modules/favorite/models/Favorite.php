@@ -13,7 +13,6 @@ use Yii;
 use yii\base\Model;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
-use yii\web\Cookie;
 
 
 class Favorite extends Model

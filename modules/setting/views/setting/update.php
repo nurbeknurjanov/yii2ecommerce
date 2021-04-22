@@ -10,9 +10,9 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Settings'), 'url'
 $this->params['breadcrumbs'][] = ['label' => $model->keyText, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('common', 'Update');
 ?>
-<div class="setting-update box">
+<div class="setting-update card">
 
-    <div class="box-body">
+    <div class="card-body">
         <?= $this->render('_form', [
             'model' => $model,
         ]) ?>

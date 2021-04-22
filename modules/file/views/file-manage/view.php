@@ -19,9 +19,9 @@ $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('common', 'Files'), 'url' => [Yii::$app->controller->defaultAction]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="file-view box">
+<div class="file-view card">
 
-    <div class="box-header">
+    <div class="card-header">
         <?php
         if(Yii::$app->user->can('update'.$model->shortModelName, ['model' => $model->model])){
             ?>
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
     </div>
 
-    <div class="box-body">
+    <div class="card-body">
         <?= DetailView::widget([
             'model' => $model,
             'attributes' => [

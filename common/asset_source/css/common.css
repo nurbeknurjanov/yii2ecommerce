@@ -1,0 +1,124 @@
+li{
+    list-style-type: none;
+}
+
+.required > label:after{
+    content: "*";
+    color:#c9302c;
+    position: relative;
+    top:-2px;
+    left:5px;
+}
+
+.nonRequired label:after{
+    content: "";
+}
+
+.alert-error {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+}
+
+
+.dropdown-menu > li ul{
+    padding: 0;
+}
+.dropdown-menu > li ul a{
+    color: #333;
+}
+.dropdown-menu > li a{
+    padding: 3px 20px;
+    display: block;
+}
+.dropdown-menu > li li > a{
+    padding-left: 35px;
+}
+.dropdown-menu > li li li > a{
+    padding-left: 50px;
+}
+.dropdown-menu > li li li li > a{
+    padding-left: 65px;
+}
+.dropdown-menu > li li li li li > a{
+    padding-left: 80px;
+}
+
+.dropdown-menu > li li a:hover, .dropdown-menu > li li a:focus{
+    color: #262626;
+    text-decoration: none;
+    background-color: #f5f5f5;
+}
+
+.dropdown-menu > li li.active > a{
+    background-color: #337ab7;
+    color:white;
+}
+
+
+
+
+
+
+.green{
+    color: #5cb85c;
+}
+.red{
+    color:#d9534f;
+}
+.gray, .gray a{
+    color: #777;
+}
+.dropdown-menu li.gray > a{
+    color: #777;
+}
+
+
+
+.clear{
+    clear: both;
+}
+
+input[type="radio"], input[type="checkbox"]{
+    position: relative;
+    top:2px;
+    margin: 0;
+}
+.help-block{
+    margin: 0;
+    margin-top: 5px;
+}
+
+.rating-xs{
+    font-size: 14px;
+}
+
+.dropdown-sp .dropdown-menu{
+    bottom: auto;
+    top: 35px;
+}
+
+.auth-clients{
+    padding: 0;
+}
+
+.sorter{
+    padding: 0;
+    margin: 0;
+}
+
+
+
+.bootstrap-select .btn-default{
+    background: white;
+}
+
+
+
+.input-group.date .kv-date-remove{
+    display: none;
+}
+.input-group-addon{
+    padding: 6px 5px 6px 6px;
+}
+

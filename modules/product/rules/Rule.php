@@ -64,7 +64,7 @@ class Rule extends \yii\rbac\Rule
             }
         }
 
-        if(Yii::$app->user->can(User::ROLE_MANAGER))
+        if(Yii::$app->user->can(User::ROLE_ADMINISTRATOR))
             return true;
 
         switch(true){

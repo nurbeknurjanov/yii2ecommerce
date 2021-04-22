@@ -26,7 +26,7 @@ class DeliveryController extends Controller
                     [
                         'actions' => ['index',],
                         'allow' => true,
-                        'roles' => [User::ROLE_MANAGER],
+                        'roles' => [User::ROLE_ADMINISTRATOR],
                     ],
                 ]
             ],
