@@ -67,8 +67,6 @@ $frontendBaseUrl = str_replace('/backend/web', '', $frontendBaseUrl);
 $frontendHostInfo = (new Request)->hostInfo;
 $frontendHostInfo = str_replace('backend.', '', $frontendHostInfo);
 $frontendHostInfo = str_replace('api.', '', $frontendHostInfo);
-if(YII_ENV_PROD && strpos($frontendHostInfo, 'spa.')===false)
-    $frontendHostInfo = str_replace('://', '://spa.', $frontendHostInfo);
 
 if(isset($_SERVER['HTTP_ORIGIN']))
     $frontendHostInfo = $_SERVER['HTTP_ORIGIN'];
@@ -77,7 +75,6 @@ $imgHostInfo = (new Request)->hostInfo;
 $imgHostInfo = str_replace('backend.', '', $imgHostInfo);
 $imgHostInfo = str_replace('demo.', '', $imgHostInfo);
 $imgHostInfo = str_replace('api.', '', $imgHostInfo);
-$imgHostInfo = str_replace('spa.', '', $imgHostInfo);
 if(strpos($imgHostInfo, 'img.')===false)
     $imgHostInfo = str_replace('://', '://img.', $imgHostInfo);
 
@@ -89,12 +86,10 @@ $apiBaseUrl = str_replace('/backend/web', '', $apiBaseUrl);
 
 $backendHostInfo = (new Request)->hostInfo;
 $backendHostInfo = str_replace('api.', '', $backendHostInfo);
-$backendHostInfo = str_replace('spa.', '', $backendHostInfo);
 if(strpos($backendHostInfo, 'backend')===false)
     $backendHostInfo = str_replace('://', '://backend.', $backendHostInfo);
 
 $apiHostInfo = (new Request)->hostInfo;
-$apiHostInfo = str_replace('spa.', '', $apiHostInfo);
 $apiHostInfo = str_replace('backend.', '', $apiHostInfo);
 if(strpos($apiHostInfo, 'api')===false)
     $apiHostInfo = str_replace('://', '://api.', $apiHostInfo);
