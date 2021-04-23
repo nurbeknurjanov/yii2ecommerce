@@ -1337,12 +1337,6 @@ ALTER TABLE `tag`
   ADD PRIMARY KEY (`id`);
 
 --
--- Индексы таблицы `upwork`
---
-ALTER TABLE `upwork`
-  ADD PRIMARY KEY (`id`);
-
---
 -- Индексы таблицы `user`
 --
 ALTER TABLE `user`
@@ -1499,12 +1493,6 @@ ALTER TABLE `shop`
 --
 ALTER TABLE `tag`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT для таблицы `upwork`
---
-ALTER TABLE `upwork`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=103;
 
 --
 -- AUTO_INCREMENT для таблицы `user`

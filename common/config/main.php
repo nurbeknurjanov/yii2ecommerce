@@ -262,8 +262,8 @@ return [
                 'port' => 587,
                 'encryption' => 'tls',*/
                 'host' => 'smtp.gmail.com',
-                'username' => 'gomer.simpson.developer',
-                'password' => '3@Rz%V3Gy"t^ctuS1',
+                'username' => '',
+                'password' => '',
                 //'port' => 587,
                 'port' => 465,
                 //'encryption' => 'tls',
@@ -273,8 +273,8 @@ return [
         'reCaptcha' => [
             'name' => 'reCaptcha',
             'class' => 'himiklab\yii2\recaptcha\ReCaptcha',
-            'siteKey' => '6LcF4p8UAAAAAOmoJnF1JDSeXN5tkBJ870flNRGF',
-            'secret' => '6LcF4p8UAAAAAJFSoikpVAG0gF_18NU7HiNY1npD',
+            'siteKey' => '',
+            'secret' => '',
             //https://www.google.com/recaptcha/admin#createsite
         ],
         'assetManager' => [
